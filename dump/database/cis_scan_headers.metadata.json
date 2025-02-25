@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"518ccef3022f448081c5bce0c22a29d9","collectionName":"cis_scan_headers","type":"collection"}

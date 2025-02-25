@@ -1,0 +1,12 @@
+/**/
+.interactive-breadcrumb:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.pr {
+    padding-right: 12px;
+}
+
+
+

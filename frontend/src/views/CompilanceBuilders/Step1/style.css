@@ -1,0 +1,45 @@
+.tile-container {
+    width: 300px;
+    height: 135px;
+    border-radius: 20px;
+    color: #FFFFFF;
+    background-color: #35a7ff11;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    .tile-header {
+        font-size: 15px;
+        padding: 15px 20px;
+        font-weight: 500;
+    }
+
+    .tile-footer {
+        text-align: end;
+        padding: 0 20px 15px;
+        margin-top: auto;
+        font-size: 18px;
+        font-weight: 600;
+    }
+}
+
+@media (max-width:400px) {
+    .tile-container {
+        width: 200px;
+        height: 150px;
+    }
+}
+
+.tile-container:hover {
+    color: #ffff;
+    background-color: #222a42;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        linear-gradient(135deg, #006bbd83 0%, #35a7ff78 100%);
+    background-clip: content-box, border-box;
+}
+
+.selected-tile-container,
+.selected-tile-container:hover {
+    background: linear-gradient(135deg, #008BF3 0%, #57B7FF 100%);
+}

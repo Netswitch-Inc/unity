@@ -1,0 +1,247 @@
+const hostRestApiUrl = process.env?.REACT_APP_BACKEND_REST_API_URL || "";
+const hostRestApiPrefix = process.env?.REACT_APP_BACKEND_REST_API_PREFIX || "";
+const superAdminRole = "6694b16dc2bc754ae7c64e0a";
+const companyAdminRole = "6694b643c788405b9fcafbe1";
+
+/* Module permission Ids */
+const masterGroupPermissionId = "master";
+const rolesPermissionId = "roles";
+const usersPermissionId = "users";
+const companiesPermissionId = "companies";
+const eventLogPermissionId = "event-logs";
+
+const discoveryGroupPermissionId = "discovery";
+const sectionsPermissionId = "sections";
+const questionsPermissionId = "questions";
+const assessmentFormsPermissionId = "assessment-forms";
+
+const governanceGroupPermissionId = "governance";
+const riskAssessmentPermissionId = "risk-assessment";
+const complianceBuilderPermissionId = "compliance-builder";
+const resilienceIndexPermissionId = "resilience-index";
+const projectsPermissionId = "projects";
+const helpdeskTicketPermissionId = "helpdesk-support-ticket";
+
+const toolsGroupPermissionId = "tools";
+const cveLookupPermissionId = "cve-lookup";
+const complianceLookupPermissionId = "compliance-lookup";
+const vulnerabilityScannerPermissionId = "vulnerability-scanner";
+const siemPermissionId = "siem";
+const logCollectorPermissionId = "log-collector";
+
+const settingGroupPermissionId = "setting";
+const connectionPermissionId = "connections";
+const cronSchedulerPermissionId = "cron-schedulers";
+const openVasScanReportPermissionId = "openvas-scan-reports";
+/* /Module permission Ids */
+
+/* Used for datatable display entries */
+const defaultPerPageRow = 10;
+const perPageRowItems = [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "10", value: 10 },
+  { label: "25", value: 25 },
+  { label: "50", value: 50 },
+  { label: "100", value: 100 }
+]
+
+const questionTypeOptions = [
+  { label: "Note", value: "note" },
+  { label: "Radio", value: "radio" },
+  { label: "Checkbox", value: "checkbox" },
+  { label: "Text Box", value: "text" },
+  { label: "Text Area", value: "textarea" },
+  { label: "Date", value: "date" }
+]
+
+const priviledgesArr = ["executive", "governor", "technologist"]
+const priviledgesObjectPermission = {
+  executive: true,
+  governor: true,
+  technologist: true
+}
+
+/* /Used for datatable display entries */
+
+/* Spinner color */
+const spinnerColor = "default";
+/* /Spinner color */
+
+const statusEnum = {
+  1: "Active",
+  0: "InActive"
+}
+
+/* Role */
+const roleItem = { _id: "", name: "", group: "", status: 1, deletedAt: null }
+/* /Role */
+
+/* /User */
+const userItem = { company_id: null, role_id: null, id: null, _id: "", name: "", first_name: "", last_name: "", email: "", phone: "", user_name: "", password: "", image: "", priviledges: [], status: 1 }
+
+const initialSection = { name: "", description: "", order: "", status: 0 }
+
+const profileItem = { first_name: "", last_name: "", email: "", phone: "", user_name: "" }
+
+const initialConnectionItem = { _id: "", tool_id: "", name: "", type: "", description: "", ip_address: "", port: "", username: "", password: "" }
+
+const initialQuestion = { section_id: "", question: "", description: "", option_type: { label: "Note", value: "note" }, options: [{ value: "", points: "" }], value: "", is_mandatory: false, point: 0, order: null, status: 1, deletedAt: null }
+
+const initialProject = { company_id: "", user_id: "", framework_id: [], involved_parties: [], submitted_by: "", name: "", description: "", cost_of_risk: 0, fix_cost_risk_ratio: 0, affected_scope: "", priority: "", fix_projected_cost: 0, likelyhood: 1, impact_assessment: 1, affected_risk: 0, status: "" }
+
+const initialAssessment = { name: "", description: "", order: "", status: 1, show_score_calculation: false }
+
+const priority = [
+  { label: "Low", value: "low" },
+  { label: "Medium", value: "medium" },
+  { label: "High", value: "high" },
+  { label: "Critical", value: "critical" }
+]
+
+const projectStatus = [
+  { label: "Created", value: "created" },
+  { label: "Approved", value: "approved" },
+  { label: "Completed", value: "completed" },
+  { label: "Cancelled", value: "cancelled" }
+]
+
+const pipFormats = [
+  "Not Foreseeable",
+  "Foreseeable, but unexpected",
+  "Expected, but not common",
+  "Common",
+  "Current"
+]
+
+const pipFormats2 = [
+  "Negligible",
+  "Acceptable",
+  "Unacceptable",
+  "High",
+  "Catastrophic"
+]
+
+const currencySign = "$";
+
+const businessType = [
+  { label: "Individual", value: "individual" },
+  { label: "Corporation", value: "corporation" },
+  { label: "Partnership", value: "partnership" },
+  { label: "Other", value: "other" }
+]
+
+const AssessmentReport = { name: "", company_name: "", email: "", mobile: "", business_type: "", team_size: 0, operation_description: "", address1: "", address2: "", city: "", state: "", country: "", zipcode: "" }
+
+const OptionsForGraph = [
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" },
+]
+
+const OptionsForConfigrationAssessmentGraph = [
+  // { label: "Day", value: "day" },
+  // { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" },
+];
+
+const OptionsForCriticalGraph = [
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" }
+]
+
+const OptionsForSIEMGraph = [
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  // { label: "Year", value: "year" }
+]
+
+const OptionsForVulnerGraph = [
+  // { label: "Day", value: "day" },
+  // { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" }
+]
+
+const defaultCronStyle = '0 0 * * *';
+const initCronSchedulerItem = { _id: "", tool_id: "", name: "", type: "", slug: "", cron_style: defaultCronStyle, cron_style_disabled: false, description: "", is_default: false, status: true }
+
+const initAgentItem = { _id: "", ref_id: "", os: null, group: null, name: "", ip: "", registerIP: "", version: "", node_name: "", manager: "", mergedSum: "", configSum: "", dateAdd: "", lastKeepAlive: "", disconnection_time: "", group_config_status: "", status: "", status_code: 0 }
+
+const initOpenVASScanReportItem = { _id: "", affected_software_os: "", bids: "", certs: "", cves: "", cvss: 0, hostname: "", impact: "", ip: "", nvt_name: "", nvt_oid: "", other_references: "", port: "", port_protocol: "", product_detection_result: "", qod: 0, result_id: "", severity: "", solution: "", solution_type: "", specific_result: "", summary: "", task_id: "", task_name: "", timestamp: "", vulnerability_detection_method: "", vulnerability_insight: "" }
+
+const initConfigurationAssessmentItem = { _id: "", agent_ref_id: "", policy_id: "", name: "", references: "", invalid: 0, description: "", hash_file: "", total_checks: 0, pass: 0, fail: 0, score: 0, date_in_string: "", start_scan: "", end_scan: "" }
+
+export {
+  hostRestApiUrl,
+  hostRestApiPrefix,
+  superAdminRole,
+  companyAdminRole,
+
+  masterGroupPermissionId,
+  rolesPermissionId,
+  usersPermissionId,
+  companiesPermissionId,
+  eventLogPermissionId,
+
+  discoveryGroupPermissionId,
+  sectionsPermissionId,
+  questionsPermissionId,
+  assessmentFormsPermissionId,
+
+  governanceGroupPermissionId,
+  complianceBuilderPermissionId,
+  riskAssessmentPermissionId,
+  resilienceIndexPermissionId,
+  projectsPermissionId,
+  helpdeskTicketPermissionId,
+
+  toolsGroupPermissionId,
+  cveLookupPermissionId,
+  complianceLookupPermissionId,
+  vulnerabilityScannerPermissionId,
+  siemPermissionId,
+  logCollectorPermissionId,
+
+  settingGroupPermissionId,
+  connectionPermissionId,
+  openVasScanReportPermissionId,
+  cronSchedulerPermissionId,
+
+  defaultPerPageRow,
+  perPageRowItems,
+  spinnerColor,
+  statusEnum,
+  roleItem,
+  userItem,
+  profileItem,
+  initialConnectionItem,
+  initialSection,
+  questionTypeOptions,
+  initialQuestion,
+  initialAssessment,
+  initialProject,
+  projectStatus,
+  priority,
+  pipFormats,
+  pipFormats2,
+  currencySign,
+  businessType,
+  AssessmentReport,
+  priviledgesArr,
+  priviledgesObjectPermission,
+  OptionsForGraph,
+  OptionsForConfigrationAssessmentGraph,
+  OptionsForCriticalGraph,
+  OptionsForSIEMGraph,
+  OptionsForVulnerGraph,
+  initCronSchedulerItem,
+  initAgentItem,
+  initConfigurationAssessmentItem,
+  initOpenVASScanReportItem,
+}
