@@ -100,31 +100,31 @@ async function manageConnectionAndCronSchedulers() {
 
         var toolsPermission = await getToolsPermissions();
         /* Connection Enable/Disable */
-        var updateCnStatusDisableIds = [];
-        var disableConnections = await ConnetionService.getConnections({ status: true, deletedAt: null, tool_id: { $nin: toolsPermission } })
-        if (disableConnections?.length) {
-            for (let i = 0; i < disableConnections.length; i++) {
-                let disableConnItm = disableConnections[i]
-                if (disableConnItm?._id) { updateCnStatusDisableIds.push(disableConnItm._id); }
-            }
-        }
+        // var updateCnStatusDisableIds = [];
+        // var disableConnections = await ConnetionService.getConnections({ status: true, deletedAt: null, tool_id: { $nin: toolsPermission } })
+        // if (disableConnections?.length) {
+        //     for (let i = 0; i < disableConnections.length; i++) {
+        //         let disableConnItm = disableConnections[i]
+        //         if (disableConnItm?._id) { updateCnStatusDisableIds.push(disableConnItm._id); }
+        //     }
+        // }
 
-        if (updateCnStatusDisableIds?.length) {
-            await ConnetionService.updateManyConnection({ _id: { $in: updateCnStatusDisableIds } }, { status: false, deletedAt: currentDateTime })
-        }
+        // if (updateCnStatusDisableIds?.length) {
+        //     await ConnetionService.updateManyConnection({ _id: { $in: updateCnStatusDisableIds } }, { status: false, deletedAt: currentDateTime })
+        // }
 
-        var updateCnStatusEnableIds = [];
-        var enableConnections = await ConnetionService.getConnections({ status: false, deletedAt: { $ne: null }, tool_id: { $in: toolsPermission } })
-        if (enableConnections?.length) {
-            for (let i = 0; i < enableConnections.length; i++) {
-                let enableConnItm = enableConnections[i]
-                if (enableConnItm?._id) { updateCnStatusEnableIds.push(enableConnItm._id); }
-            }
-        }
+        // var updateCnStatusEnableIds = [];
+        // var enableConnections = await ConnetionService.getConnections({ status: false, deletedAt: { $ne: null }, tool_id: { $in: toolsPermission } })
+        // if (enableConnections?.length) {
+        //     for (let i = 0; i < enableConnections.length; i++) {
+        //         let enableConnItm = enableConnections[i]
+        //         if (enableConnItm?._id) { updateCnStatusEnableIds.push(enableConnItm._id); }
+        //     }
+        // }
 
-        if (updateCnStatusEnableIds?.length) {
-            await ConnetionService.updateManyConnection({ _id: { $in: updateCnStatusEnableIds } }, { status: true, deletedAt: null })
-        }
+        // if (updateCnStatusEnableIds?.length) {
+        //     await ConnetionService.updateManyConnection({ _id: { $in: updateCnStatusEnableIds } }, { status: true, deletedAt: null })
+        // }
         /* /Connection Enable/Disable */
 
         /* Cron Scheduler Enable/Disable */
