@@ -1,3 +1,6 @@
+# New documentation guide
+https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing
+
 # Installation Guide
 
 1). Install Nginx if not installed
