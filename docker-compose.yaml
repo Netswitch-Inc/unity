@@ -4,18 +4,16 @@ services:
       context: frontend
       target: development
     ports:
-      - 8081:8081
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     env_file:
-      - frontend/.env  
+      - frontend/.env
     stdin_open: true
     restart: always
     networks:
       - react-express
+      - app-network
     depends_on:
       - backend
-    networks:
-      - app-network 
-    
 
   backend:
     restart: always
@@ -23,28 +21,29 @@ services:
       context: backend
       target: development
     ports:
-      - 3006:3006  
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     env_file:
-      - backend/.env  
+      - backend/.env
     environment:
-      - MONGO_URI=mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@mongodb:${DB_PORT}/${DATABASE_NAME}?authSource=${DATABASE_AUTH}  
+      - MONGO_URI=mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@mongodb:${DB_PORT}/${DATABASE_NAME}?authSource=${DATABASE_AUTH}
     depends_on:
       - mongo
     networks:
       - app-network
-    expose: 
+    expose:
       - 3000
+
   mongo:
     image: mongo:5.0
     container_name: mongodb
     ports:
-      - "27017:27017"  # Expose MongoDB on port 27017
+      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MONGO_INITDB_DATABASE: ${DATABASE_NAME}
     volumes:
-      - mongodb_data:/data/db  # Persistent storage for MongoDB data
+      - mongodb_data:/data/db # Persistent storage for MongoDB data
       - ./dump:/dump  # Mount the database dump
       - ./mongo-init/import.sh:/docker-entrypoint-initdb.d/import.sh  # Mount the import script
     entrypoint: ["/bin/bash", "/docker-entrypoint-initdb.d/import.sh"]
@@ -53,9 +52,10 @@ services:
 
 volumes:
   mongodb_data:
+
 networks:
   app-network:
-    driver: bridge  
-#networks:
-#  react-express:
-#  express-mongo:
+    driver: bridge
+    
+  react-express:  # Ensure this network is defined if needed
+    driver: bridge
