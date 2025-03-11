@@ -245,7 +245,6 @@ router.get("/cron-schedulers/:id", Authorization, CronSchedulerController.getCro
 router.delete("/cron-schedulers/:id", Authorization, CronSchedulerController.softDeleteCronScheduler);
 
 // ** Test
-router.get("/test-helpdesk-ticket/", Authorization, TestController.testHelpdeskTickets);
 
 // ** Dashboard
 router.get("/dashboard-widgets-order", Authorization, DashboardController.getDashboardWidgets);

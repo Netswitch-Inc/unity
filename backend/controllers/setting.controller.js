@@ -74,11 +74,16 @@ exports.createSetting = async function (req, res, next) {
 exports.updateSettingAlias = async function (req, res, next) {
     // Id is necessary for the update
     try {
-        for (var i = 0; i < req.body.length; i++) {
-            for (let value of Object.keys(req.body[i])) {
-                var keys = value;
-                var data = { slug: keys, value: req.body[i][keys] }
-                var updatedSetting = await SettingService.updateSettingAlias(data);
+        var updatedSetting = null;
+        if (req.body?.length) {
+            for (var i = 0; i < req.body.length; i++) {
+                if (req.body[i] && Object.keys(req.body[i])) {
+                    for (let value of Object.keys(req.body[i])) {
+                        var keys = value;
+                        var data = { slug: keys, value: req.body[i][keys] }
+                        updatedSetting = await SettingService.updateSettingAlias(data);
+                    }
+                }
             }
         }
 
