@@ -101,39 +101,6 @@ exports.createSetting = async function (setting) {
     }
 }
 
-exports.updateSettingAlias = async function (setting) {
-    var key = setting.slug;
-    try {
-        //Find the old Setting Object by the Id
-        var oldSetting = await Setting.findOne({ slug: key });
-    } catch (e) {
-        throw Error("Setting not found");
-    }
-
-    if (setting.type) {
-        oldSetting.type = setting.type;
-    }
-
-    if (setting?.value || setting.value == "") {
-        oldSetting.value = setting?.value || "";
-    }
-
-    if (setting.options) {
-        oldSetting.options = setting.options;
-    }
-
-    if (setting.deletedAt) {
-        oldSetting.deletedAt = setting.deletedAt;
-    }
-
-    try {
-        var savedSetting = await oldSetting.save();
-        return savedSetting;
-    } catch (e) {
-        throw Error("Error occurred while updating the Setting");
-    }
-}
-
 exports.updateSetting = async function (setting) {
     var id = setting._id;
     try {

@@ -71,28 +71,6 @@ exports.createSetting = async function (req, res, next) {
     }
 }
 
-exports.updateSettingAlias = async function (req, res, next) {
-    // Id is necessary for the update
-    try {
-        var updatedSetting = null;
-        if (req.body?.length) {
-            for (var i = 0; i < req.body.length; i++) {
-                if (req.body[i] && Object.keys(req.body[i])) {
-                    for (let value of Object.keys(req.body[i])) {
-                        var keys = value;
-                        var data = { slug: keys, value: req.body[i][keys] }
-                        updatedSetting = await SettingService.updateSettingAlias(data);
-                    }
-                }
-            }
-        }
-
-        return res.status(200).json({ status: 200, flag: true, data: updatedSetting, message: "Setting updated successfully!" })
-    } catch (e) {
-        return res.status(200).json({ status: 200, flag: false, message: e.message })
-    }
-}
-
 exports.updateSetting = async function (req, res, next) {
     try {
         var data = req.body?.data || [];

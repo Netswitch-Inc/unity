@@ -196,7 +196,6 @@ router.get("/settings", Authorization, SettingController.getSettings);
 router.get("/settings/:id", Authorization, SettingController.getSetting);
 router.post("/settings", Authorization, SettingController.createSetting);
 router.put("/settings", Authorization, SettingController.updateSetting);
-router.put("/settings-alias", Authorization, SettingController.updateSettingAlias);
 router.get("/settings-slug/:slug", Authorization, SettingController.getSettingSlug);
 router.delete("/settings/:id", Authorization, SettingController.removeSetting);
 
