@@ -1,5 +1,6 @@
 # New documentation guide
-https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing
+https://docs.google.com/document/d/1ZRjwYjm0zV53UzFgPYuu463LOOcOsCYE/edit?usp=sharing&ouid=117099388604405782143&rtpof=true&sd=true
+<!-- https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing -->
 
 # Installation Guide
 
