@@ -1,9 +1,10 @@
-# New documentation guide
+# Docker Installation guide document
 https://docs.google.com/document/d/1ZRjwYjm0zV53UzFgPYuu463LOOcOsCYE/edit?usp=sharing&ouid=117099388604405782143&rtpof=true&sd=true
-<!-- https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing -->
+
+# Docker Installation guide document option 2
+https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing
 
 # Installation Guide
-
 1). Install Nginx if not installed
 Check nginx installed or not: whereis nginx (Run command - response will display installed path)
 https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
