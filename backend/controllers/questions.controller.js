@@ -1,6 +1,7 @@
 var QuestionService = require("../services/question.service");
 var QuestionAnswerService = require("../services/questionAnswer.service");
 var SectionService = require("../services/section.service");
+
 // Saving the context of this question inside the _the variable
 _this = this;
 
@@ -21,28 +22,16 @@ exports.getQuestions = async function (req, res, next) {
     if (search) {
       query["$or"] = [
         { question: { $regex: ".*" + search + ".*", $options: "i" } },
-        { option_type: { $regex: ".*" + search + ".*", $options: "i" } },
+        { option_type: { $regex: ".*" + search + ".*", $options: "i" } }
       ];
     }
 
     var count = await QuestionService.getQuestionsCount(query);
-    var questions = await QuestionService.getQuestions(
-      query,
-      page,
-      limit,
-      sortColumn,
-      sort
-    );
+    var questions = await QuestionService.getQuestions(query, page, limit, sortColumn, sort)
     if (!questions || !questions.length) {
       if (Number(req.query?.page || 0) > 0) {
         page = 1;
-        questions = await QuestionService.getQuestions(
-          query,
-          page,
-          limit,
-          sortColumn,
-          sort
-        );
+        questions = await QuestionService.getQuestions(query, page, limit, sortColumn, sort)
       }
     }
 
@@ -57,8 +46,8 @@ exports.getQuestions = async function (req, res, next) {
       total: count,
       pageIndex,
       startIndex,
-      endIndex,
-    };
+      endIndex
+    }
 
     // Return the Questions list with the appropriate HTTP password Code and Message.
     return res.status(200).json({
@@ -66,15 +55,13 @@ exports.getQuestions = async function (req, res, next) {
       flag: true,
       data: questions,
       pagination,
-      message: "Questions received successfully!",
+      message: "Questions received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.getQuestion = async function (req, res, next) {
   // Check the existence of the query parameters, If doesn't exists assign a default value
@@ -87,15 +74,13 @@ exports.getQuestion = async function (req, res, next) {
       status: 200,
       flag: true,
       data: question,
-      message: "Question received successfully!",
+      message: "Question received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.createQuestion = async function (req, res, next) {
   try {
@@ -106,22 +91,18 @@ exports.createQuestion = async function (req, res, next) {
       status: 200,
       flag: true,
       data: createdQuestion,
-      message: "Question created successfully!",
+      message: "Question created successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.updateQuestion = async function (req, res, next) {
   // Id is necessary for the update
-  if (!req.body._id) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: "Id must be present!" });
+  if (!req.body?._id) {
+    return res.status(200).json({ status: 200, flag: false, message: "Id must be present." })
   }
 
   try {
@@ -132,28 +113,23 @@ exports.updateQuestion = async function (req, res, next) {
       status: 200,
       flag: true,
       data: updatedQuestion,
-      message: "Question updated successfully!",
-    });
+      message: "Question updated successfully."
+    })
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.removeQuestion = async function (req, res, next) {
   var id = req.params.id;
   if (!id) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: true, message: "Id must be present!" });
+    return res.status(200).json({ status: 200, flag: true, message: "Id must be present." });
   }
+
   try {
     var softDelete = false;
-    var questionAns = await QuestionAnswerService.getQuestionAnswers({
-      question_id: id,
-    });
+    var questionAns = await QuestionAnswerService.getQuestionAnswers({ question_id: id });
     if (questionAns?.length) {
       softDelete = true;
     }
@@ -164,16 +140,12 @@ exports.removeQuestion = async function (req, res, next) {
       var deleted = await QuestionService.deleteQuestion(id);
     }
 
-    return res
-      .status(200)
-      .send({ status: 200, flag: true, message: "Successfully Deleted... " });
+    return res.status(200).send({ status: 200, flag: true, message: "Successfully Deleted... " });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message })
   }
-};
+}
 
 exports.updateOrderMultipleListing = async function (req, res, next) {
   try {
@@ -183,43 +155,41 @@ exports.updateOrderMultipleListing = async function (req, res, next) {
 
     // Check if updates array exists
     if (!bulkItems || !Array.isArray(bulkItems) || bulkItems.length === 0) {
-      return res
-        .status(200)
-        .json({ status: 200, flag: false, message: "No updates provided" });
+      return res.status(200).json({ status: 200, flag: false, message: "No updates provided." });
     }
     // Create bulk operations for MongoDB
     const bulkOperations = bulkItems.map((item) => ({
       updateOne: {
         filter: { _id: item._id },
-        update: { $set: { order: item.order } },
-      },
+        update: { $set: { order: item.order } }
+      }
     }));
+
     if (questionOrder) {
       const updateBulkItems = QuestionService.bulkWriteOperation(bulkOperations);
       return res.status(200).json({
         status: 200,
-        message: "Orders updated successfully",
-        data: updateBulkItems,
         flag: true,
-      });
+        data: updateBulkItems,
+        message: "Orders updated successfully."
+      })
     }
+    
     if (sectionOrder) {
       const updateBulkItems = SectionService.bulkWriteOperation(bulkOperations);
       return res.status(200).json({
         status: 200,
-        message: "Orders updated successfully",
-        data: updateBulkItems,
         flag: true,
-      });
+        data: updateBulkItems,
+        message: "Orders updated successfully."
+      })
     }
   } catch (error) {
     // Handle errors
     console.error("Error updating orders:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", flag: false, error });
+    return res.status(201).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.getQuestionFilter = async function (req, res, next) {
   try {
@@ -229,34 +199,33 @@ exports.getQuestionFilter = async function (req, res, next) {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "assessment id is required!",
-      });
+        message: "assessment id is required."
+      })
     }
 
-    const questions = await QuestionService.getGroupedQuestionsByAssessment(
-      assessment_id
-    );
+    const questions = await QuestionService.getGroupedQuestionsByAssessment(assessment_id)
     if (questions.length > 0) {
       return res.status(200).json({
         status: 200,
         flag: true,
         data: questions,
-        message: "Questions received successfully!",
-      });
+        message: "Questions received successfully!"
+      })
     }
+
     return res.status(200).json({
       status: 200,
       flag: false,
-      message: "Questions not found!",
+      message: "Questions not found."
     });
   } catch (error) {
     return res.status(200).json({
       status: 200,
       flag: false,
-      message: error.message,
-    });
+      message: error.message
+    })
   }
-};
+}
 
 exports.getQuestionByAssessmentId = async function (req, res, next) {
   try {
@@ -265,21 +234,22 @@ exports.getQuestionByAssessmentId = async function (req, res, next) {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "assessment id and assessment_report_id are required!",
+        message: "assessment id and assessment_report_id are required."
       });
     }
+
     const questionAsessmentId = await QuestionService.getSectionsWithQuestionsAndAnswers(assessment_id, asessment_report_id)
     return res.status(200).json({
       status: 200,
       flag: true,
       data: questionAsessmentId,
-      message: "Questions received successfully!",
-    });
+      message: "Questions received successfully."
+    })
   } catch (error) {
     return res.status(200).json({
       status: 200,
       flag: false,
       message: error.message
-    });
+    })
   }
 }

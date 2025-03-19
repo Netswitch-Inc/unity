@@ -24,8 +24,7 @@ exports.getCronSchedulerErrors = async function (req, res, next) {
         if (search) {
             search = search.trim();
             query["$or"] = [
-                { type: { $regex: search, $options: 'i' } },
-                { name: { $regex: search, $options: 'i' } },
+                { tool_id: { $regex: search, $options: 'i' } },
                 { slug: { $regex: search, $options: 'i' } },
                 { cron_style: { $regex: search, $options: 'i' } },
                 { description: { $regex: search, $options: 'i' } }

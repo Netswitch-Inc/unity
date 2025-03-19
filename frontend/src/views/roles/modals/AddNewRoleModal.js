@@ -57,12 +57,12 @@ const AddNewRoleModal = ({
             size="lg"
             show={open}
             backdrop="static"
-            className="UpdateUserPopup"
+            className="UpdateUserPopup modal-design"
             aria-labelledby="example-modal-sizes-title-lg"
         >
             <Modal.Header>
                 <span className='modal-title col-sm-12' id="example-modal-sizes-title-lg">
-                    <h3 className='border-bottom pb-2 mb-0 mt-0'>{roleItemData?._id ? "Edit" : "Add"} Role</h3>
+                    <h3 className='border-bottom mb-0 mt-0'>{roleItemData?._id ? "Edit" : "Add"} Role</h3>
                 </span>
 
                 <button type="button" className='Close-button' onClick={handleModalClose}>×</button>
@@ -76,7 +76,7 @@ const AddNewRoleModal = ({
                 >
                     {({ errors, touched }) => (
                         <Form>
-                            <Row className="mb-2">
+                            <Row className="mb-2 mt-3">
                                 <Col md={12}>
                                     <BootstrapForm.Group controlId="formGridRoleName">
                                         <BootstrapForm.Label>Role Name</BootstrapForm.Label>
@@ -94,9 +94,9 @@ const AddNewRoleModal = ({
                                     </BootstrapForm.Group>
                                 </Col>
                             </Row>
-
+                                        
                             <div className="w-100 PadR0 ItemInfo-right mt-3">
-                                <div className="row justify-content-end m-0">
+                                <div className="row justify-content-between m-0">
                                     <button type="submit" className="float-end btn btn-primary">
                                         Submit
                                     </button>

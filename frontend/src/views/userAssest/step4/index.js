@@ -1,15 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { Button, Card, CardBody } from "reactstrap";
-import { Row, Col } from "react-bootstrap";
+// ** React Imports
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { assessmentReportPdf, assessmentReportPdfSentEmail } from "../store";
+
+// ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
-import SimpleSpinner from "components/spinner/simple-spinner";
-import reactLogo from "assets/img/react-logo.png";
-import thankYouImg from "assets/img/thank-you-img.png";
-import { useEffect, useState, useLayoutEffect } from "react";
 import { getAssessmentReportAnswersList } from "../store";
+import { assessmentReportPdf, assessmentReportPdfSentEmail } from "../store";
+
+// ** Reactstrap Imports
+import { Card } from "reactstrap";
+import { Row, Col } from "react-bootstrap";
+
+// ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
+
+// ** Icons
+import reactLogo from "assets/img/react-logo.png";
+import thankYouImg from "assets/img/thankyouicon.svg";
+
 const ThankYou = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -107,49 +117,107 @@ const ThankYou = () => {
     return (
         <div className="step-wise-content vh-100">
             <Row className="sticky--- m-0 thank-you-sticky">
-                <Col className="personal-information left-side thank-you-left">
-                    <div className="steps">
+                <Card className="main-progress col-md-3 mb-0">
+                    <div className="main-logo-img">
                         <div className="logo">
                             <img alt="..." src={reactLogo} />
                         </div>
-                        <ul>
-                            <li className="active done">Company Information</li>
-                            <li className="active done">Verification(Email & Mobile)</li>
-                            <li className="active done">Self Assessment</li>
-                            <li className="active">Thank You</li>
-                        </ul>
                     </div>
-                </Col>
+                    <div className="mb-0">
+                        <div className="steps-mains">
+                            <div className="steps filled-step">
+                                <div className="borders step-line second-step">
+                                    <div className="step-icon">
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Company Info</h4>
+                                </div>
+                            </div>
+                            <div className="steps filled-step">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>2</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Verification</h4>
+                                </div>
+                            </div>
+                            <div className="steps filled-step">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>3</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Self Assessment</h4>
+                                </div>
+                            </div>
+                            <div className="steps active-class">
+                                <div className="borders">
+                                    <div className="step-icon">
+                                        <p>4</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Thank You</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
                 <Col className="right-side thank-you">
-                    <Card className="h-100">
-                        {!assessmentReport?.loading ? <SimpleSpinner /> : null}
-                        <CardBody className="pl-0 pr-0">
-                            <div className="row-row">
+                    <div className="card-header">
+                        <h3 className="m-0">THANK YOU</h3>
+                    </div>
+                    {/* {!assessmentReportAnswerList?.asessmentReportAnswers?.assessment_show_score_calculation ? (
+                        <>
+                            <div className="card-header">
+                                <h3 className="m-0">THANK YOU</h3>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="card-header">
+                                <h3 className="m-0">
+                                    {` ${assessmentReportAnswerList?.asessmentReportAnswers?.assessment_name} Results`}
+                                </h3>
+                            </div>
+                        </>
+                    )} */}
+
+                    <Card className="">
+                        {!assessmentReport?.loading ? (<SimpleSpinner />) : null}
+
+                        <div className="pl-0 pr-0">
+                            <div className="row-row  text-center">
                                 {!assessmentReportAnswerList?.asessmentReportAnswers?.assessment_show_score_calculation ? (
                                     <>
-                                        <div className="card-header mb-3">
-                                            <h3 className="m-0">THANK YOU!</h3>
+                                        <div className="thank-name mt-5">
+                                            <h3 className="m-0">THANK YOU !</h3>
                                         </div>
                                         <img alt="..." src={thankYouImg} className="mb-3" />
-                                        <p className="mb-3">
+                                        <p className="thanks-text">
                                             In publishing and graphic design, Lorem ipsum is a placeholder
                                             text commonly used to demonstrate the visual form of a
                                             document
                                         </p>
                                     </>) : (
                                     <>
-                                        <div className="card-header mb-3">
-                                            <h3 className="m-0">{` ${assessmentReportAnswerList?.asessmentReportAnswers?.assessment_name} Results`}</h3>
+                                        <div className="thank-name">
+                                            <h3 className="m-0 p-0">{` ${assessmentReportAnswerList?.asessmentReportAnswers?.assessment_name} Results`}</h3>
                                         </div>
 
-                                        <div role="alert" style={{ marginBottom: '20px', padding: '30px', fontSize: '18px' }}>
-                                            <div>
+                                        <div role="alert" className="warn-progress">
+                                            <div className="main-warning">
                                                 {/* Title or description text */}
-                                                <strong className="fs-3">Warning!</strong> <span>We recommend discussing budget allocations to strengthen your defenses. The NIST Framework can help identify weaknesses and guide where to allocate funds effectively.</span>
+                                                <strong className="fs-3 warning">Warning!</strong> <span className="warning-text">We recommend discussing budget allocations to strengthen your defenses. The NIST Framework can help identify weaknesses and guide where to allocate funds effectively.</span>
                                             </div>
 
                                             {/* Progress Bar */}
-                                            <div className="progress" style={{ height: '15px' }}>
+                                            <div className="progress">
                                                 <div
                                                     className="progress-bar"
                                                     role="progressbar"
@@ -163,56 +231,47 @@ const ThankYou = () => {
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-
+                                        <div className="row h-100 thanks-card" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {assessmentReportAnswerList?.asessmentReportAnswers?.sections.map((section, index) => (
-                                                <div
-                                                    key={section._id}
-                                                    style={{
-                                                        border: '1px solid #ccc',
-                                                        borderRadius: '8px',
-                                                        padding: '20px',
-                                                        margin: '10px',
-                                                        width: '200px',
-                                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                                                        backgroundColor: '#f9f9f9',
-                                                    }}
-                                                >
-                                                    <h3 style={{ fontSize: '18px', marginBottom: '10px' }}>{section.name}</h3>
-                                                    <p style={{ marginBottom: '10px', fontSize: '14px' }}>{section.description}</p>
-                                                    <p style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                                        {totalPoints[index] || 0}/{totalMaxPoints[index] || 0}
-                                                    </p>
-                                                    <p style={{ fontSize: '14px', color: '#4caf50' }}>
-                                                        {totalMaxPoints[index] > 0
-                                                            ? `${((totalPoints[index] * 100) / totalMaxPoints[index]).toFixed(2)}%`
-                                                            : "0%"}
-                                                    </p>
+                                                <div className="col-lg-4 col-md-6 mt-4">
+                                                    <div key={section._id} className="card-box">
+                                                        <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#fff', fontWeight: '600' }}>{section.name}</h3>
+                                                        <p style={{ marginBottom: '10px', color: '#fff', fontSize: '14px' }}>{section.description}</p>
+                                                        <p style={{ fontSize: '16px', fontWeight: '600' }}>
+                                                            {totalPoints[index] || 0}/{totalMaxPoints[index] || 0}
+                                                        </p>
+                                                        <p style={{ fontSize: '14px', color: '#09D66E', fontWeight: '600' }}>
+                                                            {totalMaxPoints[index] > 0
+                                                                ? `${((totalPoints[index] * 100) / totalMaxPoints[index]).toFixed(2)}%`
+                                                                : "0%"}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </>
                                 )}
-                                <div className="buttons d-flex">
-                                    <Button
-                                        className="btn btn-primary"
+                                <div className="buttons d-flex justify-content-center both-btn">
+                                    <button
+                                        className=" btnprimary mt-0"
                                         onClick={() => handleSendEmailPdf()}
                                     >
                                         Send Report to Email
-                                    </Button>
-                                    <Button
-                                        className="btn btn-primary"
+                                    </button>
+                                    <button
+                                        className="btnprimary"
                                         onClick={() => handleDownloadPdf()}
                                     >
                                         Download Report
-                                    </Button>
+                                    </button>
                                 </div>
                             </div>
-                        </CardBody>
+                        </div>
                     </Card>
                 </Col>
             </Row>
         </div>
-    );
-};
+    )
+}
+
 export default ThankYou;

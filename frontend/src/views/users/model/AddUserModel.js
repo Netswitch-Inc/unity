@@ -6,7 +6,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { getRoleList } from "../../roles/store/index";
-import { creatActionRequest, updateActionRequest } from "../store";
+import { createUser, updateUser } from "../store";
 import {
   isUserUniqueAction,
   isEmailUniqueAction,
@@ -270,7 +270,7 @@ const AddUser = ({ lgshow, closePopup, title, initialValues, isEditing }) => {
       setRoleOptions(store?.roleItems, setRoleData);
     }
     if (companyStore?.actionFlag === "COMPANY_LISTING") {
-      setCompOptions(companyStore?.CompanyItems, setCompanyDropdown);
+      setCompOptions(companyStore?.companyItems, setCompanyDropdown);
     }
   }, [store?.roleItems, store.actionFlag, companyStore?.actionFlag]);
 
@@ -325,7 +325,7 @@ const AddUser = ({ lgshow, closePopup, title, initialValues, isEditing }) => {
         status: values?.status,
       };
       if (errMessage === "" && userErrMessage === "") {
-        dispatch(updateActionRequest(payload));
+        dispatch(updateUser(payload));
         setUserErrMessage("");
         setErrMessage("");
         dispatch(cleanCompanyMessage());
@@ -349,7 +349,7 @@ const AddUser = ({ lgshow, closePopup, title, initialValues, isEditing }) => {
         weightIndex: value[1],
       };
       if (errMessage === "" && userErrMessage === "") {
-        const data = await dispatch(creatActionRequest(payload));
+        const data = await dispatch(createUser(payload));
         if (data.payload.error !== "") {
           setshowSnackbar(() => true);
           setSnakbarMessage(() => data.payload.error);

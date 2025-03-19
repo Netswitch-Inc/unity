@@ -74,10 +74,7 @@ table.center {
 #IMAGEINFORMATION:checked ~ nav .IMAGEINFORMATION label:before,
 #BANKINFORMATION:checked ~ nav .BANKINFORMATION label:before,
 #TAXINFORMATION:checked ~ nav .TAXINFORMATION label:before,
-#SOCIALSECURITYINFORMATION:checked
-  ~ nav
-  .SOCIALSECURITYINFORMATION
-  label:before,
+#SOCIALSECURITYINFORMATION:checked ~ nav .SOCIALSECURITYINFORMATION label:before,
 #EDITQUALIFICATIONS:checked ~ nav .EDITQUALIFICATIONS label:before {
   border-top: 3px solid #000069;
   content: "";
@@ -409,10 +406,10 @@ body {
 }
 
 .sidebar-wrapper .nav-custom {
-  /* overflow-y: scroll; */
-  /* overflow-x: hidden; */
+  overflow-y: hidden;
+  overflow-x: hidden;
   max-height: 100%;
-  /* padding-bottom: 150px; */
+  padding-bottom: 150px;
 }
 
 .nav.nav-pills {
@@ -441,7 +438,9 @@ body {
   -moz-appearance: none;
   appearance: none;
   border-radius: 0.375rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
   font-family: "Poppins", sans-serif;
   color: white;
 }
@@ -476,7 +475,9 @@ body {
   background-size: 16px 12px;
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
   /* -webkit-appearance: none; */
   /* -moz-appearance: none;
   appearance: none; */
@@ -668,7 +669,9 @@ ul.nested-Lists li label:hover {
   border-bottom-left-radius: 0.2rem !important;
   border-bottom-right-radius: 0.2rem !important;
   font-size: 0.85rem !important;
-  transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out,
+  transition:
+    color 0.3s ease-in-out,
+    border-color 0.3s ease-in-out,
     background-color 0.3s ease-in-out !important;
   height: calc(2.25rem + 2px) !important;
   padding: 0.5rem 0.7rem !important;
@@ -679,9 +682,7 @@ ul.nested-Lists li label:hover {
 
 * .input-group-focus:not(.has-danger):not(.has-success) .form-control,
 .input-group-focus:not(.has-danger):not(.has-success) .form-control,
-.card-white
-  .input-group-focus:not(.has-danger):not(.has-success)
-  .form-control {
+.card-white .input-group-focus:not(.has-danger):not(.has-success) .form-control {
   border-color: #1d8cf8 !important;
   box-shadow: none !important;
 }
@@ -694,9 +695,7 @@ ul.nested-Lists li label:hover {
 
 .login-page .input-group .form-control:first-child,
 .login-page .input-group-btn:first-child > .dropdown-toggle,
-.login-page
-  .input-group-btn:last-child
-  > .btn:not(:last-child):not(.dropdown-toggle) {
+.login-page .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
   border-right: 0 none;
 }
 
@@ -1095,30 +1094,15 @@ fieldset[disabled] .form-control {
   width: 32%;
 }
 
-.UpdateUserPopupp
-  .table-responsive
-  table.clicktable
-  thead
-  tr
-  th.header:first-child {
+.UpdateUserPopupp .table-responsive table.clicktable thead tr th.header:first-child {
   background-position: 69% center !important;
 }
 
-.UpdateUserPopupp
-  .table-responsive
-  table.clicktable
-  thead
-  tr
-  th.header:nth-child(2) {
+.UpdateUserPopupp .table-responsive table.clicktable thead tr th.header:nth-child(2) {
   background-position: 74% center !important;
 }
 
-.UpdateUserPopupp
-  .table-responsive
-  table.clicktable
-  thead
-  tr
-  th.header:nth-child(3) {
+.UpdateUserPopupp .table-responsive table.clicktable thead tr th.header:nth-child(3) {
   background-position: 78% center !important;
 }
 

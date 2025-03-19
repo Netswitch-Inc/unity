@@ -20,6 +20,10 @@ exports.getCompanies = async function (req, res, next) {
         var endIndex = 0;
 
         var query = { deletedAt: null };
+        if (req.query?.search == "active") {
+            query.status = 1;
+        }
+
         if (search) {
             search = search.trim()
             query["$or"] = [
@@ -104,6 +108,7 @@ exports.createCompany = async function (req, res, next) {
                 name: req.body?.name || "",
                 user_name: user_name,
                 email: email,
+                country_code: req.body?.country_code,
                 phone: req.body?.contact_no,
                 password: password,
                 company_id: createdCompany._id,

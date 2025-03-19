@@ -239,8 +239,6 @@ exports.softDeleteOpenVASScanReport = async function (id) {
 
 
 exports.insertMultipleOpenVASScanReport = async function (scanResults) {
-
-    // console.log("scanRe",scanResults);
     try {
         // Filter out empty objects
         const filteredResults = scanResults.filter(obj => Object.keys(obj).length > 0);
@@ -264,7 +262,7 @@ exports.insertMultipleOpenVASScanReport = async function (scanResults) {
     }
 }
 
-exports.getOpenVASScanReportGraph = async function (startTime, endTime, query) {
+exports.getOpenVASScanReportGraph = async function (startTime, endTime, query, dateFormat) {
     try {
         if (typeof query !== "object" || Array.isArray(query)) {
             throw new Error("Invalid query format: Query must be an object.");
@@ -274,13 +272,13 @@ exports.getOpenVASScanReportGraph = async function (startTime, endTime, query) {
             {
                 $match: {
                     ...query,
-                    timestamp: { $gte: startTime, $lte: endTime }  // Filter based on timestamp range
+                    timestamp: { $gte: startTime, $lte: endTime } // Filter based on timestamp range
                 }
             },
             {
                 $addFields: {
                     yearMonth: {
-                        $dateToString: { format: "%Y-%m", date: "$timestamp" } // Extract year and month
+                        $dateToString: { format: dateFormat, date: "$timestamp" } // Extract year and month in YYYY-MM format
                     }
                 }
             },
@@ -298,24 +296,7 @@ exports.getOpenVASScanReportGraph = async function (startTime, endTime, query) {
             },
             {
                 $project: {
-                    timestamp: {
-                        $let: {
-                            vars: {
-                                parts: { $split: ["$_id.yearMonth", "-"] },
-                                months: [
-                                    "", "January", "February", "March", "April", "May", "June", 
-                                    "July", "August", "September", "October", "November", "December"
-                                ]
-                            },
-                            in: {
-                                $concat: [
-                                    { $arrayElemAt: ["$$months", { $toInt: { $arrayElemAt: ["$$parts", 1] } }] },
-                                    " ",
-                                    { $arrayElemAt: ["$$parts", 0] }
-                                ]
-                            }
-                        }
-                    },
+                    timestamp: "$_id.yearMonth", // Keep YYYY-MM format
                     severity: {
                         $concat: [
                             { $toUpper: { $substrCP: ["$_id.severity", 0, 1] } }, // Capitalize first letter
@@ -330,7 +311,6 @@ exports.getOpenVASScanReportGraph = async function (startTime, endTime, query) {
 
         return scanResults || [];
     } catch (error) {
-        console.error("getOpenVASScanReportGraph catch >>>", error);
         throw new Error(error.message);
     }
 };

@@ -173,14 +173,14 @@ function GeneralCard(props) {
     if (projectStore.actionFlag === "PROJECT_UPDATED") {
       handleProjectLists(sort, sortColumn, currentPage, rowsPerPage, statusval);
     }
-    if (companyStore?.CompanyItems?.length > 0) {
-      const list = companyStore?.CompanyItems?.map((item) => ({
+    if (companyStore?.companyItems?.length > 0) {
+      const list = companyStore?.companyItems?.map((item) => ({
         label: item?.name,
         value: item?._id,
       }));
       setCompaniesList(() => list);
     }
-  }, [projectStore.actionFlag, companyStore?.CompanyItems]);
+  }, [projectStore.actionFlag, companyStore?.companyItems]);
 
   const updateStatus = async (payload, status, action) => {
     setStatusval(() => status);

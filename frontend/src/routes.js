@@ -1,50 +1,87 @@
 // ** Tool Config
-import { openVASKey, helpdeskSupportTicketKey } from "configs/toolConfig";
+import {
+  wazuhKey,
+  openVASKey,
+  helpdeskSupportTicketKey,
+  netswitchThreatIntelKey
+} from "configs/toolConfig";
+
+// ** PNG Icons
+import dashboardIcon from "assets/img/icons/dashboard.png";
+import discoveryIcon from "assets/img/icons/discovery.png";
+import governanceIcon from "assets/img/icons/governance.png";
+import toolsIcon from "assets/img/icons/tools.png";
+import masterIcon from "assets/img/icons/master.png";
+import settingIcon from "assets/img/icons/setting.png";
 
 // ** Module Imports
 import Dashboard from "views/dashboard/Dashboard";
-import UserManagement from "views/users";
-import RoleManagement from "views/roles";
-import CompanyManagement from "views/companies";
-import ConnectionManagement from "views/connections";
+import GlobalSetting from "views/global";
 import UserProfile from "views/users/profile";
-import ModulePermission from "views/roles/ModulePermission";
-import RiskAssessmentMethod from "views/ram";
-import ProjectDetails from "views/ram/ProjectDetails";
 import CompanyProfile from "views/companies/profile";
+
+import UserManagement from "views/users";
+import AddUser from "views/users/add";
+import EditUser from "views/users/edit";
+
+import RoleManagement from "views/roles";
+import ModulePermission from "views/roles/ModulePermission";
+
+import CompanyList from "views/companies";
+import AddCompany from "views/companies/add";
+import EditCompany from "views/companies/edit";
+
+import ConnectionManagement from "views/connections";
+import AddConnection from "views/connections/add";
+import EditConnection from "views/connections/edit";
+
+import RiskAssessmentMethod from "views/ram";
 import ComplianceBuilder from "views/CompilanceBuilders";
 import CompilanceController from "views/CompilanceControl/index";
 import CVELookupTool from "views/cveLookupTool";
 import ComplianceLookupTool from "views/complianceLookupTool";
+
 import EventLogList from "views/eventLogs";
-import GlobalSetting from "views/global";
+import EventLogDetail from "views/eventLogs/detail";
+
+import SectionsList from "views/section";
 import AddSection from "views/section/AddSection";
 import EditSection from "views/section/EditSection";
+
+import QuestionsList from "views/questions";
 import AddQuestion from "views/questions/AddQuestion";
 import EditQuestion from "views/questions/EditQuestion";
-import Assessment from "views/Assessment/AddAssessment";
+
 import AssessmentList from "views/Assessment";
-import Editassessment from "views/Assessment/EditAssessment";
-import SectionsList from "views/section";
-import QuestionsList from "views/questions";
+import AddAssessmentForm from "views/Assessment/add";
+import EditAssessmentForm from "views/Assessment/edit";
+import AssessmentFormDetail from "views/Assessment/detail";
+
 import AddProject from "views/Projects/AddProject";
 import EditProject from "views/Projects/EditProject";
-import PreviewAssessment from "views/Assessment/previewAssessment";
+import ProjectDetails from "views/ram/ProjectDetails";
+
 import HelpdeskGraphs from "views/helpdesks";
-import AsessmentReportList from "views/AssessmentReport";
-import SeverityGraph from "views/dashboard/wazuhGraph/SeverityGraph";
-import AssessmentReportFront from "views/AssessmentReport/TabsIndex";
+import AssessmentReportList from "views/AssessmentReport";
+import AssessmentReportDetail from "views/AssessmentReport/detail";
+
 import VulnerabilityScanner from "views/vulnerability-scanner";
 import SIEM from "views/SIEM";
 import LogCollector from "views/LogCollector";
+import SeverityGraph from "views/dashboard/wazuhGraph/SeverityGraph";
+
 import CronSchedulerList from "views/cronSchedulers";
 import AddCronScheduler from "views/cronSchedulers/add";
 import EditCronScheduler from "views/cronSchedulers/edit";
+import CronSchedulerAlertDetail from "views/cronSchedulers/cronAlertDetail";
+
 import ConfigurationAssessmentChart from "views/configurationAssessments/configurationAssessmentChart";
 
-import AddOpenVASScanReport from "views/openVASScanReports/add";
 import OpenVASScanReportList from "views/openVASScanReports";
+import AddOpenVASScanReport from "views/openVASScanReports/add";
 import EditOpenVASScanReport from "views/openVASScanReports/edit";
+
+import NetswitchThreatIntelList from "views/netswitchThreatIntels";
 
 // ** Constant
 import {
@@ -78,12 +115,15 @@ import {
   openVasScanReportPermissionId
 } from "utility/reduxConstant";
 
+
 var routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
     mini: "D",
-    icon: "tim-icons icon-chart-pie-36",
+    // icon: "tim-icons icon-chart-pie-36",
+    icon: "",
+    imgIcon: dashboardIcon,
     layout: "/admin",
     component: (<Dashboard />)
   },
@@ -91,11 +131,31 @@ var routes = [
     collapse: true,
     name: "DISCOVERY",
     mini: "DS",
-    icon: "tim-icons icon-zoom-split",
     state: "DiscoveryCollapse",
     // customClass: "d-none",
+    // icon: "tim-icons icon-zoom-split",
+    icon: "",
+    imgIcon: discoveryIcon,
     permissionId: discoveryGroupPermissionId,
     views: [
+      {
+        path: "/sections/add",
+        name: "Add Sections",
+        mini: "SEC",
+        layout: "/admin",
+        component: (<AddSection />),
+        permissionId: sectionsPermissionId,
+        redirect: true
+      },
+      {
+        path: "/sections/edit/:id",
+        name: "Edit Sections",
+        mini: "SEC",
+        layout: "/admin",
+        component: (<EditSection />),
+        permissionId: sectionsPermissionId,
+        redirect: true
+      },
       {
         path: "/sections",
         name: "Sections",
@@ -106,21 +166,21 @@ var routes = [
         permissionId: sectionsPermissionId
       },
       {
-        path: "/sections/add",
-        name: "Add Section",
-        mini: "SEC",
+        path: "/questions/add",
+        name: "Add Questions",
+        mini: "QUE",
         layout: "/admin",
-        component: (<AddSection />),
-        permissionId: sectionsPermissionId,
+        component: (<AddQuestion />),
+        permissionId: questionsPermissionId,
         redirect: true
       },
       {
-        path: "/sections/:id",
-        name: "Add Section",
-        mini: "SEC",
+        path: "/questions/edit/:id",
+        name: "Questions",
+        mini: "QUE",
         layout: "/admin",
-        component: (<EditSection />),
-        permissionId: sectionsPermissionId,
+        component: (<EditQuestion />),
+        permissionId: questionsPermissionId,
         redirect: true
       },
       {
@@ -133,29 +193,29 @@ var routes = [
         permissionId: questionsPermissionId
       },
       {
-        path: "/questions/add",
-        name: "Add Questions",
-        mini: "QUE",
-        layout: "/admin",
-        component: (<AddQuestion />),
-        permissionId: questionsPermissionId,
-        redirect: true
-      },
-      {
-        path: "/questions/:id",
-        name: "Edit Questions",
-        mini: "QUE",
-        layout: "/admin",
-        component: (<EditQuestion />),
-        permissionId: questionsPermissionId,
-        redirect: true
-      },
-      {
-        path: "/assessment-form-preview/:id",
-        name: "Assessment Form Preview",
+        path: "/assessment-forms/detail/:id",
+        name: "Assessment Form Detail",
         mini: "AFP",
         layout: "/admin",
-        component: (<PreviewAssessment />),
+        component: (<AssessmentFormDetail />),
+        permissionId: assessmentFormsPermissionId,
+        redirect: true
+      },
+      {
+        path: "/assessment-forms/add",
+        name: "Add Assessment Form",
+        mini: "A",
+        layout: "/admin",
+        component: (<AddAssessmentForm />),
+        permissionId: assessmentFormsPermissionId,
+        redirect: true
+      },
+      {
+        path: "/assessment-forms/edit/:id",
+        name: "Edit Assessment Form",
+        mini: "A",
+        layout: "/admin",
+        component: (<EditAssessmentForm />),
         permissionId: assessmentFormsPermissionId,
         redirect: true
       },
@@ -167,42 +227,23 @@ var routes = [
         component: (<AssessmentList />),
         permissionId: assessmentFormsPermissionId
       },
-
       {
-        path: "/assessment-forms/add",
-        name: "Add Assessment",
-        mini: "AS",
-        layout: "/admin",
-        component: (<Assessment />),
-        permissionId: assessmentFormsPermissionId,
-        redirect: true
-      },
-      {
-        path: "/assessment-forms/:id",
-        name: "Edit Assessment Form",
+        path: "/assessment-reports/detail/:id",
+        name: "Assessment Report Detail",
         mini: "A",
         layout: "/admin",
-        component: (<Editassessment />),
+        component: (<AssessmentReportDetail />),
         permissionId: assessmentFormsPermissionId,
         redirect: true
       },
       {
-        path: "/assessment-repots/:id",
+        path: "/assessment-reports/:id",
         name: "Assessment Reports",
         mini: "A",
         layout: "/admin",
-        component: (<AsessmentReportList />),
+        component: (<AssessmentReportList />),
         permissionId: assessmentFormsPermissionId,
         redirect: true,
-      },
-      {
-        path: "/report/:id",
-        name: "Assessment Reports",
-        mini: "A",
-        layout: "/admin",
-        component: (<AssessmentReportFront />),
-        permissionId: assessmentFormsPermissionId,
-        redirect: true
       }
     ]
   },
@@ -210,8 +251,10 @@ var routes = [
     collapse: true,
     name: "Governance",
     mini: "Governance",
-    icon: "tim-icons icon-bank",
     state: "GovernanceCollapse",
+    // icon: "tim-icons icon-bank",
+    icon: "",
+    imgIcon: governanceIcon,
     permissionId: governanceGroupPermissionId,
     views: [
       {
@@ -286,8 +329,10 @@ var routes = [
     collapse: true,
     name: "TOOLS",
     mini: "T",
-    icon: "tim-icons icon-settings",
     state: "ToolsCollapse",
+    // icon: "tim-icons icon-settings",
+    icon: "",
+    imgIcon: toolsIcon,
     permissionId: toolsGroupPermissionId,
     views: [
       {
@@ -341,10 +386,21 @@ var routes = [
     collapse: true,
     name: "Master",
     mini: "Master",
-    icon: "tim-icons icon-settings-gear-63",
     state: "MasterCollapse",
+    // icon: "tim-icons icon-settings-gear-63",
+    icon: "",
+    imgIcon: masterIcon,
     permissionId: masterGroupPermissionId,
     views: [
+      {
+        path: "/roles/permission/:id",
+        name: "Role Module Permissions",
+        mini: "RM",
+        layout: "/admin",
+        customClass: "d-none",
+        component: (<ModulePermission />),
+        permissionId: rolesPermissionId
+      },
       {
         path: "/roles",
         name: "Roles",
@@ -355,13 +411,24 @@ var routes = [
         permissionId: rolesPermissionId
       },
       {
-        path: "/roles/permission/:id",
-        name: "Roles",
-        mini: "RM",
+        path: "/users/add",
+        name: "Add User",
+        mini: "UM",
         layout: "/admin",
-        customClass: "d-none",
-        component: (<ModulePermission />),
-        permissionId: rolesPermissionId
+        customClass: "",
+        component: (<AddUser />),
+        permissionId: usersPermissionId,
+        redirect: true
+      },
+      {
+        path: "/users/edit/:id",
+        name: "Edit User",
+        mini: "UM",
+        layout: "/admin",
+        customClass: "",
+        component: (<EditUser />),
+        permissionId: usersPermissionId,
+        redirect: true
       },
       {
         path: "/users",
@@ -373,17 +440,46 @@ var routes = [
         permissionId: usersPermissionId
       },
       {
+        path: "/companies/add",
+        name: "Add Location",
+        mini: "CM",
+        layout: "/admin",
+        customClass: "",
+        component: (<AddCompany />),
+        permissionId: companiesPermissionId,
+        redirect: true
+      },
+      {
+        path: "/companies/edit/:id",
+        name: "Edit Location",
+        mini: "CM",
+        layout: "/admin",
+        component: (<EditCompany />),
+        permissionId: companiesPermissionId,
+        customClass: "",
+        redirect: true
+      },
+      {
         path: "/companies",
         name: "Locations",
         mini: "CM",
         layout: "/admin",
-        component: (<CompanyManagement />),
+        component: (<CompanyList />),
         permissionId: companiesPermissionId
+      },
+      {
+        path: "/event-logs/detail/:id",
+        name: "Event Log Detail",
+        mini: "ELGD",
+        layout: "/admin",
+        component: (<EventLogDetail />),
+        permissionId: eventLogPermissionId,
+        redirect: true
       },
       {
         path: "/event-logs",
         name: "Event Logs",
-        mini: "EL",
+        mini: "ELGD",
         layout: "/admin",
         component: (<EventLogList />),
         permissionId: eventLogPermissionId
@@ -394,10 +490,32 @@ var routes = [
     collapse: true,
     name: "SETTING",
     mini: "SETTING",
-    icon: "tim-icons icon-settings-gear-63",
     state: "SETTINGSCollapse",
+    // icon: "tim-icons icon-settings-gear-63",
+    icon: "",
+    imgIcon: settingIcon,
     permissionId: settingGroupPermissionId,
     views: [
+      {
+        path: "/connections/add",
+        name: "Add Connections",
+        mini: "CON",
+        layout: "/admin",
+        customClass: "",
+        component: (<AddConnection />),
+        permissionId: connectionPermissionId,
+        redirect: true
+      },
+      {
+        path: "/connections/edit/:id",
+        name: "Edit Connections",
+        mini: "CON",
+        layout: "/admin",
+        customClass: "",
+        component: (<EditConnection />),
+        permissionId: connectionPermissionId,
+        redirect: true
+      },
       {
         path: "/connections",
         name: "Connections",
@@ -405,14 +523,6 @@ var routes = [
         layout: "/admin",
         component: (<ConnectionManagement />),
         permissionId: connectionPermissionId
-      },
-      {
-        path: "/cron-schedulers",
-        name: "Cron Schedulers",
-        mini: "CS",
-        layout: "/admin",
-        component: (<CronSchedulerList />),
-        permissionId: cronSchedulerPermissionId
       },
       {
         path: "/cron-schedulers/add",
@@ -435,13 +545,22 @@ var routes = [
         redirect: true
       },
       {
-        path: "/openvas-scan-reports",
-        name: "OpenVAS Scan Reports",
-        mini: "A",
+        path: "/cron-schedulers/alert-detail/:id",
+        name: "Cron Scheduler Alert Detail",
+        mini: "CS",
         layout: "/admin",
-        component: (<OpenVASScanReportList />),
-        toolId: openVASKey,
-        permissionId: openVasScanReportPermissionId
+        customClass: "",
+        component: (<CronSchedulerAlertDetail />),
+        permissionId: cronSchedulerPermissionId,
+        redirect: true
+      },
+      {
+        path: "/cron-schedulers",
+        name: "Cron Schedulers",
+        mini: "CS",
+        layout: "/admin",
+        component: (<CronSchedulerList />),
+        permissionId: cronSchedulerPermissionId
       },
       {
         path: "/openvas-scan-reports/add",
@@ -464,6 +583,15 @@ var routes = [
         toolId: openVASKey,
         permissionId: openVasScanReportPermissionId,
         redirect: true
+      },
+      {
+        path: "/openvas-scan-reports",
+        name: "OpenVAS Scan Reports",
+        mini: "A",
+        layout: "/admin",
+        component: (<OpenVASScanReportList />),
+        toolId: openVASKey,
+        permissionId: openVasScanReportPermissionId
       }
     ]
   },
@@ -502,6 +630,7 @@ var routes = [
     mini: "MSG",
     icon: "tim-icons icon-chart-pie-36",
     layout: "/admin",
+    toolId: wazuhKey,
     component: (<SeverityGraph />),
     redirect: true
   },
@@ -511,7 +640,18 @@ var routes = [
     mini: "CAC",
     icon: "tim-icons icon-chart-pie-36",
     layout: "/admin",
+    toolId: wazuhKey,
     component: (<ConfigurationAssessmentChart />),
+    redirect: true
+  },
+  {
+    path: "/netswitch-threat-intels",
+    name: "Netswitch Threat Intels",
+    mini: "NTI",
+    icon: "tim-icons icon-chart-pie-36",
+    layout: "/admin",
+    toolId: netswitchThreatIntelKey,
+    component: (<NetswitchThreatIntelList />),
     redirect: true
   }
 ]

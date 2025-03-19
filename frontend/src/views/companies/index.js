@@ -1,21 +1,10 @@
 // ** React Imports
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  Fragment,
-} from "react";
+import React, { useState, Fragment, useEffect, useCallback, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
-import {
-  getCompanyList,
-  editActionRequest,
-  cleanCompanyMessage,
-  deleteActionRequest,
-} from "./store";
-import SimpleSpinner from "components/spinner/simple-spinner";
+import { getCompanyList, deleteComapany } from "./store";
 
 // ** Reactstrap Imports
 import { Col, Row, Card, CardBody, InputGroup } from "reactstrap";
@@ -24,12 +13,17 @@ import { Col, Row, Card, CardBody, InputGroup } from "reactstrap";
 import { onImageSrcError, getModulePermissionData } from "utility/Utils";
 
 // ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
 import DatatablePagination from "components/DatatablePagination";
 
 // ** Third Party Components
 import Swal from "sweetalert2";
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiEdit, TiTrash } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
+
+// ** PNG Icons
+import editIcon from "assets/img/edit.svg";
+import deleteIcon from "assets/img/delete.svg";
 
 // ** Constant
 import {
@@ -42,8 +36,6 @@ import {
 // ** SVG Icons
 import { BiSearch } from "components/SVGIcons";
 
-import CompanyProfileForm from "./model/AddEditCompany";
-
 // ** Default Avatar
 import defaultAvatar from "assets/img/avatar-default.jpg";
 
@@ -51,17 +43,13 @@ const CompanyList = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.company);
   const loginStore = useSelector((state) => state.login);
-
+  const navigate = useNavigate();
   // ** Const
   const permission = getModulePermissionData(
     loginStore?.authRolePermission,
     companiesPermissionId,
     masterGroupPermissionId
   );
-
-  const [openModel, setOpenModel] = useState(false);
-  const [title, setTitle] = useState("Add Company");
-
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
 
@@ -69,7 +57,6 @@ const CompanyList = () => {
   const [sort, setSort] = useState("desc");
   const [sortColumn, setSortColumn] = useState("_id");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isEdited, setIsEdited] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(defaultPerPageRow);
 
@@ -125,14 +112,20 @@ const CompanyList = () => {
   }, [handleCompanyLists, store.actionFlag]);
 
   useEffect(() => {
-    if (store.success) {
-      setshowSnackbar(true);
-      setSnakbarMessage(store.success);
-    }
+    if (
+      store?.actionFlag === "CREAT" ||
+      store?.actionFlag === "COMPANY_UPDATED" ||
+      store?.actionFlag === "COMPANY_DELETED"
+    ) {
+      if (store.success) {
+        setshowSnackbar(true);
+        setSnakbarMessage(store.success);
+      }
 
-    if (store.error) {
-      setshowSnackbar(true);
-      setSnakbarMessage(store.error);
+      if (store.error) {
+        setshowSnackbar(true);
+        setSnakbarMessage(store.error);
+      }
     }
   }, [handleCompanyLists, store.error, store.success, store.actionFlag]);
 
@@ -141,20 +134,6 @@ const CompanyList = () => {
       setshowSnackbar(false);
     }, 6000);
   }, [showSnackBar]);
-
-  const AddCompany = () => {
-    dispatch(cleanCompanyMessage());
-    setOpenModel(true);
-    setTitle("Add Location");
-  };
-
-  const EditCompany = (id) => {
-    const query = { id: id };
-    setIsEdited(true);
-    dispatch(editActionRequest(query));
-    setOpenModel(true);
-    setTitle("Edit Location");
-  };
 
   const handlePerPage = (value) => {
     setRowsPerPage(value);
@@ -175,17 +154,13 @@ const CompanyList = () => {
     if (result.isConfirmed) {
       try {
         // Perform delete action here, e.g., call an API to delete the user
-        await dispatch(deleteActionRequest(id));
+        await dispatch(deleteComapany(id));
         Swal.fire("Deleted!", "Your user has been deleted.", "success");
         // Refresh user list or update UI as needed
       } catch (error) {
         Swal.fire("Error!", "There was an error deleting the user.", "error");
       }
     }
-  };
-
-  const closePopup = () => {
-    setOpenModel(() => false);
   };
 
   const columns = [
@@ -206,13 +181,14 @@ const CompanyList = () => {
       name: "Name",
       sortField: "name",
       sortable: true,
-      selector: (row) => row?.name || "",
-    },
-    {
-      name: "Contact",
-      sortField: "contact_no",
-      sortable: true,
-      selector: (row) => row?.contact_no || "",
+      selector: (row) => (
+        <div className="cursor-pointer"
+        onClick={() => navigate(`edit/${row?._id || ""}`)}
+        >
+            {row?.name || ""}
+        </div>
+      ),
+
     },
     {
       name: "Email",
@@ -221,25 +197,40 @@ const CompanyList = () => {
       cell: (row) => <div className="text-break">{row?.email || ""}</div>,
     },
     {
+      name: "Contact",
+      sortField: "contact_no",
+      sortable: true,
+      selector: (row) => row?.contact_no || "",
+    },
+    {
       name: "Action",
       center: true,
       cell: (row) => (
         <Fragment>
+          {/* <img
+              height={22}
+              title="view"
+              src={viewIcon}
+              className="cursor-pointer mr-2"
+              /> */}
           {permission?.update ? (
-            <TiEdit
-              size={20}
-              color="#fff"
-              cursor="pointer"
-              onClick={() => EditCompany(row?._id)}
-              className="mr-1"
+            <img
+              height={22}
+              alt="Edit"
+              title="Edit"
+              src={editIcon}
+              className="cursor-pointer mr-2"
+              onClick={() => navigate(`edit/${row?._id || ""}`)}
             />
           ) : null}
 
           {permission?.delete ? (
-            <TiTrash
-              size={20}
-              color="#fff"
-              cursor="pointer"
+            <img
+              height={22}
+              alt="Delete"
+              title="Delete"
+              src={deleteIcon}
+              className="cursor-pointer"
               onClick={() => deleteProfile(row?._id)}
             />
           ) : null}
@@ -267,16 +258,16 @@ const CompanyList = () => {
       <div className="container-fluid">
         <Row className="row-row">
           <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-            <div className="d-flex justify-content-between p-0 border-bottom card-header">
+            {/* <div className="d-flex justify-content-between p-0 border-bottom card-header">
               <h3 className="card-title">Locations</h3>
-            </div>
+            </div> */}
 
             <CardBody className="pl-0 pr-0">
               <Row className="mt-2">
                 <Col sm="6">
                   <InputGroup>
                     <input
-                      className="form-control "
+                      className="col-input w-100"
                       type="search"
                       placeholder="Search"
                       aria-label="Search"
@@ -290,22 +281,24 @@ const CompanyList = () => {
                 </Col>
 
                 <Col sm="6" className="text-right">
-                  {permission?.create ? (
-                    <button
-                      onClick={() => AddCompany()}
-                      className="btn btn-primary my-2"
-                      type="button"
-                    >
-                      Add Location
-                    </button>
-                  ) : null}
+                  <div className="buttons">
+                    {permission?.create ? (
+                      <button
+                        onClick={() => navigate(`add`)}
+                        className="btnprimary"
+                        type="button"
+                      >
+                        Add Location
+                      </button>
+                    ) : null}
+                  </div>
                 </Col>
               </Row>
 
               <Row className="userManagement mt-3">
                 <Col className="pb-2" md="12">
                   <DatatablePagination
-                    data={store.CompanyItems}
+                    data={store.companyItems}
                     columns={columns}
                     pagination={store?.pagination}
                     handleSort={handleSort}
@@ -319,15 +312,6 @@ const CompanyList = () => {
           </Card>
         </Row>
       </div>
-
-      {openModel && (
-        <CompanyProfileForm
-          show={openModel}
-          closePopup={closePopup}
-          title={title}
-          initialValues={isEdited ? store.editItem : store?.addItem}
-        />
-      )}
     </div>
   );
 };

@@ -7,6 +7,7 @@ var EventLogSchema = new mongoose.Schema({
     action_user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     reference_id: { type: mongoose.Schema.Types.ObjectId },
+    date_in_string: String,
     module_slug: String,
     type: String,
     action: String,

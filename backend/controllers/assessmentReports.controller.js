@@ -3,13 +3,14 @@ var sectionService = require("../services/section.service");
 var AssessmentService = require("../services/assessment.service.js");
 var QuestionService = require("../services/question.service.js");
 var MailService = require("../services/mail.service.js");
+
 var {
-  generateCode,
-  sendSimpleHtmlEmail,
-  // generateReport,
   sendSMS,
+  generateCode,
   sendVerification,
-} = require("./../helper/index.js");
+  sendSimpleHtmlEmail
+} = require("../helper");
+
 // Saving the context of this AssessmentReport inside the _the variable
 _this = this;
 let ejs = require("ejs");
@@ -290,16 +291,21 @@ exports.createAssessmentReport = async function (req, res, next) {
         assessment_data: assessmentData,
       });
     if (createdAssessmentReport) {
+      const html = `
+        Your email verification code is: <strong>${emailCode}</strong><br>
+        Your mobile verification code is: <strong>${mobileCode}</strong>
+      `;
+
       await sendSimpleHtmlEmail(
         createdAssessmentReport.email,
         createdAssessmentReport.name,
         "Verification Code",
-        `Your verification code is: ${emailCode}`
+        html
       );
-      await sendSMS({
-        message: `Your verification code is: ${mobileCode}`,
-        mobile: createdAssessmentReport?.mobile,
-      });
+      // await sendSMS({
+      //   message: `Your verification code is: ${mobileCode}`,
+      //   mobile: createdAssessmentReport?.mobile,
+      // });
     }
     return res.status(200).json({
       status: 200,
@@ -328,36 +334,41 @@ exports.updateAssessmentReport = async function (req, res, next) {
       await AssessmentReportService.getAssessmentReport(req.body._id);
     if (req.body?.email !== getAssessmentReport?.email) {
       req.body.email_code = generateCode();
+      req.body.mobile_code = generateCode();
       req.body.email_verified = false;
+      req.body.mobile_verified = false;
+      const html = `
+        Your email verification code is: <strong>${req.body.email_code}</strong><br>
+        Your mobile verification code is: <strong>${req.body.mobile_code}</strong>
+      `;
       await sendSimpleHtmlEmail(
         getAssessmentReport.email,
         getAssessmentReport.name,
         "Verification Code",
-        `Your verification code is: ${emailCode}`
+        html
       );
     }
-    if (req.body?.mobile !== getAssessmentReport?.mobile) {
-      req.body.mobile_code = generateCode();
-      req.body.mobile_verified = false;
-      await sendSMS({
-        message: `Your verification code is: ${mobileCode}`,
-        mobile: getAssessmentReport?.mobile,
-      });
-    }
+
+    // if (req.body?.mobile !== getAssessmentReport?.mobile) {
+    //   req.body.mobile_verified = false;
+    //   req.body.mobile_code = generateCode();
+    //   await sendSMS({
+    //     message: `Your verification code is: ${mobileCode}`,
+    //     mobile: getAssessmentReport?.mobile,
+    //   });
+    // }
+
     // Calling the Service function with the new object from the Request Body
-    var updatedAssessmentReport =
-      await AssessmentReportService.updateAssessmentReport(req.body);
+    var updatedAssessmentReport = await AssessmentReportService.updateAssessmentReport(req.body);
     return res.status(200).json({
       status: 200,
       flag: true,
       data: updatedAssessmentReport,
-      message: "Assessment Report updated successfully!",
+      message: "Assessment Report updated successfully!"
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
 };
 

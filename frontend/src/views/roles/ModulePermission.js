@@ -12,7 +12,14 @@ import {
 } from './store';
 
 // ** Reactstrap Imports
-import { Card, CardBody, Col, Row, Table } from 'reactstrap';
+import {
+    Col,
+    Row,
+    Card,
+    Table,
+    CardBody,
+    Collapse
+} from 'reactstrap';
 
 // ** Utils
 import { isObjEmpty } from 'utility/Utils';
@@ -22,7 +29,11 @@ import SimpleSpinner from 'components/spinner/simple-spinner';
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiArrowLeft } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
+
+// images
+import Opened from "../../assets/img/openpolygon.png"
+import Closed from "../../assets/img/closedpolygon.png"
 
 const ModulePermission = () => {
     // ** Hooks
@@ -119,6 +130,8 @@ const ModulePermission = () => {
     }
 
     const handleChangeSelectAll = async (checked = false, row) => {
+        console.log("handleChangeSelectAll >>> ",checked);
+        
         const payload = {
             _id: row?._id,
             can_all: checked,
@@ -162,47 +175,45 @@ const ModulePermission = () => {
                 </ReactSnackBar>
 
                 <Row>
-                    <Col className="col-md-12 col-xxl-10 ml-auto mr-auto">
+                    <Col className="col-md-12 col-xxl-10 ml-auto mr-auto roles-setting">
+                        <div className="p-0 mb-3 role-name">
+                            <h3 className='card-title mb-0 mt-0'>
+                                {store?.roleItem?.name || ""} - Module Permissions
+                            </h3>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => navigate('/admin/roles')}
+                            >
+                                Back
+                            </button>
+                        </div>
+
                         <Card className="card-category card-subcategories m-0">
-                            <div className="p-0 border-bottom pb-2 card-header row justify-content-between m-0">
-                                <h3 className='card-title mb-0 mt-0'>
-                                    {store?.roleItem?.name || ""} - Module Permissions
-                                </h3>
-
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => navigate('/admin/roles')}
-                                >
-                                    Back
-                                    <TiArrowLeft size={25} title="Back" className='ml-2' />
-                                </button>
-                            </div>
-
                             <CardBody className='m-0 p-0'>
                                 <div className='role--container mt-2 mb-0 pt-0 pb-0 d-block'>
                                     {store?.groupPermissions && !isObjEmpty(store.groupPermissions) && Object.keys(store.groupPermissions).length ? (
                                         <ul className='nested-Lists'>
                                             {Object.keys(store.groupPermissions).map((key) => (
                                                 store.groupPermissions && store.groupPermissions[key] && store.groupPermissions[key]?.length ? (
-                                                    <li key={key}>
-                                                        <div className='d-flex align-items-center mb-0'>
-                                                            <span
-                                                                className="check-box-permission user-select-none"
-                                                                onClick={() => {
-                                                                    setSelectedGroup(key);
-                                                                    if (key === selectedGroup) {
-                                                                        setSelectedGroup("");
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <p>{selectedGroup === key ? "-" : "+"}</p>
+                                                    <li
+                                                        key={key}
+                                                        className={`role-settings-box cursor-pointer ${key === selectedGroup ? 'accordion-border-left' : ''}`}
+                                                    >
+                                                        <div className='d-flex align-items-center mb-0 main-seeting-name' onClick={() => {
+                                                            setSelectedGroup(key);
+                                                            if (key === selectedGroup) {
+                                                                setSelectedGroup("");
+                                                            }
+                                                        }}>
+                                                            <span className="check-box-permission user-select-none">
+                                                                <span>{selectedGroup === key ? <img alt="" src={Opened} /> : <img alt="" src={Closed} />}</span>
                                                             </span>
-                                                            <label className="text-capitalize mb-0" title={key} htmlFor={key}>{key}</label>
+                                                            <div className="title text-capitalize mb-0" title={key} htmlFor={key}>{key}</div>
                                                         </div>
 
-                                                        {key === selectedGroup ? (
-                                                            <Table className="" responsive>
+                                                        <Collapse isOpen={key === selectedGroup} className='gobal-input border-top-0'>
+                                                            <Table responsive>
                                                                 <thead>
                                                                     <tr>
                                                                         <th>Module Name</th>
@@ -218,59 +229,101 @@ const ModulePermission = () => {
                                                                         <tr key={`${key}-${index}`}>
                                                                             <td>{item?.module_id?.name}</td>
                                                                             <td className="text-center">
-                                                                                <input
+                                                                                {/* <input
                                                                                     id={`can_all-${key}-${index}`}
                                                                                     type="checkbox"
                                                                                     className="form-check-input pointer "
                                                                                     checked={item?.can_all || false}
                                                                                     onChange={(event) => handleChangeSelectAll(event?.target?.checked, item)}
-                                                                                />
+                                                                                /> */}
+                                                                                <label className="checkbox-box text-center">
+                                                                                    <input
+                                                                                        id={`can_all-${key}-${index}`}
+                                                                                        name={`can_all-${key}-${index}`}
+                                                                                        type="checkbox"
+                                                                                        className="form-check-input pointer "
+                                                                                        checked={item?.can_all || false}
+                                                                                        onChange={(event) => handleChangeSelectAll(event?.target?.checked, item)}
+                                                                                    />
+                                                                                    <span className="checkmark" for={`can_all-${key}-${index}`}></span>
+                                                                                </label>
                                                                             </td>
 
                                                                             <td className="text-center">
-                                                                                <input
+                                                                                {/* <input
                                                                                     id={`can_read-${key}-${index}`}
                                                                                     type="checkbox"
                                                                                     className="form-check-input pointer "
                                                                                     checked={item?.can_read || false}
                                                                                     onChange={(event) => handleChange(event?.target?.checked, "can_read", item)}
+                                                                                /> */}
+
+                                                                                <label className="checkbox-box text-center">
+                                                                                <input
+                                                                                    id={`can_read-${key}-${index}`}
+                                                                                    name={`can_read-${key}-${index}`}
+                                                                                    type="checkbox"
+                                                                                    className="form-check-input pointer "
+                                                                                    checked={item?.can_read || false}
+                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_read", item)}
                                                                                 />
+                                                                                    <span className="checkmark" for={`can_read-${key}-${index}`}></span>
+                                                                                </label>
                                                                             </td>
 
                                                                             <td className="text-center">
-                                                                                <input
+                                                                                {/* <input
                                                                                     id={`can_create-${key}-${index}`}
                                                                                     type="checkbox"
                                                                                     className="form-check-input pointer "
                                                                                     checked={item?.can_create || false}
                                                                                     onChange={(event) => handleChange(event?.target?.checked, "can_create", item)}
+                                                                                /> */}
+                                                                                <label className="checkbox-box text-center">
+                                                                                <input
+                                                                                    id={`can_create-${key}-${index}`}
+                                                                                    name={`can_create-${key}-${index}`}
+                                                                                    type="checkbox"
+                                                                                    className="form-check-input pointer "
+                                                                                    checked={item?.can_create || false}
+                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_create", item)}
                                                                                 />
+                                                                                    <span className="checkmark" for={`can_create-${key}-${index}`}></span>
+                                                                                </label>
                                                                             </td>
 
                                                                             <td className="text-center">
+                                                                            <label className="checkbox-box text-center">
                                                                                 <input
                                                                                     id={`can_update-${key}-${index}`}
+                                                                                    name={`can_update-${key}-${index}`}
                                                                                     type="checkbox"
                                                                                     className="form-check-input pointer "
                                                                                     checked={item?.can_update || false}
                                                                                     onChange={(event) => handleChange(event?.target?.checked, "can_update", item)}
                                                                                 />
+                                                                                <span className="checkmark" for={`can_update-${key}-${index}`}></span>
+                                                                            </label>
                                                                             </td>
 
                                                                             <td className="text-center">
+                                                                            <label className="checkbox-box text-center">
                                                                                 <input
                                                                                     id={`can_delete-${key}-${index}`}
+                                                                                    name={`can_delete-${key}-${index}`}
                                                                                     type="checkbox"
                                                                                     className="form-check-input pointer "
                                                                                     checked={item?.can_delete || false}
                                                                                     onChange={(event) => handleChange(event?.target?.checked, "can_delete", item)}
                                                                                 />
+                                                                                <span className="checkmark" for={`can_delete-${key}-${index}`}></span>
+                                                                            </label>
                                                                             </td>
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
                                                             </Table>
-                                                        ) : null}
+                                                        </Collapse>
                                                     </li>
                                                 ) : null
                                             ))}

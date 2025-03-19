@@ -4,32 +4,24 @@ import React, { useState, useEffect, useCallback } from "react";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { editProfile, updateProfile } from "views/login/store/index";
-// import {
-//     isUserUniqueAction,
-//     isEmailUniqueAction,
-//     cleanCompanyMessage,
-// } from "../../companies/store/index";
-import { isEmailUniqueAction, isUserUniqueAction } from "views/companies/store";
 
 import {
-    Col,
-    Row,
-    Card,
-    Input,
-    Button,
-    CardBody,
-    CardText,
-    FormGroup,
-} from "reactstrap";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+  getEmailExist,
+  getUsernameExist,
+  cleanAuthMessage,
+} from "views/login/store";
+import { Col, Row, Form as BootstrapForm } from "react-bootstrap";
+import { Card, CardBody, FormFeedback } from "reactstrap";
+import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import PhoneInput from "react-phone-input-2";
 
 // ** Utils
 import { onImageSrcError } from "utility/Utils";
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiContacts } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
 import { profileItem, hostRestApiUrl } from "utility/reduxConstant";
@@ -38,312 +30,357 @@ import { profileItem, hostRestApiUrl } from "utility/reduxConstant";
 import defaultAvatar from "assets/img/avatar-default.jpg";
 
 const UserProfile = () => {
-    const ProfileSchema = Yup.object({
-        first_name: Yup.string().required("First Name Is Required"),
-        last_name: Yup.string().required("Last Name Is Required"),
-        email: Yup.string()
-            .email("Invalid email format")
-            .required("Email Is Required"),
-        phone: Yup.string()
-            .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
-            .required("Phone Number Is Required"),
-        user_name: Yup.string().required("Username Is Required"),
-    });
+  const ProfileSchema = Yup.object({
+    first_name: Yup.string().required("First Name Is Required"),
+    last_name: Yup.string().required("Last Name Is Required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email Is Required"),
+    phone: Yup.string().required("Phone number is required")
+      .min(8, "Invalid phone number (Minimum 8 Digits Are Required)")
+      .max(15, "Invalid phone number (Must Not Exceed 10 digits)"),
+    user_name: Yup.string().required("Username Is Required"),
+    country_code: Yup.object().nullable(),
+  });
 
-    const dispatch = useDispatch();
-    const store = useSelector((state) => state.login);
-    const companyStore = useSelector((state) => state.company);
+  const dispatch = useDispatch();
+  const store = useSelector((state) => state.login);
+  const id = store.profile?._id;
 
-    const [user, setUser] = useState(profileItem);
-    const [loadFirst, setLoadFirst] = useState(true);
-    const [showSnackBar, setshowSnackbar] = useState(false);
-    const [snakebarMessage, setSnakbarMessage] = useState("");
-    const [errMessage, setErrMessage] = useState("");
-    const [userErrMessage, setUserErrMessage] = useState("");
+  const [user, setUser] = useState(profileItem);
+  const [loadFirst, setLoadFirst] = useState(true);
+  const [showSnackBar, setshowSnackbar] = useState(false);
+  const [snakebarMessage, setSnakbarMessage] = useState("");
+  const [emailExist, setEmailExist] = useState(false);
+  const [usernameExist, setUsernameExist] = useState(false);
+  const [imgBase64Data, setImgBase64Data] = useState("");
 
-    useEffect(() => {
-        if (loadFirst) {
-            dispatch(editProfile());
-            setLoadFirst(false);
+  useEffect(() => {
+    if (loadFirst) {
+      dispatch(editProfile());
+      setLoadFirst(false);
+    }
+  }, [dispatch, loadFirst]);
+
+  useEffect(() => {
+    if (store.profile) {
+      setUser(store.profile);
+    }
+
+    if (store.success && store.actionFlag === "PROFILE_UPDATED") {
+      setshowSnackbar(true);
+      setSnakbarMessage(store.success);
+      dispatch(editProfile());
+    }
+
+    if (store.error && store.actionFlag === "PROFILE_UPDATED") {
+      setshowSnackbar(true);
+      setSnakbarMessage(store.error);
+    }
+  }, [user, store.profile, store.success, store.error, store.actionFlag, dispatch]);
+
+  useEffect(() => {
+    if (store?.actionFlag || store?.success || store?.error) {
+      dispatch(cleanAuthMessage(null));
+    }
+
+    if (
+      store?.actionFlag === "EML_EXST" ||
+      store?.actionFlag === "EML_EXST_ERR"
+    ) {
+      setEmailExist(store?.isEmailExist || false);
+    }
+
+    if (
+      store?.actionFlag === "USRNM_EXST" ||
+      store?.actionFlag === "USRNM_EXST_ERR"
+    ) {
+      setUsernameExist(store?.isUsernameExist || false);
+    }
+  }, [
+    dispatch,
+    store.actionFlag,
+    store.success,
+    store.error,
+    store.isEmailExist,
+    store.isUsernameExist,
+  ]);
+  /* Login */
+
+  useEffect(() => {
+    setTimeout(() => {
+      setshowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar]);
+
+  const handleCheckEmailExist = useCallback(
+    (email = "") => {
+      const query = { id, email };
+      dispatch(getEmailExist(query));
+    },
+    [dispatch, id]
+  );
+
+  const handleCheckUsernameExist = useCallback(
+    (userName = "") => {
+      const query = { id, user_name: userName };
+      dispatch(getUsernameExist(query));
+    },
+    [dispatch, id]
+  );
+
+  const handleChangeEmail = (value = "") => {
+    handleCheckEmailExist(value);
+  };
+
+  const handleChangeUsername = (value = "") => {
+    handleCheckUsernameExist(value);
+  };
+
+  const handleFileUpload = (event, func) => {
+    if (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          func("image", reader.result)
+          setImgBase64Data(reader.result)
         }
-    }, [dispatch, loadFirst]);
+        reader.readAsDataURL(file)
+      }
+    }
+  }
 
-    useEffect(() => {
-        if (store.profile) {
-            setUser(store.profile);
-        }
+  const handleSubmit = (values) => {
+    dispatch(updateProfile(values));
+  }
 
-        if (store.success && store.actionFlag === 'PROFILE_UPDATED') {
-            setshowSnackbar(true);
-            setSnakbarMessage(store.success);
-        }
+  return (
+    <div className="h-100">
+      {showSnackBar && (
+        <ReactSnackBar Icon={(
+          <span><TiMessages size={25} /></span>
+        )} Show={showSnackBar}>
+          {snakebarMessage}
+        </ReactSnackBar>
+      )}
 
-        if (store.error && store.actionFlag === 'PROFILE_UPDATED') {
-            setshowSnackbar(true);
-            setSnakbarMessage(store.error);
-        }
-    }, [user, store.profile, store.success, store.error, store.actionFlag]);
-
-    const handleEmailChange = useCallback(
-        async (event, validateField, values) => {
-            const { name, value } = event.target;
-            const Editpayload = {
-                email: value,
-                _id: values?._id,
-            };
-            await validateField(name);
-            const errors = await ProfileSchema.validateAt(name, values).catch(
-                (err) => err
-            );
-
-            if (!errors || !errors.message) {
-                dispatch(isEmailUniqueAction(Editpayload));
-            }
-        },
-        [dispatch, ProfileSchema]
-    );
-
-    const handleUserChange = useCallback(
-        async (event, validateField, values) => {
-            const { name, value } = event.target;
-            const Editpayload = {
-                user_name: value,
-                _id: values?._id,
-            };
-            await validateField(name);
-            const errors = await ProfileSchema
-                .validateAt(name, values)
-                .catch((err) => err);
-
-            if (!errors || !errors.message) {
-
-                dispatch(isUserUniqueAction(Editpayload));
-
-            }
-        },
-        [dispatch, ProfileSchema]
-    );
-
-    useEffect(() => {
-        if (companyStore.actionFlag === "CHECK_EMIAL_IS_UNIQUE") {
-            if (!companyStore.isEmailUnique) {
-                setErrMessage("Email is not unique");
-            }
-            if (companyStore.isEmailUnique) {
-                setErrMessage("");
-            }
-        }
-
-        if (companyStore.actionFlag === "CHECK_USER_IS_UNIQUE") {
-            if (!companyStore.isUserUnique) {
-                setUserErrMessage("User is not unique");
-            }
-            if (companyStore.isUserUnique) {
-                setUserErrMessage("");
-            }
-        }
-    }, [companyStore]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setshowSnackbar(false);
-        }, 6000);
-    }, [showSnackBar]);
-
-    const handleSubmit = (values) => {
-        dispatch(updateProfile(values));
-    };
-
-    return (
-        <>
-            <div className="content">
-                {showSnackBar && (
-                    <ReactSnackBar
-                        Icon={
-                            <span>
-                                <TiMessages size={25} />
-                            </span>
-                        }
-                        Show={showSnackBar}
-                    >
-                        {snakebarMessage}
-                    </ReactSnackBar>
+      {/* <Col md="4" className="mb-3">
+        <Card className="card-user mb-0">
+          <CardBody>
+            <CardText />
+            <div className="author">
+              <a href="#pablo" onClick={(event) => event.preventDefault()}>
+                {user?.image ? (
+                  <img
+                    alt="Profile"
+                    className="avatar"
+                    src={`${hostRestApiUrl}/${user?.image}`}
+                    onError={(currentTarget) =>
+                      onImageSrcError(currentTarget, defaultAvatar)
+                    }
+                  />
+                ) : (
+                  <img
+                    alt="Profile"
+                    className="avatar"
+                    src={defaultAvatar}
+                  />
                 )}
+                <h5 className="title">{user?.user_name}</h5>
+              </a>
 
-                <Row>
-                    <Col md="8" className="mb-3">
-                        <Card className="mb-0">
-                            <div className="p-0 card-header">
-                                <h3 className="card-title border-bottom pb-2 mt-0">Profile</h3>
-                            </div>
-
-                            <CardBody className="pl-0 pr-0">
-                                <Formik
-                                    initialValues={user}
-                                    enableReinitialize={user}
-                                    validationSchema={ProfileSchema}
-                                    onSubmit={handleSubmit}
-                                >
-                                    {({ validateField, values }) => (
-                                        <Form>
-                                            <Row>
-                                                <Col className="" md="4">
-                                                    <FormGroup>
-                                                        <label>Username</label>
-                                                        <Field
-                                                            as={Input}
-                                                            type="text"
-                                                            name="user_name"
-                                                            placeholder="Username"
-                                                            onBlur={(event) =>
-                                                                handleUserChange(event, validateField, values)
-                                                            }
-                                                        />
-                                                        {userErrMessage !== "" && (
-                                                            <div style={{ color: 'red' }}>{userErrMessage}</div>
-                                                        )}
-                                                        <ErrorMessage
-                                                            name="user_name"
-                                                            component="span"
-                                                            style={{ color: "red" }}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-
-                                                <Col className="" md="4">
-                                                    <FormGroup>
-                                                        <label>Email address</label>
-                                                        <Field
-                                                            name="email"
-                                                            type="email"
-                                                            placeholder="Enter email"
-                                                            onBlur={(e) =>
-                                                                handleEmailChange(e, validateField, values)
-                                                            }
-                                                            as={Input}
-                                                        />
-                                                        {errMessage !== "" && (
-                                                            <div style={{ color: 'red' }}>{errMessage}</div>
-                                                        )}
-                                                        <ErrorMessage
-                                                            name="email"
-                                                            component="span"
-                                                            style={{ color: "red" }}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-
-                                                <Col className="" md="4">
-                                                    <FormGroup>
-                                                        <label>Contact Number</label>
-                                                        <Field
-                                                            as={Input}
-                                                            name="phone"
-                                                            placeholder="Enter contact number"
-                                                        />
-                                                        <ErrorMessage
-                                                            name="phone"
-                                                            component="span"
-                                                            style={{ color: "red" }}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-                                            </Row>
-
-                                            <Row>
-                                                <Col className="" md="6">
-                                                    <FormGroup>
-                                                        <label>First Name</label>
-                                                        <Field
-                                                            type="text"
-                                                            as={Input}
-                                                            name="first_name"
-                                                            placeholder="First Name"
-                                                        />
-                                                        <ErrorMessage
-                                                            name="first_name"
-                                                            component="span"
-                                                            style={{ color: "red" }}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-
-                                                <Col className="" md="6">
-                                                    <FormGroup>
-                                                        <label>Last Name</label>
-                                                        <Field
-                                                            name="last_name"
-                                                            placeholder="Last Name"
-                                                            type="text"
-                                                            as={Input}
-                                                        />
-                                                        <ErrorMessage
-                                                            name="last_name"
-                                                            component="span"
-                                                            style={{ color: "red" }}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-                                            </Row>
-
-                                            <Button
-                                                type="submit"
-                                                color="primary"
-                                                className="btn-fill"
-                                            >
-                                                Submit
-                                            </Button>
-                                        </Form>
-                                    )}
-                                </Formik>
-                            </CardBody>
-                        </Card>
-                    </Col>
-
-                    <Col md="4" className="mb-3">
-                        <Card className="card-user mb-0">
-                            <CardBody>
-                                <CardText />
-                                <div className="author">
-                                    <div className="block block-one" />
-                                    <div className="block block-two" />
-                                    <div className="block block-three" />
-                                    <div className="block block-four" />
-
-                                    <a href="#pablo" onClick={(event) => event.preventDefault()}>
-                                        {user?.image ? (
-                                            <img
-                                                alt="Profile"
-                                                className="avatar"
-                                                src={`${hostRestApiUrl}/${user?.image}`}
-                                                onError={(currentTarget) =>
-                                                    onImageSrcError(currentTarget, defaultAvatar)
-                                                }
-                                            />
-                                        ) : (
-                                            <img
-                                                alt="Profile"
-                                                className="avatar"
-                                                src={defaultAvatar}
-                                            />
-                                        )}
-                                        <h5 className="title">{user?.user_name}</h5>
-                                    </a>
-
-                                    <p className="description">{user?.email}</p>
-                                    {user?.phone && (
-                                        <p className="description">
-                                            <TiContacts size={20} /> {user?.phone || ""}
-                                        </p>
-                                    )}
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
+              <p className="description">{user?.email}</p>
+              {user?.phone && (
+                <p className="description">
+                  <TiContacts size={20} /> {user?.phone || ""}
+                </p>
+              )}
             </div>
-        </>
-    );
-};
+          </CardBody>
+        </Card>
+      </Col> */}
+
+      <div className="profile-card">
+        <Card className="mb-0 ">
+
+          <CardBody className="pl-0 pr-0">
+            <Formik
+              initialValues={user}
+              enableReinitialize={user}
+              validationSchema={ProfileSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
+                <Form>
+                  <Row>
+                    <Col
+                      xl={6}
+                      lg={6}
+                      as={BootstrapForm.Group}
+                      controlId="formGridFirstName"
+                      className="full-width"
+                    >
+                      <BootstrapForm.Label className="col-label">
+                        First Name
+                      </BootstrapForm.Label>
+                      <Field
+                        type="text"
+                        name="first_name"
+                        placeholder="First Name"
+                        className="col-input w-100"
+                      />
+                      {errors.first_name && touched.first_name && (
+                        <FormFeedback className="d-block">{errors?.first_name}</FormFeedback>
+                      )}
+                    </Col>
+
+                    <Col
+                      xl={6}
+                      lg={6}
+                      as={BootstrapForm.Group}
+                      controlId="formGridLastName"
+                      className="full-width"
+                    >
+                      <BootstrapForm.Label className="col-label">
+                        Last Name
+                      </BootstrapForm.Label>
+                      <Field
+                        name="last_name"
+                        placeholder="Last Name"
+                        type="text"
+                        className="col-input w-100"
+                      />
+
+                      {errors.last_name && touched.last_name && (
+                        <FormFeedback className="d-block">{errors?.last_name}</FormFeedback>
+                      )}
+                    </Col>
+                    <Col
+                      xl={6}
+                      lg={6}
+                      as={BootstrapForm.Group}
+                      controlId="formGridUserName"
+                      className="full-width"
+                    >
+                      <BootstrapForm.Label className="col-label">
+                        Email address
+                      </BootstrapForm.Label>
+                      <Field
+                        name="email"
+                        type="email"
+                        placeholder="Enter email"
+                        className="col-input w-100"
+                        onInput={(event) => handleChangeEmail(event?.target?.value || "")}
+                      />
+
+                      {errors.email && (
+                        <FormFeedback className="d-block">{errors?.email}</FormFeedback>
+                      )}
+                      {emailExist && (
+                        <FormFeedback className="d-block">Email already taken.</FormFeedback>
+                      )}
+                    </Col>
+                    <Col
+                      xl={6}
+                      lg={6}
+                      as={BootstrapForm.Group}
+                      controlId="formGridPhoneNumber"
+                      className="full-width country-drpdwn"
+                    >
+                      <BootstrapForm.Label className="col-label">
+                        Mobile Number
+                      </BootstrapForm.Label>
+                      <PhoneInput
+                        country={"us"}
+                        value={values?.phone}
+                        onChange={(val, data) => {
+                          setFieldValue('phone', val);
+                          setFieldValue('country_code', data);
+                        }}
+                        inputClass="col-input w-100"
+                        placeholder="Enter contact number"
+                        onBlur={() => setFieldTouched("phone", true)}
+                      />
+                      {errors.phone && (
+                        <FormFeedback className="d-block">
+                          {errors?.phone}
+                        </FormFeedback>
+                      )}
+                    </Col>
+
+                    <Col
+                      xl={6}
+                      lg={6}
+                      as={BootstrapForm.Group}
+                      controlId="formGridUserName"
+                      className="full-width"
+                    >
+                      <BootstrapForm.Label className="col-label">
+                        Username
+                      </BootstrapForm.Label>
+                      <Field
+                        type="text"
+                        name="user_name"
+                        className="col-input w-100"
+                        placeholder="Username"
+                        onInput={(event) => handleChangeUsername(event?.target?.value)}
+                      />
+
+                      {errors.user_name && (
+                        <FormFeedback className="d-block">{errors?.user_name}</FormFeedback>
+                      )}
+                      {usernameExist && (
+                        <FormFeedback className="d-block">Username already taken.</FormFeedback>
+                      )}
+                    </Col>
+
+                    <Col xl={6} lg={6} className="full-width">
+                      <BootstrapForm.Group controlId="formGridClientLogo">
+                        <BootstrapForm.Label className="col-label">Photo</BootstrapForm.Label>
+                        <div className="d-flex">
+                          <span className="col-photo">
+                            <input
+                              type="file"
+                              name="logo"
+                              accept="image/*"
+                              // className="w-100"
+                              onChange={(event) =>
+                                handleFileUpload(event, setFieldValue)
+                              }
+                            />
+                          </span>
+                          {imgBase64Data || store?.profile?.image ? (
+                            <img
+                              width={50}
+                              height={45}
+                              alt="Profile"
+                              src={imgBase64Data ? imgBase64Data : `${hostRestApiUrl}/${store.profile?.image}`}
+                              style={{
+                                marginLeft: "10px",
+                                maxWidth: "100%",
+                              }}
+                              onError={(currentTarget) => onImageSrcError(currentTarget, defaultAvatar)}
+                            />
+                          ) : null}
+                        </div>
+                      </BootstrapForm.Group>
+                    </Col>
+                  </Row>
+
+                  <div className="buttons">
+                    <button type="submit" className="btnprimary">
+                      save
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </CardBody>
+        </Card>
+      </div>
+    </div>
+  )
+}
 
 export default UserProfile;

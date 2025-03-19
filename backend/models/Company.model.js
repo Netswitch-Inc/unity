@@ -6,6 +6,7 @@ var CompanySchema = new mongoose.Schema({
     name: String,
     email: String,
     logo: String,
+    country_code: Object,
     contact_no: String,
     address: String,
     header_color: String,

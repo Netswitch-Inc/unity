@@ -1,15 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
+// ** React Imports
 import React, { useEffect, useState, useLayoutEffect, useMemo } from "react";
-import { Card, CardBody } from "reactstrap";
-import { Row, Col } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+
+// ** Store & Actions
+import { useDispatch, useSelector } from "react-redux";
 import { getAssessmentReportAnswersList } from "../store";
-import DynamicInput from "components/AssessmentReportQuestionType/DynamicInput";
-import { createAnswer, updateAnswer } from "../assessment-report-answer-store";
-import { cleanAnswerMessage } from "../assessment-report-answer-store";
+import { createAnswer, updateAnswer, cleanAnswerMessage } from "../assessment-report-answer-store";
+
+// ** Reactstrap Imports
+import { Card } from "reactstrap";
+import { Row, Col } from "react-bootstrap";
+
+// ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
+import DynamicInput from "components/AssessmentReportQuestionType/DynamicInput";
+
+// ** Logo
 import reactLogo from "assets/img/react-logo.png";
 
 const AsessmentReport = () => {
@@ -306,27 +314,73 @@ const AsessmentReport = () => {
   return (
     <div className="step-wise-content">
       <Row className="sticky--- m-0">
-        <Col className="personal-information left-side">
-          <div className="steps">
+        <Card className="main-progress col-md-3 mb-0">
+          <div className="main-logo-img">
             <div className="logo">
               <img alt="..." src={reactLogo} />
             </div>
-            <ul>
-              <li className="active done">Company Information</li>
-              <li className="active done">Verification(Email & Mobile)</li>
-              <li className="active">Self Assessment</li>
-              <li>Thank You</li>
-            </ul>
           </div>
-        </Col>
-        <Col className="right-side self-assesement">
-          <Card className="h-100">
-            <CardBody className="pl-0 pr-0">
+          <div className="mb-0">
+            <div className="steps-mains">
+              <div className="steps filled-step">
+                <div className="borders step-line second-step">
+                  <div className="step-icon">
+                    <p>1</p>
+                  </div>
+                </div>
+                <div className="step-name">
+                  <h4>Company Info</h4>
+                </div>
+              </div>
+              <div className="steps filled-step">
+                <div className="borders step-line">
+                  <div className="step-icon ">
+                    <p>2</p>
+                  </div>
+                </div>
+                <div className="step-name">
+                  <h4>Verification</h4>
+                </div>
+              </div>
+              <div className="steps active-class">
+                <div className="borders step-line">
+                  <div className="step-icon ">
+                    <p>3</p>
+                  </div>
+                </div>
+                <div className="step-name">
+                  <h4>Self Assessment</h4>
+                </div>
+              </div>
+              <div className="steps">
+                <div className="borders">
+                  <div className="step-icon">
+                    <p>4</p>
+                  </div>
+                </div>
+                <div className="step-name">
+                  <h4>Thank You</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+        <Col className="right-side self-assesement col-md-9">
+          <div className="card-header">
+            <h3 className="m-0">Self Assessment
+              {/* {
+                assessmentReport?.asessmentReportAnswers
+                  ?.assessment_name
+              } */}
+            </h3>
+          </div>
+          <Card className="assesment-card">
+            <div className="pl-0 pr-0">
               {!assessmentReportAnswerList?.loading ? <SimpleSpinner /> : null}
               {show && (
                 <>
-                  <div className="card-header">
-                    <h3 className="m-0">
+                  <div className="assesment-heading">
+                    <h3 className="m-0 ">
                       {
                         assessmentReport?.asessmentReportAnswers
                           ?.assessment_name
@@ -355,7 +409,7 @@ const AsessmentReport = () => {
                 0 && (
                   <>
                     {questionIndex !== -1 && (
-                      <div className="card-header">
+                      <div className="assesment-heading">
                         <h3 className="m-0">
                           {
                             assessmentReport?.asessmentReportAnswers?.sections[
@@ -471,27 +525,29 @@ const AsessmentReport = () => {
                   </div>
                 </div>
               )}
-              <div className="buttons justify-content-between">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => handlePreviousClick()}
-                >
-                  Previous
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    handleNextClick();
-                    setShow(() => false);
-                  }}
-                // onClick={handleSubmit}
-                // disabled={isSubmitting}
-                >
-                  Next
-                </button>
+              <div className="w-100">
+                <div className="buttons d-flex justify-content-between btn-position">
+                  <button
+                    type="button"
+                    className="btnprimary ml-3"
+                    onClick={() => handlePreviousClick()}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    className="btnprimary mr-3"
+                    onClick={() => {
+                      handleNextClick();
+                      setShow(() => false);
+                    }}
+                  // onClick={handleSubmit}
+                  // disabled={isSubmitting}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </CardBody>
+            </div>
           </Card>
         </Col>
       </Row>

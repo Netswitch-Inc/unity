@@ -1,10 +1,13 @@
+// ** React Imports
 import React, { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { getAuthRolePermission } from "views/login/store";
 import { cleanGlobalSettingMessage, getGlobalSettingsList, updateGlobalSettingsList } from "./store";
 
+// ** Reactstrap Imports
 import {
     Col,
     Row,
@@ -13,13 +16,12 @@ import {
     Button,
     CardBody,
     Collapse,
-    FormGroup,
     CustomInput
 } from 'reactstrap';
 import { FormikReactSelect } from "components/FormikFields";
 
 // ** Utils
-import { splitWithPipe, arrayJoinWithPipe } from "utility/Utils";
+import { splitWithPipe, arrayJoinWithPipe, onImageSrcError } from "utility/Utils";
 
 // ** Custom Components
 import SimpleSpinner from 'components/spinner/simple-spinner';
@@ -27,16 +29,26 @@ import SimpleSpinner from 'components/spinner/simple-spinner';
 // ** Third Party Components
 import classnames from 'classnames';
 import ReactSnackBar from "react-js-snackbar";
-import { TiArrowLeft, TiMessages } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
-import { superAdminRole } from "utility/reduxConstant";
+import { hostRestApiUrl, superAdminRole } from "utility/reduxConstant";
+
+// ** Default Avatar
+import defaultAvatar from "assets/img/avatar-default.jpg";
+
+// ** PNG Icons
+import openedIcon from "../../assets/img/openpolygon.png"
+import closedIcon from "../../assets/img/closedpolygon.png"
 
 const GlobalSetting = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate()
+
+    const dispatch = useDispatch();
     const store = useSelector((state) => state.globalSetting);
 
+    // ** States
+    const [reRenderKey, setReRenderKey] = useState("")
     const [selectedAccordion, setSelectedAccordion] = useState();
     const [settingValues, setSettingValues] = useState([]);
 
@@ -107,6 +119,31 @@ const GlobalSetting = () => {
         setSettingValues([...data]);
     }
 
+    const handleChangeImage = (id, slug, event) => {
+        const data = [...settingValues];
+        if (id && slug && event) {
+            const ind = data.findIndex(x => x._id === id);
+            const file = event.currentTarget.files[0]
+            if (file) {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    if (ind !== -1) {
+                        data[ind].value = reader.result;
+                    } else {
+                        data.push({ _id: id, slug, value: reader.result });
+                    }
+
+                    setReRenderKey(new Date().getTime());
+                }
+
+                reader.readAsDataURL(file)
+            }
+        }
+
+        // console.log("handleChangeImage >>> ", data);
+        setSettingValues(data);
+    }
+
     const handleChangeSelect = (item = null, val = null) => {
         const data = settingValues;
         const id = item?._id || "";
@@ -160,6 +197,27 @@ const GlobalSetting = () => {
         return result || ""
     }
 
+    const getImageOptValue = (item = null) => {
+        let result = "";
+        const id = item?._id || "";
+        if (id) {
+            let value = item?.value || "";
+
+            const ind = settingValues.findIndex(x => x._id === id);
+            if (ind !== -1) {
+                if (settingValues[ind]?._id) { value = settingValues[ind].value; }
+            }
+
+            if (value) {
+                result = `${hostRestApiUrl}/${value}`;
+                if (value.includes(";base64,")) { result = value; }
+            }
+        }
+
+        // console.log("getImageOptValue >>> ", result);
+        return result || ""
+    }
+
     const handleChangeCheckbox = (item = null, val = null, value = "") => {
         const data = settingValues;
         const id = item?._id || "";
@@ -203,39 +261,36 @@ const GlobalSetting = () => {
     }
 
     return (<>
-        <div className="content data-list global-management">
+        <div className="content global-management">
             {!store?.loading ? (
                 <SimpleSpinner />
             ) : null}
 
-            {showSnackBar && (
-                <ReactSnackBar
-                    Icon={(<span><TiMessages size={25} /></span>)}
-                    Show={showSnackBar}
-                >
-                    {snakebarMessage}
-                </ReactSnackBar>
-            )}
+            <ReactSnackBar Icon={(
+                <span><TiMessages size={25} /></span>
+            )} Show={showSnackBar}>
+                {snakebarMessage}
+            </ReactSnackBar>
 
             <div className='container-fluid'>
                 {store?.globalSettingsList && store?.globalSettingsList?.length > 0 ? (
-                    <Row>
+                    <Row key={reRenderKey}>
                         <Col xxs="12" className="mb-4">
                             <Card className="m-0">
-                                <div className="p-0 border-bottom pb-2 card-header row justify-content-between m-0">
+                                {/* <div className="p-0 border-bottom pb-2 card-header row justify-content-between m-0">
                                     <h3 className='card-title mb-0 mt-0'>Global Setting</h3>
                                     <button
                                         type="button"
                                         className="btn btn-primary d-none"
                                     >
                                         Back
-                                        <TiArrowLeft size={25} title="Back" className='ml-2' />
                                     </button>
-                                </div>
+                                </div> */}
 
                                 <CardBody className='m-0 p-0'>
                                     {store?.globalSettingsList.map((group, indexTab) => (
-                                        <div className="accrodion-permi mt-2" key={`div_${indexTab}_${group.group_name}`}>
+                                        <div className={`accrodion-permi mt-2 ${selectedAccordion === indexTab ? 'accordion-border-left' : ''}`}
+                                            key={`div_${indexTab}_${group.group_name}`}>
                                             <Button
                                                 color="link"
                                                 className='permission-accordion d-flex align-items-center'
@@ -248,9 +303,9 @@ const GlobalSetting = () => {
                                                 aria-expanded={selectedAccordion === indexTab}
                                             >
                                                 {selectedAccordion === indexTab ? (
-                                                    <span className="check-box-permission"><p className="mb-0">-</p></span>
+                                                    <span className="check-box-permission"><img alt="Open" src={openedIcon} /></span>
                                                 ) : (
-                                                    <span className="check-box-permission"><p className="mb-0">+</p></span>
+                                                    <span className="check-box-permission"><img alt="Close" src={closedIcon} /></span>
                                                 )} <span>{group.group_name} </span>
                                             </Button>
 
@@ -258,68 +313,103 @@ const GlobalSetting = () => {
                                                 <Row>
                                                     {group.settings.map((setting, ind) => (
                                                         <Col xxs="12" lg="12" xl="12" key={`custom_${setting.slug}`}>
-                                                            <FormGroup className={classnames({
-                                                                'mb-4': true,
+                                                            <div className={classnames({
+                                                                'full-width': true,
                                                                 '': setting?.type === "select"
                                                             })}>
-                                                                <Label className="w-100 d-block">{setting.name}</Label>
+                                                                <Label className="col-label w-100">{setting.name}</Label>
                                                                 {setting?.type === "text" ? (
                                                                     <CustomInput
                                                                         type="text"
                                                                         id={setting.slug}
                                                                         name={setting.slug}
                                                                         defaultValue={setting.value}
-                                                                        className="w-100 form-control"
-                                                                        onInput={(event) => onInputChange(setting._id, setting.slug, event.target.value)}
+                                                                        className="col-input w-100"
+                                                                        onInput={(event) => onInputChange(setting?._id, setting?.slug, event?.target?.value)}
                                                                     />
                                                                 ) : null}
 
-                                                                {setting?.type === "select" ? (<>
+                                                                {setting?.type === "image" ? (
+                                                                    <div className="d-flex">
+                                                                        <span className="col-photo">
+                                                                            <input
+                                                                                type="file"
+                                                                                accept="image/*"
+                                                                                name={setting.slug}
+                                                                                onChange={(event) => handleChangeImage(setting?._id, setting?.slug, event)}
+                                                                            />
+                                                                        </span>
+
+                                                                        {getImageOptValue(setting) ? (
+                                                                            <img
+                                                                                width={50}
+                                                                                height={45}
+                                                                                alt="Avatar"
+                                                                                key={setting.slug}
+                                                                                src={getImageOptValue(setting)}
+                                                                                style={{
+                                                                                    marginLeft: "10px",
+                                                                                    maxWidth: "100%"
+                                                                                }}
+                                                                                onError={(currentTarget) => onImageSrcError(currentTarget, defaultAvatar)}
+                                                                            />
+                                                                        ) : null}
+                                                                    </div>
+                                                                ) : null}
+
+                                                                {setting?.type === "select" ? (
                                                                     <FormikReactSelect
                                                                         id={setting.slug}
                                                                         name={setting.slug}
                                                                         onBlur={() => null}
                                                                         placeholder="Select..."
+                                                                        classNamePrefix="react-select"
+                                                                        className="react-select col-select w-100"
                                                                         options={setting?.options || []}
                                                                         value={getSelectOpsValue(setting)}
                                                                         onChange={(name, val) => handleChangeSelect(setting, val)}
                                                                     />
-                                                                </>) : null}
+                                                                ) : null}
 
-                                                                {setting?.options?.length && setting?.type === "checkbox" ? (<>
-                                                                    {setting.options.map((opt) => (
-                                                                        <div key={`${opt.value}-${ind}`} className="d-inline-block mr-2">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                id={`${opt.value}-${ind}`}
-                                                                                className="pointer mr-1 align-middle"
-                                                                                checked={(getCheckboxOpsValue(setting, opt.value) === opt?.value) || false}
-                                                                                onChange={() => handleChangeCheckbox(setting, opt)}
-                                                                            />
-                                                                            <Label
-                                                                                for={`${opt.value}-${ind}`}
-                                                                                className="form-check-label user-select-none pointer mb-0"
-                                                                            >
-                                                                                {opt?.label || ""}
-                                                                            </Label>
-                                                                        </div>
-                                                                    ))}
-                                                                </>) : null}
-                                                            </FormGroup>
+                                                                {setting?.options?.length && setting?.type === "checkbox" ? (
+                                                                    <div className="row m-0">
+                                                                        {setting.options.map((opt) => (
+                                                                            <div key={`${opt.value}-${ind}`} className="d-flex align-items-center checkbox-container">
+                                                                                <label className="checkbox-box text-center">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={`${opt.value}-${ind}`}
+                                                                                        name={`${opt.value}-${ind}`}
+                                                                                        className="pointer mr-1 align-middle"
+                                                                                        checked={(getCheckboxOpsValue(setting, opt.value) === opt?.value) || false}
+                                                                                        onChange={() => handleChangeCheckbox(setting, opt)}
+                                                                                    />
+                                                                                    <span className="checkmark" for={`${opt.value}-${ind}`}></span>
+                                                                                </label>
+
+                                                                                <Label
+                                                                                    for={`${opt.value}-${ind}`}
+                                                                                    className="form-check-label user-select-none pointer mb-0 ml-2"
+                                                                                >
+                                                                                    {opt?.label || ""}
+                                                                                </Label>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                ) : null}
+                                                            </div>
                                                         </Col>
                                                     ))}
 
-                                                    <Col className="btn-login text-center">
-                                                        <FormGroup>
-                                                            <Button
-                                                                type="button"
-                                                                color="primary"
-                                                                className=""
-                                                                onClick={() => onSubmit()}
-                                                            >
-                                                                Submit
-                                                            </Button>
-                                                        </FormGroup>
+                                                    <Col className="btn-login ml-1">
+                                                        <Button
+                                                            type="button"
+                                                            color="primary"
+                                                            className="mb-3"
+                                                            onClick={() => onSubmit()}
+                                                        >
+                                                            Submit
+                                                        </Button>
                                                     </Col>
                                                 </Row>
                                             </Collapse>

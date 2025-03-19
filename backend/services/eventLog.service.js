@@ -1,6 +1,8 @@
 // Gettign the Newly created Mongoose Model we just created 
 var EventLog = require('../models/EventLog.model');
 
+const { isObjEmpty } = require('../helper')
+
 // Saving the context of this module inside the _the variable
 _this = this
 
@@ -95,6 +97,7 @@ exports.createEventLog = async function (eventLog) {
         action_user_id: eventLog.action_user_id ? eventLog.action_user_id : null,
         user_id: eventLog.user_id ? eventLog.user_id : null,
         reference_id: eventLog.reference_id ? eventLog.reference_id : null,
+        date_in_string: eventLog.date_in_string ? eventLog.date_in_string : "",
         module_slug: eventLog.module_slug ? eventLog.module_slug : "",
         type: eventLog.type ? eventLog.type : "",
         action: eventLog.action ? eventLog.action : "",
@@ -147,6 +150,10 @@ exports.updateEventLog = async function (eventLog) {
         oldEventLog.reference_id = eventLog.reference_id;
     }
 
+    if (eventLog.date_in_string) {
+        oldEventLog.date_in_string = eventLog.date_in_string;
+    }
+
     if (eventLog.module_slug) {
         oldEventLog.module_slug = eventLog.module_slug;
     }
@@ -163,12 +170,16 @@ exports.updateEventLog = async function (eventLog) {
         oldEventLog.description = eventLog.description;
     }
 
+    if (eventLog.previous) {
+        oldEventLog.previous_data = oldEventLog?.current_data || null;
+    }
+
     if (eventLog.previous_data) {
-        oldEventLog.previous_data = eventLog.previous_data;
+        oldEventLog.previous_data = !isObjEmpty(eventLog.previous_data) ? eventLog.previous_data : null;
     }
 
     if (eventLog.current_data) {
-        oldEventLog.current_data = eventLog.current_data;
+        oldEventLog.current_data = !isObjEmpty(eventLog.current_data) ? eventLog.current_data : null;
     }
 
     if (eventLog.deletedAt) {

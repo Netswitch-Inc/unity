@@ -44,56 +44,49 @@ exports.getAggregateConfigurationAssessments = async function (query = {}) {
 
         return configurationAssessments || [];
     } catch (error) {
-        console.log("getAggregateConfigurationAssessments catch >>> ", error)
+        // console.log("getAggregateConfigurationAssessments catch >>> ", error)
         throw Error(error.message);
     }
 }
 
-exports.getConfigurationAssessmentsGraph = async function (query = {}) {
+exports.getConfigurationAssessmentsGraph = async function (query = {}) { 
     try {
-        var configurationAssessments = await ConfigurationAssessment.aggregate([{ $match: query }, {
-            $addFields: {
-                yearMonth: {
-                    $dateToString: { format: "%Y-%m", date: "$end_scan" }
+        var configurationAssessments = await ConfigurationAssessment.aggregate([
+            { $match: query },
+            {
+                $addFields: {
+                    fullDate: {
+                        $dateToString: { format: dateFormat, date: "$end_scan" }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$fullDate",
+                    total_checks: { $sum: "$total_checks" }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            },
+            {
+                $project: {
+                    name: "$_id",
+                    value: "$total_checks",
+                    _id: 0
                 }
             }
-        }, {
-            $group: {
-                _id: "$yearMonth",
-                total_checks: { $sum: "$total_checks" }
-            }
-        }, {
-            $sort: {
-                _id: 1
-            }
-        }, {
-            $project: {
-                name: {
-                    $let: {
-                        vars: {
-                            parts: { $split: ["$_id", "-"] },
-                            months: ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-                        },
-                        in: {
-                            $concat: [
-                                { $arrayElemAt: ["$$months", { $toInt: { $arrayElemAt: ["$$parts", 1] } }] },
-                                "-",
-                                { $substr: [{ $arrayElemAt: ["$$parts", 0] }, 2, 2] }
-                            ]
-                        }
-                    }
-                },
-                value: "$total_checks",
-                _id: 0
-            }
-        }])
+        ]);
 
         return configurationAssessments || [];
     } catch (error) {
-        console.log("getConfigurationAssessmentsGraph catch >>> ", error)
+        // console.log("getConfigurationAssessmentsGraph catch >>> ", error);
         throw Error(error.message);
     }
-}
+};
+
 
 exports.getConfigurationAssessmentCount = async function (query) {
     try {

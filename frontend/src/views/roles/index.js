@@ -1,6 +1,7 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 
 // ** React Imports
-import React, { useEffect, useLayoutEffect, useState, useCallback, Fragment } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
@@ -8,33 +9,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { getRoleList, deleteRole, cleanRoleMessage } from './store';
 
 // ** Reactstrap Imports
-import { Card, CardBody, Col, InputGroup, Row } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
 
 // ** Utils
 import { getModulePermissionData } from 'utility/Utils';
 
 // ** Custom Components
-import DatatablePagination from 'components/DatatablePagination';
 import SimpleSpinner from 'components/spinner/simple-spinner';
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
-import { TiEye, TiEdit, TiTrash, TiMessages } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 // ** Constant
-import {
-    roleItem,
-    defaultPerPageRow,
-    rolesPermissionId,
-    masterGroupPermissionId
-} from "utility/reduxConstant";
-
-// ** SVG Icons
-import { BiSearch } from 'components/SVGIcons';
+import { roleItem, rolesPermissionId, masterGroupPermissionId } from "utility/reduxConstant";
 
 import AddNewRoleModal from './modals/AddNewRoleModal';
+
+import deleteicon from "assets/img/delete_blue.svg";
+import settingicon from "assets/img/setting.svg";
 
 const RoleList = () => {
     // ** Hooks
@@ -57,43 +52,16 @@ const RoleList = () => {
     const [snackMessage, setSnackMessage] = useState("");
 
     /* Pagination */
-    const [sort, setSort] = useState("desc");
-    const [sortColumn, setSortColumn] = useState("_id");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(defaultPerPageRow);
-    const [searchInput, setSearchInput] = useState("");
+    const [sort] = useState("desc");
+    const [sortColumn] = useState("_id");
 
     const handleRoleLists = useCallback((sorting = sort,
-        sortCol = sortColumn, page = currentPage, perPage = rowsPerPage, search = searchInput) => {
+        sortCol = sortColumn) => {
         dispatch(getRoleList({
             sort: sorting,
-            sortColumn: sortCol,
-            page,
-            limit: perPage,
-            search: search
+            sortColumn: sortCol
         }));
-    }, [sort, sortColumn, currentPage, rowsPerPage, searchInput, dispatch])
-
-    const handleSort = (column, sortDirection) => {
-        setSort(sortDirection);
-        setSortColumn(column.sortField);
-        handleRoleLists(sortDirection, column.sortField, currentPage, rowsPerPage, searchInput)
-    }
-
-    const handlePagination = (page) => {
-        setCurrentPage(page + 1);
-        handleRoleLists(sort, sortColumn, page + 1, rowsPerPage, searchInput)
-    }
-
-    const handlePerPage = (value) => {
-        setRowsPerPage(value);
-        handleRoleLists(sort, sortColumn, currentPage, value, searchInput)
-    }
-
-    const onSearchKey = (value) => {
-        setSearchInput(value);
-        handleRoleLists(sort, sortColumn, currentPage, rowsPerPage, value)
-    }
+    }, [sort, sortColumn, dispatch])
 
     useLayoutEffect(() => {
         handleRoleLists();
@@ -147,34 +115,6 @@ const RoleList = () => {
         });
     }
 
-    const columns = [
-        {
-            name: 'Name',
-            sortField: "name",
-            sortable: true,
-            selector: (row) => row?.name || ""
-        },
-        {
-            name: 'Action',
-            center: true,
-            cell: (row) => (
-                <Fragment>
-                    {permission?.update ? (
-                        <TiEdit title="Edit" size={20} color="#fff" cursor="pointer" className='mr-1' onClick={() => handleEditRole(row)} />
-                    ) : null}
-
-                    {permission?.update ? (
-                        <TiEye title="Module Permission" size={20} color="#fff" cursor="pointer" className='mr-1' onClick={() => navigate(`permission/${row?._id}`)} />
-                    ) : null}
-
-                    {!row?.is_default && permission?.delete ? (
-                        <TiTrash title="Delete" size={20} color="#fff" cursor="pointer" onClick={() => handleDeleteRole(row?._id)} />
-                    ) : null}
-                </Fragment>
-            )
-        }
-    ];
-
     return (
         <div className="content data-list">
             {!store?.loading ? (
@@ -188,58 +128,83 @@ const RoleList = () => {
                     {snackMessage}
                 </ReactSnackBar>
 
-                <Row className='row-row'>
-                    <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-                        <div className="d-flex justify-content-between p-0 border-bottom card-header">
-                            <h3 className="card-title">Roles</h3>
-                        </div>
+                <Row>
+                    <div className="col-md-12 col-xxl-10 mx-auto tbl-height-container roles-page">
+                        <Row>
+                            {store?.roleItems?.length ? (
+                                store.roleItems.map((item, ind) => (
+                                    <Col key={`${item?._id}-${ind}`} sm={6} lg={4} xl={3} className='grid-box'>
+                                        <div className='content-wrap'>
+                                            <h3 className='title'>{item?.name || ""}</h3>
+                                            <div className='actions'>
+                                                <div className='edit'>
+                                                    {permission?.update ? (
+                                                        <a
+                                                            // title="Edit"
+                                                            role="button"
+                                                            onClick={() => handleEditRole(item)}
+                                                        >
+                                                            Edit Role
+                                                        </a>
+                                                    ) : null}
+                                                </div>
 
-                        <CardBody className='pl-0 pr-0'>
-                            <Row className="mt-2">
-                                <Col sm="6">
-                                    <InputGroup>
-                                        <input className="form-control " type="search" placeholder="Search" aria-label="Search" value={searchInput} onChange={(event) => onSearchKey(event?.target?.value)} />
-                                        <span className="edit2-icons position-absolute">
-                                            <BiSearch />
-                                        </span>
-                                    </InputGroup>
+                                                <div className='view-delete'>
+                                                    {permission?.update ? (
+                                                        <a
+                                                            role="button"
+                                                            className='view'
+                                                            title="Module Permission"
+                                                            onClick={() => navigate(`permission/${item?._id}`)}
+                                                        >
+                                                            <img src={settingicon} alt="" />
+                                                        </a>
+                                                    ) : null}
+
+                                                    {!item?.is_default && permission?.delete ? (
+                                                        <a
+                                                            role="button"
+                                                            title="Delete"
+                                                            className="delete"
+                                                            onClick={() => handleDeleteRole(item?._id)}
+                                                        >
+                                                            <img src={deleteicon} alt="" />
+                                                        </a>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                ))
+                            ) : null}
+
+                            {permission?.create ? (
+                                <Col sm={6} lg={4} xl={3} className='grid-box'>
+                                    <div className='content-wrap'>
+                                        <div className='buttons'>
+                                            <button type="button"
+                                                className='btnprimary'
+                                                onClick={() => setModalOpen(true)}
+                                            >
+                                                Add New Role
+                                            </button>
+                                        </div>
+
+                                        <div className='content-box'>
+                                            Add a new role, if it does not exist
+                                        </div>
+                                    </div>
                                 </Col>
+                            ) : null}
+                        </Row>
 
-                                <Col sm="6" className='text-right'>
-                                    {permission?.create ? (
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() => setModalOpen(true)}
-                                        >
-                                            Add Role
-                                        </button>
-                                    ) : null}
-                                </Col>
-                            </Row>
-
-                            <Row className="roleManagement mt-3">
-                                <Col className="pb-2" md="12">
-                                    <DatatablePagination
-                                        data={store.roleItems}
-                                        columns={columns}
-                                        rowsPerPage={rowsPerPage}
-                                        pagination={store?.pagination}
-                                        handleSort={handleSort}
-                                        handleRowPerPage={handlePerPage}
-                                        handlePagination={handlePagination}
-                                    />
-                                </Col>
-                            </Row>
-
-                            <AddNewRoleModal
-                                open={modalOpen}
-                                roleItemData={roleItemData}
-                                closeModal={() => setModalOpen(false)}
-                                resetRoleItemData={() => setRoleItemData(roleItem)}
-                            />
-                        </CardBody>
-                    </Card>
+                        <AddNewRoleModal
+                            open={modalOpen}
+                            roleItemData={roleItemData}
+                            closeModal={() => setModalOpen(false)}
+                            resetRoleItemData={() => setRoleItemData(roleItem)}
+                        />
+                    </div>
                 </Row>
             </div>
         </div>

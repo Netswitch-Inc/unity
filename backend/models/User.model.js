@@ -11,6 +11,7 @@ var UserSchema = new mongoose.Schema({
   user_name: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, select: false },
+  country_code: Object,
   phone: String,
   image: String,
   retry_count: Number,

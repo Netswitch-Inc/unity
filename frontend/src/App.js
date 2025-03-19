@@ -31,7 +31,7 @@ const App = () => {
             )}
 
             {!isAuthenticated && (
-                <Route path="/forgot-passowrd" element={(<ForgotPassword />)} />
+                <Route path="/forgot-password" element={(<ForgotPassword />)} />
             )}
 
             {!isAuthenticated && (

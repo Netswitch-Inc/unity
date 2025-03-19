@@ -6,6 +6,7 @@ var SettingSchema = new mongoose.Schema({
   name: String,
   slug: { type: String, required: true, unique: true },
   type: String,
+  note: String,
   value: String,
   options: { type: Array, default: null },
   deletedAt: Date

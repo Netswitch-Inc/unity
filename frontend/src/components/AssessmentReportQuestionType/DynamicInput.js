@@ -26,7 +26,7 @@ const DynamicInput = ({ type, label, options = [], value = "", onChange, written
           value={value}
           onChange={handleChange}
           placeholder="Enter your Answer here"
-          className="form-control"
+          className="col-input w-100"
         />
       )}
       {type === "textarea" && (
@@ -34,6 +34,7 @@ const DynamicInput = ({ type, label, options = [], value = "", onChange, written
           value={value}
           onChange={handleChange}
           placeholder="Enter your Answer here"
+          className="col-input w-100"
         />
       )}
       {type === "checkbox" &&
@@ -123,7 +124,7 @@ const DynamicInput = ({ type, label, options = [], value = "", onChange, written
           type="date"
           value={value}
           onChange={handleChange}
-          className="form-control"
+          className="col-input birth-input"
         />
       )}
     </div>

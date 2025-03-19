@@ -103,7 +103,7 @@ exports.checkIsEmailUnique = async function (req, res, next) {
         if (user && user?._id) {
             return res.status(200).json({ status: 200, flag: false, message: "Email already taken." });
         } else {
-            return res.status(200).json({ status: 200, flag: true, message: "Email Is Not taken." });
+            return res.status(200).json({ status: 200, flag: true, message: "Email is available." });
         }
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -120,14 +120,56 @@ exports.checkIsUserUnique = async function (req, res, next) {
         if (id) { query._id = { $ne: id }; }
         var user = await UserService.getUserOne(query);
         if (user && user?._id) {
-            return res.status(200).json({ status: 200, flag: false, message: "User Name already taken." });
+            return res.status(200).json({ status: 200, flag: false, message: "User name already taken." });
         } else {
-            return res.status(200).json({ status: 200, flag: true, message: "User Name Is Not taken." });
+            return res.status(200).json({ status: 200, flag: true, message: "User name is available." });
         }
-
-
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message });
+    }
+}
+
+exports.checkUsernameExist = async function (req, res, next) {
+    // Check the existence of the query parameters, If doesn't exists assign a default value
+    try {
+        var userName = req.query?.user_name || "";
+        var id = req.query?.id || "";
+        if (!userName) {
+            return res.status(200).json({ status: 200, flag: false, message: "Username must be present" });
+        }
+
+        var query = { user_name: userName };
+        if (id) { query._id = { $ne: id }; }
+        var user = await UserService.getUserOne(query);
+        if (user && user?._id) {
+            return res.status(200).json({ status: 200, flag: false, data: true, message: "User name already taken." });
+        } else {
+            return res.status(200).json({ status: 200, flag: true, data: false, message: "User name is available." });
+        }
+    } catch (e) {
+        return res.status(200).json({ status: 200, flag: false, data: true, message: e.message });
+    }
+}
+
+exports.checkEmailExist = async function (req, res, next) {
+    // Check the existence of the query parameters, If doesn't exists assign a default value
+    try {
+        var email = req.query?.email;
+        var id = req.query?.id || "";
+        if (!email) {
+            return res.status(200).json({ status: 200, flag: false, message: "Email must be present" });
+        }
+
+        var query = { email };
+        if (id) { query._id = { $ne: id }; }
+        var user = await UserService.getUserOne(query);
+        if (user && user?._id) {
+            return res.status(200).json({ status: 200, flag: false, data: true, message: "Email already taken." });
+        } else {
+            return res.status(200).json({ status: 200, flag: true, data: false, message: "Email is available." });
+        }
+    } catch (e) {
+        return res.status(200).json({ status: 200, flag: false, data: true, message: e.message });
     }
 }
 
@@ -379,18 +421,13 @@ exports.changePassword = async function (req, res, next) {
             status: 200,
             flag: false,
             message: "old password and new password must be present",
-        });
+        })
     }
+
     try {
-        var User = await UserService.checkUserPassword({
-            _id: id,
-            password: data.old_password,
-        });
+        var User = await UserService.checkUserPassword({ _id: id, password: data.old_password })
         if (User && User._id) {
-            var updatedUser = await UserService.updateUser({
-                _id: User._id,
-                password: data.password,
-            });
+            var updatedUser = await UserService.updateUser({ _id: User._id, password: data.password })
             updatedUser = await UserService.getUser(updatedUser._id);
             flag = true;
             message = "Password updated successfully!";
@@ -398,13 +435,12 @@ exports.changePassword = async function (req, res, next) {
             flag = false;
             message = "old password not matched!";
         }
+
         return res.status(200).json({ status: 200, flag: flag, message: message });
     } catch (e) {
-        return res
-            .status(200)
-            .json({ status: 200, flag: false, message: e.message });
+        return res.status(200).json({ status: 200, flag: false, message: e.message });
     }
-};
+}
 
 exports.updateUserProfile = async function (req, res, next) {
     // Id is necessary for the update

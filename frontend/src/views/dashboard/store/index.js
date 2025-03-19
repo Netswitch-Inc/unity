@@ -287,11 +287,49 @@ export const openVASScanReportStatsData = createAsyncThunk("appDashboard/openVAS
   }
 })
 
+async function netSwitchThreatIntelCountryCountDataRequest(params) {
+  return instance.get(`${API_ENDPOINTS.dashboard.netSwitchThreatIntelCount}`, { params })
+    .then((items) => items.data)
+    .catch((error) => error)
+}
+
+export const netSwitchThreatIntelCountryCount = createAsyncThunk("appDashboard/netSwitchThreatIntelCountryCount", async (params) => {
+  try {
+    const response = await netSwitchThreatIntelCountryCountDataRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        netSwitchThreatIntelCount: response?.data || null,
+        actionFlag: "NSTI_CNT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        params,
+        netSwitchThreatIntelCount: null,
+        actionFlag: "NSTI_CNT_ERR",
+        success: "",
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      netSwitchThreatIntelCount: null,
+      actionFlag: "NSTI_CNT_ERR",
+      success: "",
+      error: error
+    }
+  }
+})
+
 const appAuthSlice = createSlice({
   name: "appDashboard",
   initialState: {
     WidgetsOrder: [],
     widgetItems: [],
+    netSwitchThreatIntelCount : null,
     wazuhSeverityCount: null,
     wazuhSeverityGraphData: null,
     incidentTrendWazuhData: null,
@@ -441,6 +479,23 @@ const appAuthSlice = createSlice({
         state.error = action.payload?.error || "";
       })
       .addCase(openVASScanReportStatsData.rejected, (state, action) => {
+        state.loading = true;
+        state.success = "";
+        state.error = action.payload?.error || "";
+      })
+      .addCase(netSwitchThreatIntelCountryCount.pending, (state) => {
+        state.loading = false;
+        state.success = "";
+        state.error = "";
+      })
+      .addCase(netSwitchThreatIntelCountryCount.fulfilled, (state, action) => {
+        state.loading = true;
+        state.actionFlag = action.payload?.actionFlag;
+        state.netSwitchThreatIntelCount = action.payload?.netSwitchThreatIntelCount || null;
+        state.success = action.payload?.success || "";
+        state.error = action.payload?.error || "";
+      })
+      .addCase(netSwitchThreatIntelCountryCount.rejected, (state, action) => {
         state.loading = true;
         state.success = "";
         state.error = action.payload?.error || "";

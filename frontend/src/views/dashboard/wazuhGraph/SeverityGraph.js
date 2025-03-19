@@ -29,7 +29,7 @@ import {
   CategoryScale
 } from "chart.js";
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiArrowLeft } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
 import { OptionsForGraph } from "utility/reduxConstant";
@@ -185,7 +185,7 @@ const SeverityGraph = () => {
           onClick={() => navigate(-1)}
         >
           Back
-          <TiArrowLeft size={25} title="Back" className="ml-2" />
+          {/* <TiArrowLeft size={25} title="Back" className="" /> */}
         </button>
       </div>
       <div className="d-flex justify-content-between">

@@ -1,6 +1,7 @@
 var moment = require('moment');
-var backendNodeUrl = process.env?.NODE_BACKEND_URL || "";
 var path = require("path");
+
+var backendNodeUrl = process.env?.NODE_BACKEND_URL || "";
 
 var MailService = require("../services/mail.service");
 var EventLogService = require("../services/eventLog.service");
@@ -14,6 +15,8 @@ var SettingService = require("../services/setting.service");
 const wazuhKey = "wazuh";
 const openVASKey = "openvas";
 const helpdeskSupportTicketKey = "helpdesk-support-ticket";
+const netswitchThreatIntelKey = "netswitch-threat-intel";
+const zendeskSupportTicketKey = "zendesk-support-ticket";
 
 const moduleSlugs = {
   roles: "roles",
@@ -204,6 +207,52 @@ const sendSimpleHtmlEmail = async (to, name, subject, html) => {
   }
 }
 
+const createUpdateCronEventLog = async (payload = null) => {
+  try {
+    if (!payload || (payload && isObjEmpty(payload))) {
+      return { data: null, error: "Payload must be present." };
+    }
+
+    if (!payload?.action) {
+      return { data: null, error: "Action must be present." };
+    }
+
+    if (!payload?.type) {
+      return { data: null, error: "Type must be present." };
+    }
+
+    if (payload?.module_slug && moduleSlugs[payload.module_slug]) {
+      const module = modulesData.find((x) => x.slug == moduleSlugs[payload.module_slug]);
+      if (module && module?._id) {
+        payload.module_id = module._id;
+        payload.module_slug = module.slug;
+      }
+    }
+
+    var todayDate = formatDate(null, "YYYY-MM-DD")
+    payload.date_in_string = todayDate;
+
+    var eventLog = null;
+    if (payload?._id) {
+      eventLog = await EventLogService.updateEventLog(payload);
+    } else {
+      eventLog = await EventLogService.createEventLog(payload);
+    }
+
+    var result = { data: eventLog };
+    if (eventLog?._id) {
+      result.message = "Cron event log created successfully.";
+    } else {
+      result.error = "Something went wrong.";
+    }
+
+    return result;
+  } catch (error) {
+    console.log("createUpdateCronEventLog catch >>>", error);
+    return { data: null, error };
+  }
+}
+
 const createUpdateEventLog = async (payload = null, action = "", type = "") => {
   try {
     if (!action) {
@@ -219,25 +268,22 @@ const createUpdateEventLog = async (payload = null, action = "", type = "") => {
     }
 
     if (payload?.module_slug && moduleSlugs[payload.module_slug]) {
-      const module = modulesData.find(
-        (x) => x.slug == moduleSlugs[payload.module_slug]
-      );
+      const module = modulesData.find((x) => x.slug == moduleSlugs[payload.module_slug]);
       if (module && module?._id) {
         payload.module_id = module._id;
         payload.module_slug = module.slug;
       }
     }
 
+    var todayDate = formatDate(null, "YYYY-MM-DD")
+
     var query = { action, type, user_id: null, company_id: null };
-    if (payload?.reference_id) {
-      query.reference_id = payload.reference_id;
-    }
-    if (payload?.user_id) {
-      query.user_id = payload.user_id;
-    }
-    if (payload?.company_id) {
-      query.company_id = payload.company_id;
-    }
+    if (payload?.reference_id) { query.reference_id = payload.reference_id; }
+    if (payload?.user_id) { query.user_id = payload.user_id; }
+    if (payload?.company_id) { query.company_id = payload.company_id; }
+
+    payload.date_in_string = todayDate;
+
     var eventLog = await EventLogService.getEventLogOne(query);
     if (eventLog && eventLog?._id) {
       payload._id = eventLog._id;
@@ -345,12 +391,24 @@ const getToolsPermissions = async function () {
   }
 }
 
+const removeWhiteSpaceString = (string = "") => {
+  if (string) {
+    string = string.replace(/\s+/g, "") || string;
+  }
+
+  return string
+}
+
 module.exports = {
   wazuhKey,
   openVASKey,
   helpdeskSupportTicketKey,
+  netswitchThreatIntelKey,
+  zendeskSupportTicketKey,
+
   moduleSlugs,
   modulesData,
+
   isObjEmpty,
   sendEmail,
   sendSimpleHtmlEmail,
@@ -361,5 +419,7 @@ module.exports = {
   sendVerification,
   formatDate,
   splitWithPipe,
-  getToolsPermissions
+  getToolsPermissions,
+  removeWhiteSpaceString,
+  createUpdateCronEventLog
 }

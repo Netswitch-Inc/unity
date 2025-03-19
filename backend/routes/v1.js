@@ -36,6 +36,9 @@ var AgentController = require("../controllers/agents.controller");
 var HelpdeskSupportController = require("../controllers/helpdeskSupports.controller");
 var OpenVASScanReportController = require("../controllers/openVASScanReports.controller");
 var CronSchedulerErrorController = require("../controllers/cronSchedulerErrors.controller");
+var NetSwitchThreatIntelController = require("../controllers/netSwitchThreatIntels.controller");
+var NetswitchThreatIntelStatsController = require("../controllers/netswitchThreatIntelsStats.controller");
+
 
 // ** Auth
 router.post("/users/login", UserController.loginUser);
@@ -50,6 +53,9 @@ router.get("/auth/role-permission", Authorization, PermissionController.getAllPe
 
 router.post("/users/isemailunique", UserController.checkIsEmailUnique);
 router.post("/users/isusernameunique", UserController.checkIsUserUnique);
+
+router.get("/users/email-exist", UserController.checkEmailExist);
+router.get("/users/username-exist", UserController.checkUsernameExist);
 
 // ** Modules
 router.post("/modules", Authorization, ModulesController.createModule);
@@ -240,27 +246,25 @@ router.delete("/project_histories/:id", Authorization, ProjectHistories.removePr
 router.get("/cron-schedulers", Authorization, CronSchedulerController.getCronSchedulers);
 router.post("/cron-schedulers", Authorization, CronSchedulerController.createCronScheduler);
 router.put("/cron-schedulers", Authorization, CronSchedulerController.updateCronScheduler);
+router.get("/cron-schedulers/alert-warning", Authorization, CronSchedulerController.getCronSchedulerAlertWarning);
 router.get("/cron-schedulers/:id", Authorization, CronSchedulerController.getCronScheduler);
 router.delete("/cron-schedulers/:id", Authorization, CronSchedulerController.softDeleteCronScheduler);
 
+
 // ** Test
+
 
 // ** Dashboard
 router.get("/dashboard-widgets-order", Authorization, DashboardController.getDashboardWidgets);
 router.post("/dashboard-widgets-order-update", Authorization, DashboardController.updateDashboardData);
 router.put("/dashboard-widgets-update-toggle", Authorization, DashboardController.updateDashboardWidgetToggleUpdate);
 
-router.get("/wazuh-medium-graph", Authorization, DashboardController.MediumWazuhGraphAPI);
-router.get("/helpdesk-ticket-graph", Authorization, DashboardController.helpdeskTicketsGraph);
-router.get("/dashboard-widgets-unassigned", Authorization, DashboardController.helpdeskTicketsGraphForUnassigned);
-router.get("/request-summary", Authorization, DashboardController.helpdeskTicketsGraphForRequestSummery);
-router.get("/close-request", Authorization, DashboardController.helpdeskTicketsGraphForCloseRequest);
-router.get("/request-recived", Authorization, DashboardController.helpdeskTicketsGraphForRecivedRequest);
 router.get("/wazuh-indexer-severity-counts", Authorization, DashboardController.wazuhIndexerStatisticsData);
 router.get("/wazuh-indexer-graph/filter", Authorization, DashboardController.filterWazuhIndexerStatisticsGraphData);
 router.get("/incident-trend-wazuh-stats-graph/filter", Authorization, DashboardController.incidentTrendingWazuhIndexerStatsGraphData);
 router.get("/configuration-assessment-stats-graph/filter", Authorization, DashboardController.configurationAssessmentStatsGraphData);
 router.get("/openvas-scan-report-stats-graph/filter", Authorization, DashboardController.openVASScanReportStatsGraphData);
+router.get("/netswitch-threat-intels-stats-count/filter",Authorization, DashboardController.getCountBasedOnStatsCountry);
 
 // ** Test
     
@@ -314,5 +318,22 @@ router.put("/cron-scheduler-errors", Authorization, CronSchedulerErrorController
 router.get("/cron-scheduler-errors/:id", Authorization, CronSchedulerErrorController.getCronSchedulerError);
 router.delete("/cron-scheduler-errors/:id", Authorization, CronSchedulerErrorController.softDeleteCronSchedulerError);
 
+// ** NetSwitch Threat Intels
+router.get("/netswitch-threat-intels", NetSwitchThreatIntelController.getNetswitchThreatIntels);
+router.post("/netswitch-threat-intels", NetSwitchThreatIntelController.createNetswitchThreatIntel);
+router.put("/netswitch-threat-intels", NetSwitchThreatIntelController.updateNetSwitchThreatIntel);
+router.get("/netswitch-threat-intels/:id", NetSwitchThreatIntelController.getNetswitchThreatIntel);
+router.post("/netswitch-threat-intels-createBulk", NetSwitchThreatIntelController.createNetswitchThreatIntelBulk);
+router.delete("/netswitch-threat-intels/:id", NetSwitchThreatIntelController.softDeleteNetSwitchThreatIntel);
+router.delete("/netswitch-threat-intels-deleteAll", NetSwitchThreatIntelController.deleteManyNetSwitchThreatIntel);
+
+router.get("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelsStats);
+router.post("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelStats);
+router.put("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.updateNetSwitchThreatIntelStats);
+router.get("/netswitch-threat-intels-stats/:id",Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelStats);
+router.post("/netswitch-threat-intels-createBulk-stats",Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelBulkStats);
+router.delete("/netswitch-threat-intels-stats/:id",Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
+router.delete("/netswitch-threat-intels-deleteAll-stats",Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
+router.delete("/netswitch-threat-intels-country-stats/filter",Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
 
 module.exports = router;

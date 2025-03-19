@@ -1,134 +1,141 @@
-import {
-  useState,
-  Fragment,
-  useCallback,
-  useLayoutEffect,
-  useEffect,
-} from "react";
-import SimpleSpinner from "components/spinner/simple-spinner";
-import { Col, Row, Card, CardBody, InputGroup, UncontrolledTooltip } from "reactstrap";
-import DatatablePagination from "components/DatatablePagination";
+// ** React Imports
+import { useState, Fragment, useEffect, useCallback, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+// ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
-import {
-  TiEdit,
-  TiTrash,
-  TiEye,
-  TiArrowForwardOutline,
-} from "react-icons/ti";
+import { getAssessmentList, deleteAssessment, cleanAssessmentMessage } from "./store";
+
+// ** Reactstrap Imports
+import { Col, Row, Card, CardBody, InputGroup } from "reactstrap";
+
+// ** Utils
+import { getModulePermissionData } from "utility/Utils";
+
+// ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
+import DatatablePagination from "components/DatatablePagination";
+
+// ** Third Party Components
 import Swal from "sweetalert2";
-import { getAssessmentList, deleteAssessment } from "./store";
+import withReactContent from 'sweetalert2-react-content';
+import ReactSnackBar from "react-js-snackbar";
+import { TiMessages } from "react-icons/ti";
+
+// ** Constant
 import {
   defaultPerPageRow,
   discoveryGroupPermissionId,
   assessmentFormsPermissionId,
 } from "utility/reduxConstant";
-import { BiSearch } from "components/SVGIcons";
-import { useNavigate } from "react-router-dom";
 
-// ** Utils
-import { getModulePermissionData } from "utility/Utils";
+// ** SVG Icons
+import { BiSearch } from "components/SVGIcons";
+import editIcon from "assets/img/edit.svg";
+import viewIcon from "assets/img/view.svg";
+import deleteIcon from "assets/img/delete.svg";
+import arrowForwardIcon from "assets/img/arrow-forward.svg";
 
 const AssessmentList = () => {
-  // const [showSnackBar, setshowSnackbar] = useState(false)
-  // const [snakebarMessage, setSnakbarMessage] = useState("");
+  // ** Hooks
+  const navigate = useNavigate();
+  const mySwal = withReactContent(Swal);
 
+  // ** Store vars
+  const dispatch = useDispatch();
+  const store = useSelector((state) => state.assessment);
+  const loginStore = useSelector((state) => state.login);
+
+  // ** States
+  const [showSnackBar, setShowSnackbar] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+
+  // ** Pagination
   const [sort, setSort] = useState("desc");
   const [sortColumn, setSortColumn] = useState("_id");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(defaultPerPageRow);
   const [searchInput, setSearchInput] = useState("");
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const store = useSelector((state) => state.assessment);
-  const loginStore = useSelector((state) => state.login);
-
   // ** Const
-  const permission = getModulePermissionData(
-    loginStore?.authRolePermission,
-    assessmentFormsPermissionId,
-    discoveryGroupPermissionId
-  );
+  const permission = getModulePermissionData(loginStore?.authRolePermission, assessmentFormsPermissionId, discoveryGroupPermissionId);
 
-  const handleAssesmentLists = useCallback(
-    (
-      sorting = sort,
-      sortCol = sortColumn,
-      page = currentPage,
-      perPage = rowsPerPage,
-      search = searchInput
-    ) => {
-      dispatch(
-        getAssessmentList({
-          sort: sorting,
-          sortColumn: sortCol,
-          page,
-          limit: perPage,
-          search: search,
-        })
-      );
-    },
-    [sort, sortColumn, currentPage, rowsPerPage, searchInput, dispatch]
-  );
+  const handleAssesmentLists = useCallback((sorting = sort, sortCol = sortColumn, page = currentPage, perPage = rowsPerPage, search = searchInput) => {
+    dispatch(getAssessmentList({
+      sort: sorting,
+      sortColumn: sortCol,
+      page,
+      limit: perPage,
+      search: search
+    }))
+  }, [sort, sortColumn, currentPage, rowsPerPage, searchInput, dispatch])
 
   useLayoutEffect(() => {
-    handleAssesmentLists();
-  }, [handleAssesmentLists, dispatch]);
+    handleAssesmentLists()
+  }, [handleAssesmentLists])
 
   useEffect(() => {
-    if (store?.actionFlag === "ASSESSMENT_DELETED_SUCCSESS") {
-      dispatch(getAssessmentList());
+    if (store?.actionFlag || store?.success || store?.error) {
+      dispatch(cleanAssessmentMessage(null));
     }
-  }, [store?.actionFlag, dispatch]);
+
+    if (store?.actionFlag === "ASSESSMENT_DELETED_SUCCSESS") {
+      handleAssesmentLists();
+    }
+
+    if (store?.success) {
+      setShowSnackbar(true);
+      setSnackMessage(store.success);
+    }
+
+    if (store?.error) {
+      setShowSnackbar(true);
+      setSnackMessage(store.error);
+    }
+  }, [handleAssesmentLists, store?.actionFlag, store.success, store.error, dispatch])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar])
 
   const handleDeleteAssessment = async (id) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
+    mySwal.fire({
+      title: 'Are you sure?',
       text: "You won't be able to revert this!",
-      icon: "warning",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await dispatch(deleteAssessment(id));
-        handleAssesmentLists();
-        Swal.fire("Deleted!", "Your user has been deleted.", "success");
-      } catch (error) {
-        Swal.fire("Error!", "There was an error deleting the user.", "error");
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteAssessment(id));
       }
-    }
-  };
+    })
+  }
 
   const onSearchKey = (value) => {
     setSearchInput(value);
     handleAssesmentLists(sort, sortColumn, currentPage, rowsPerPage, value);
-  };
+  }
 
   const handlePagination = (page) => {
     setCurrentPage(page + 1);
     handleAssesmentLists(sort, sortColumn, page + 1, rowsPerPage, searchInput);
-  };
+  }
 
   const handleSort = (column, sortDirection) => {
     setSort(sortDirection);
     setSortColumn(column.sortField);
-    handleAssesmentLists(
-      sortDirection,
-      column.sortField,
-      currentPage,
-      rowsPerPage,
-      searchInput
-    );
-  };
+    handleAssesmentLists(sortDirection, column.sortField, currentPage, rowsPerPage, searchInput)
+  }
 
   const handlePerPage = (value) => {
     setRowsPerPage(value);
     handleAssesmentLists(sort, sortColumn, currentPage, value, searchInput);
-  };
+  }
 
   const columns = [
     {
@@ -140,157 +147,145 @@ const AssessmentList = () => {
           className="text-break cursor-pointer"
           onClick={() => {
             if (permission?.update) {
-              navigate(`/admin/assessment-forms/${row?._id}`);
+              navigate(`/admin/assessment-forms/edit/${row?._id}`);
             }
           }}
         >
           {row?.name || ""}
         </div>
-      ),
+      )
     },
     {
       name: "Status",
       center: true,
-      selector: (row) => (row.status === 1 ? "Active" : "InActive"),
+      selector: (row) => (
+        <div className="badge">
+          {row?.status ? (<span className="active">Active</span>) : <span className="inactive">InActive</span>}
+        </div>
+      )
     },
     {
       name: "Action",
       center: true,
       cell: (row) => (
         <Fragment>
-          {permission?.update ? (
-            <>
-              <TiEdit
-                size={20}
-                cursor="pointer"
-                id={`tooltip-Update-${row?._id}`}
-                onClick={() => navigate(`/admin/assessment-forms/${row?._id}`)}
+          <div className="actions">
+            {permission?.update ? (
+              <img
+                alt="Edit"
+                title="Edit"
+                src={editIcon}
+                className="cursor-pointer mr-2"
+                onClick={() => navigate(`/admin/assessment-forms/edit/${row?._id}`)}
               />
-              <UncontrolledTooltip
-                placement="top"
-                target={`tooltip-Update-${row?._id}`}
-              >
-                Update
-              </UncontrolledTooltip>
-            </>
-          ) : null}
+            ) : null}
 
-          {permission?.delete ? (
-            <>
-              <TiTrash
-                size={20}
-                cursor="pointer"
-                id={`tooltip-Delete-${row?._id}`}
+            {permission?.delete ? (
+              <img
+                alt="Delete"
+                title="Delete"
+                src={deleteIcon}
+                className="cursor-pointer mr-2"
                 onClick={() => handleDeleteAssessment(row?._id)}
               />
-              <UncontrolledTooltip
-                placement="top"
-                target={`tooltip-Delete-${row?._id}`}
-              >
-                Delete
-              </UncontrolledTooltip>
-            </>
-          ) : null}
+            ) : null}
 
-          {permission?.update ? (
-            <>
-              <TiEye
-                size={20}
-                cursor="pointer"
-                id={`tooltip-Preview-${row?._id}`}
-                onClick={() =>
-                  navigate(`/admin/assessment-form-preview/${row?._id}`)
-                }
+            {permission?.update ? (
+              <img
+                alt="Preview"
+                title="Preview"
+                src={viewIcon}
+                className="cursor-pointer mr-2"
+                onClick={() => navigate(`/admin/assessment-forms/detail/${row?._id}`)}
               />
-              <UncontrolledTooltip
-                placement="top"
-                target={`tooltip-Preview-${row?._id}`}
-              >
-                Preview
-              </UncontrolledTooltip>
-            </>
-          ) : null}
-          <TiArrowForwardOutline
-            size={20}
-            cursor="pointer"
-            id={`tooltip-forward-${row?._id}`}
-            onClick={() =>
-              navigate(`/admin/assessment-repots/${row?._id}`, {
-                state: { name: row?.name },
-              })
-            }
-          />
-          <UncontrolledTooltip
-            placement="top"
-            target={`tooltip-forward-${row?._id}`}
-          >
-            Asessment Submissions
-          </UncontrolledTooltip>
+            ) : null}
+
+            <img
+              alt="Arrow Forward"
+              src={arrowForwardIcon}
+              title="Assessment Submissions"
+              className="cursor-pointer"
+              onClick={() => navigate(`/admin/assessment-reports/${row?._id}`, {
+                state: { name: row?.name }
+              })}
+            />
+          </div>
         </Fragment>
-      ),
-    },
-  ];
+      )
+    }
+  ]
 
   return (
     <div className="content data-list">
-      {!store?.loading ? <SimpleSpinner /> : null}
       <div className="container-fluid">
-        <Row className="row-row">
-          <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-            <div className="d-flex justify-content-between p-0 border-bottom card-header">
-              <h3 className="card-title">Assesment Forms</h3>
-            </div>
+        {!store?.loading ? <SimpleSpinner /> : null}
 
-            <CardBody className="pl-0 pr-0">
-              <Row className="mt-2">
-                <Col sm="6">
-                  <InputGroup>
-                    <input
-                      className="form-control "
-                      type="search"
-                      placeholder="Search"
-                      aria-label="Search"
-                      value={searchInput}
-                      onChange={(event) => onSearchKey(event?.target?.value)}
+        <ReactSnackBar Icon={(
+          <span><TiMessages size={25} /></span>
+        )} Show={showSnackBar}>
+          {snackMessage}
+        </ReactSnackBar>
+
+        <Row>
+          <Col className="col-md-12 col-xxl-10 mx-auto">
+            <Card className="card-content p-0">
+              {/* <div className="d-flex justify-content-between p-0 border-bottom card-header">
+                <h3 className="card-title">Assesment Forms</h3>
+              </div> */}
+
+              <CardBody>
+                <Row className="top-content">
+                  <Col sm="6">
+                    <InputGroup>
+                      <input
+                        className="col-input w-100"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                        value={searchInput}
+                        onChange={(event) => onSearchKey(event?.target?.value)}
+                      />
+                      <span className="edit2-icons position-absolute">
+                        <BiSearch />
+                      </span>
+                    </InputGroup>
+                  </Col>
+
+                  <Col sm="6" className="text-right">
+                    <div className="buttons">
+                      {permission?.create ? (
+                        <button
+                          type="button"
+                          className="btnprimary"
+                          onClick={() => navigate("/admin/assessment-forms/add")}
+                        >
+                          Add Assessment Form
+                        </button>
+                      ) : null}
+                    </div>
+                  </Col>
+                </Row>
+
+                <Row className="userManagement mt-3">
+                  <Col className="pb-2" md="12">
+                    <DatatablePagination
+                      data={store.assessmentItems}
+                      columns={columns}
+                      pagination={store?.pagination}
+                      handleSort={handleSort}
+                      handlePagination={handlePagination}
+                      handleRowPerPage={handlePerPage}
+                      rowsPerPage={rowsPerPage}
                     />
-                    <span className="edit2-icons position-absolute">
-                      <BiSearch />
-                    </span>
-                  </InputGroup>
-                </Col>
-
-                <Col sm="6" className="text-right">
-                  {permission?.create ? (
-                    <button
-                      onClick={() => navigate("/admin/assessment-forms/add")}
-                      className="btn btn-primary my-2"
-                      type="button"
-                    >
-                      Assesment Form
-                    </button>
-                  ) : null}
-                </Col>
-              </Row>
-
-              <Row className="userManagement mt-3">
-                <Col className="pb-2" md="12">
-                  <DatatablePagination
-                    data={store.assessmentItems}
-                    columns={columns}
-                    pagination={store?.pagination}
-                    handleSort={handleSort}
-                    handlePagination={handlePagination}
-                    handleRowPerPage={handlePerPage}
-                    rowsPerPage={rowsPerPage}
-                  />
-                </Col>
-              </Row>
-            </CardBody>
-          </Card>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+          </Col>
         </Row>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default AssessmentList;

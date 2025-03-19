@@ -222,7 +222,7 @@ export const deleteSection = createAsyncThunk(
       if (response && response.flag) {
         return {
           id,
-          actionFlag: "",
+          actionFlag: "SCTN_DLT_SCS",
           success: response?.message || "",
           error: "",
         };

@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import { Col, Table, UncontrolledTooltip } from "reactstrap";
 
-import { TiMediaRecord } from "react-icons/ti";
+// import { TiMediaRecord } from "react-icons/ti";
 import { scrolTop } from "utility/Utils";
 
 import SimpleSpinner from "components/spinner/simple-spinner";
-
+import iIcon from "assets/img/cis-icon.png";
 const Step2 = React.forwardRef((props, ref) => {
   const [selectedControls, setSelectedControls] = useState([]);
   const [selectedFrameworks, setSelectedFrameworks] = useState([]);
@@ -88,7 +88,7 @@ const Step2 = React.forwardRef((props, ref) => {
     }
 
     return items.map((item, ind) => (
-      <div key={ind} className="cis-complinance-control mt-2 h-100">
+      <div key={ind} className="cis-complinance-control mt-2">
         <div className="row justify-content-center">
           <Col md={6}>
             <div className="content-wrap h-100">
@@ -111,8 +111,8 @@ const Step2 = React.forwardRef((props, ref) => {
                       <span> {item?.identifier}</span>
                     </td> */}
                     <td className="tabletdsbtntyle text-right">
-                      {item?.identifier && <span className="mb-2"> {item?.identifier}</span>}
                       <span>{item?.framework_name || "No Framework"}</span>
+                      {item?.identifier && <span className="second-frame"> {item?.identifier}</span>}
                     </td>
                   </tr>
                 </tbody>
@@ -126,8 +126,11 @@ const Step2 = React.forwardRef((props, ref) => {
                 item.cis_control_id.map((cisControl, sbInd) => (
                   <div key={`${ind}-${sbInd}`} className="text-content w-100 d-flex justify-content-between">
                     <div className="pr-1" id={`complience-sub-control-${cisControl?._id}`}>
-                      <TiMediaRecord size={20} color="#fff" />
-                      <span>{cisControl?.name || "Sub-control Name"}</span>
+                      {/* <TiMediaRecord size={20} color="#fff" /> */}
+                      <div className="cis-icon">
+                        <img alt="icon" src={iIcon} height={17}/>
+                        <p>{cisControl?.name || "Sub-control Name"}</p>
+                      </div>
 
                       <UncontrolledTooltip
                         placement="auto"
@@ -170,13 +173,13 @@ const Step2 = React.forwardRef((props, ref) => {
 
   return (
     <>
-      <div className="compliance-builder">
-        <div className="row">
-          <Col md={6}>
+      <div className="compliance-builder ps">
+        <div className="row compliance-builder-row">
+          <Col md={6} className="compliance-builder-col">
             <div className="complaince-tab">Custom Compliance Framework</div>
           </Col>
 
-          <Col md={6}>
+          <Col md={6} className="compliance-builder-col">
             <div className="complaince-tab">CIS Benchmark</div>
           </Col>
         </div>
@@ -185,11 +188,13 @@ const Step2 = React.forwardRef((props, ref) => {
         {loading ? (
           <SimpleSpinner />
         ) : (
-          renderCISComplianceControl(visibleControls)
+          <div className="compliance-builder-content">
+            {renderCISComplianceControl(visibleControls)}
+          </div>
         )}
 
         {/* "Load More" Element for Infinite Scroll */}
-        <div id="load-more" style={{ height: "30px", textAlign: "center", marginTop: "20px" }}>
+        <div id="load-more" style={{ textAlign: "center", marginTop: "20px" }}>
           {/* No spinner here, infinite scroll only triggers when the user scrolls */}
         </div>
       </div>

@@ -96,9 +96,9 @@ const RiskAssessmentMethod = () => {
         <Col md="12" lg="12">
           <div className="content project-management">
             <Nav tabs className="mb-4">
-              <NavItem>
+              <NavItem className="ml-3">
                 <NavLink
-                  className={classnames({ active: activeTab === "created" })}
+                  className={classnames({ active: activeTab === "created" } )} 
                   onClick={() => {
                     toggle("created");
                   }}
@@ -106,7 +106,7 @@ const RiskAssessmentMethod = () => {
                   In Review
                 </NavLink>
               </NavItem>
-              <NavItem>
+              <NavItem className="ml-3">
                 <NavLink
                   className={classnames({ active: activeTab === "approved" })}
                   onClick={() => {
@@ -117,7 +117,7 @@ const RiskAssessmentMethod = () => {
                 </NavLink>
               </NavItem>
 
-              <NavItem>
+              <NavItem className="ml-3">
                 <NavLink
                   className={classnames({ active: activeTab === "completed" })}
                   onClick={() => {
@@ -126,8 +126,8 @@ const RiskAssessmentMethod = () => {
                 >
                   Completed
                 </NavLink>
-              </NavItem>
-              <NavItem>
+              </NavItem >
+              <NavItem className="ml-3">
                 <NavLink
                   className={classnames({ active: activeTab === "cancelled" })}
                   onClick={() => {
@@ -138,7 +138,7 @@ const RiskAssessmentMethod = () => {
                 </NavLink>
               </NavItem>
 
-              <NavItem>
+              <NavItem className="ml-3">
                 <NavLink
                   className={classnames({
                     active: activeTab === "allprojects",

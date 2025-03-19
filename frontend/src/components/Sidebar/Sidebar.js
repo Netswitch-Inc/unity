@@ -20,7 +20,7 @@ const Sidebar = (props) => {
 
   useEffect(() => {
     setState(getCollapseStates(props.routes));
-  }, []);
+  }, [])
 
   useEffect(() => {
     // if you are using a Windows Machine, the scrollbars will have a Mac look
@@ -38,8 +38,8 @@ const Sidebar = (props) => {
       if (navigator.platform.indexOf("Win") > -1) {
         if (ps) { ps.destroy(); }
       }
-    };
-  });
+    }
+  })
 
   // this creates the intial state of this component based on the collapse routes
   // that it gets through props.routes
@@ -55,9 +55,10 @@ const Sidebar = (props) => {
       }
 
       return null;
-    });
+    })
+
     return initialState;
-  };
+  }
 
   // this verifies if any of the collapses should be default opened on a rerender of this component
   // for example, on the refresh of the page,
@@ -75,7 +76,7 @@ const Sidebar = (props) => {
     }
 
     return false;
-  };
+  }
 
   // this function creates the links and collapses that appear in the sidebar (left menu)
   const createLinks = (routes) => {
@@ -105,7 +106,13 @@ const Sidebar = (props) => {
 
               }}
             >
-              {prop.icon !== undefined ? (<>
+              {prop?.imgIcon ? (<>
+                <img alt="" src={prop?.imgIcon} className="sidebar-img-icon" />
+                <p>
+                  {rtlActive ? prop.rtlName : prop.name}
+                </p>
+                <b className="caret" />
+              </>) : prop?.icon ? (<>
                 <i className={prop.icon} />
                 <p>
                   {rtlActive ? prop.rtlName : prop.name}
@@ -126,7 +133,7 @@ const Sidebar = (props) => {
               <ul className="nav">{createLinks(prop.views)}</ul>
             </Collapse>
           </li>
-        );
+        )
       }
 
       return (
@@ -140,7 +147,12 @@ const Sidebar = (props) => {
             to={prop.layout + prop.path}
             onClick={props.closeSidebar}
           >
-            {prop.icon !== undefined ? (<>
+            {prop?.imgIcon ? (<>
+              <img alt="" src={prop?.imgIcon} className="sidebar-img-icon" />
+              <p>
+                {rtlActive ? prop.rtlName : prop.name}
+              </p>
+            </>) : prop?.icon ? (<>
               <i className={prop.icon} />
               <p>{rtlActive ? prop.rtlName : prop.name}</p>
             </>) : (<>
@@ -153,9 +165,9 @@ const Sidebar = (props) => {
             </>)}
           </NavLink>
         </li>
-      );
-    });
-  };
+      )
+    })
+  }
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -222,7 +234,7 @@ const Sidebar = (props) => {
             {logoText}
           </div>
         ) : null}
-        <Nav className="nav-custom">{createLinks(props.routes)}</Nav>
+        <Nav className="nav-custom main-sidenav">{createLinks(props.routes)}</Nav>
       </div>
     </div>
   );

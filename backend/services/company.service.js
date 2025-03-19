@@ -103,6 +103,7 @@ exports.createCompany = async function (company) {
     user_id: company?.user_id ? company?.user_id : null,
     name: company.name ? company.name : "",
     logo: company.logo ? company.logo : "",
+    country_code: company.country_code ? company.country_code : "",
     contact_no: company.contact_no ? company.contact_no : "",
     email: company.email ? company.email : "",
     address: company.address ? company.address : "",
@@ -168,6 +169,10 @@ exports.updateCompany = async function (company) {
 
   if (company.name) {
     oldCompany.name = company.name;
+  }
+
+  if (company.country_code) {
+    oldCompany.country_code = company.country_code;
   }
 
   if (company.contact_no) {

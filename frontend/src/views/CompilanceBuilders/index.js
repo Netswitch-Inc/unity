@@ -19,7 +19,7 @@ import { scrolTop } from "utility/Utils";
 const steps = [
   {
     stepName: "Compliance Selection",
-    stepIcon: "tim-icons icon-single-02",
+    stepIcon: "tim-icons  icon-single-02",
     component: Step1,
   },
   {
@@ -84,7 +84,7 @@ const ComplianceBuilder = () => {
     <div className="content complaince-builder-content ps">
       {!companyComplianceControlstore?.loading ? <SimpleSpinner /> : null}
 
-      <Col className="col-md-12 col-xxl-10 mr-auto ml-auto">
+      <Col className="col-md-12 col-xxl-10 mr-auto ml-auto compliance-head">
         <ReactWizard
           steps={steps}
           navSteps
@@ -105,9 +105,9 @@ const ComplianceBuilder = () => {
           // nextButtonClasses="btn btn-primary"
           // previousButtonClasses="btn btn-primary"
           headerTextCenter
-          finishButtonClasses="btn btn-btn-simple active btn btn-info btn-sm"
-          nextButtonClasses="btn btn-btn-simple active btn btn-info btn-sm"
-          previousButtonClasses="btn btn-btn-simple active btn btn-info btn-sm"
+          finishButtonClasses="btn btn-btn-simple active btn btn-info btn-sm btnprimary"
+          nextButtonClasses="btn btn-btn-simple active btn btn-info btn-sm btnprimary"
+          previousButtonClasses="btn btn-btn-simple active btn btn-info btn-sm btnprimary"
           progressbar
           color="blue"
           validate

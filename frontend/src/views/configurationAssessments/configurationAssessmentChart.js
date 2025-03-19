@@ -154,7 +154,7 @@ const ConfigurationAssessmentChart = () => {
                 onClick={() => navigate("/admin/dashboard")}
               >
                 Back
-                <TiArrowLeft size={25} title="Back" className="ml-2" />
+                <TiArrowLeft size={25} title="Back" className="" />
               </button>
             </div>
           </Card>

@@ -326,7 +326,7 @@ export const deleteAssessmentReport = createAsyncThunk(
       if (response && response.flag) {
         return {
           id,
-          actionFlag: "",
+          actionFlag: "ASSMT_RPRT_DLT_SCS",
           success: response?.message || "",
           error: "",
         };

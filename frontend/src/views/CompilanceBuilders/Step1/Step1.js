@@ -9,11 +9,16 @@ import { getCompanyComplianceControlList } from "views/companyComplianceControls
 import { Row, Col, FormGroup, Button, UncontrolledTooltip } from "reactstrap";
 import Select from "react-select";
 
+import { scrolTop } from "utility/Utils";
+
 // ** Third Party Components
 import classnames from "classnames";
 
+// ** Modals
+import SelectFramewroksModal from "../modals/SelectFramewroksModal";
+
+// ** Styles
 import "./style.css";
-import { scrolTop } from "utility/Utils";
 
 // Define Step1 as a functional component
 const Step1 = React.forwardRef((props, ref) => {
@@ -21,21 +26,26 @@ const Step1 = React.forwardRef((props, ref) => {
   const store = useSelector((state) => state.compilance);
   const loginStore = useSelector((state) => state.login);
   const companyComplianceControls = useSelector((state) => state.companyComplianceControls)
-  // const companyComplianceControlStore = useSelector((state) => state.companyComplianceControls);
+
+  // ** Const
   const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
+
+  // ** States
+  const [modalOpen, setModalOpen] = useState(false);
   const [loadFirst, setLoadFirst] = useState(false)
-  // const [frameworks, setFrameworks] = useState(store?.frameworkItems);
   const [currentStep] = useState(1)
   const [compliance, setCompliance] = useState([]);
   const [tiles, setTiles] = useState([]);
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
 
-  // useEffect(() => {
-  //   scrolTop();
+  const openModal = () => {
+    setModalOpen(true)
+  }
 
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [props.wizardData]);
+  const closeModal = () => {
+    setModalOpen(false)
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -61,7 +71,7 @@ const Step1 = React.forwardRef((props, ref) => {
           <div className="tile-footer">
             <span>{footer}</span>
             <span>{footer2}</span>
-            </div>
+          </div>
           {description && (
             <UncontrolledTooltip placement="auto" target={`map-tile-${keyVal}`} container={`map-tile-${keyVal}`}>
               <div className="inner-desc">{description}</div>
@@ -250,15 +260,21 @@ const Step1 = React.forwardRef((props, ref) => {
     );
     handleControllerLists(selectedFrameworkIds);
     setCompliance(() => selectedCompliances);
-
   }
 
   return (
     <>
       <h5 className="info-text ps">Let's start with the basic information.</h5>
+      <div className="text-center buttons">
+        <button type="button" className="btnprimary" onClick={() => openModal()}>
+          Select Framework
+        </button>
+      </div>
+
       <Row className="justify-content-center mt-5">
-        <Col sm="10" className="mb-3">
-          <FormGroup>
+        {/*  sm="10" */}
+        <Col sm="12" className="mb-3">
+          <FormGroup className="d-none">
             <label>Compliance</label>
             <Select
               isMulti
@@ -295,15 +311,25 @@ const Step1 = React.forwardRef((props, ref) => {
       </Row>
 
       {compliance?.length ? (
-        <div className="col-sm-10 mx-auto compliance-box-content">
+        // col-sm-10
+        <div className="col-sm-12 mx-auto compliance-box-content">
           <Row className="complianceTilesRow">
             {tiles?.length > 0 &&
               tiles.map((compliance, index) => generateComplianceTile(compliance, index))}
           </Row>
         </div>
       ) : null}
+
+      <SelectFramewroksModal
+        open={modalOpen}
+        closeModal={closeModal}
+        handleSetTiles={handleSetTiles}
+        updateComplianceTiles={updateComplianceTiles}
+        compliance={compliance}
+        frameworkItems={store?.frameworkItems}
+      />
     </>
-  );
-});
+  )
+})
 
 export default Step1;

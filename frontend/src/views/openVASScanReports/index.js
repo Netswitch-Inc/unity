@@ -20,7 +20,7 @@ import DatatablePagination from "components/DatatablePagination";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import ReactSnackBar from "react-js-snackbar";
-import { TiEdit, TiTrash, TiMessages } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
 import {
@@ -34,6 +34,11 @@ import { BiSearch } from "components/SVGIcons";
 
 // ** Modals
 import ModalImportCSV from "./model/ModalImportCSV";
+
+// ** PNG Icons
+import editIcon from "assets/img/edit.svg";
+import deleteIcon from "assets/img/delete.svg";
+// import userPlus from "assets/img/user-plus.png";
 
 const OpenVASScanReportLists = () => {
   // ** Hooks
@@ -162,7 +167,9 @@ const OpenVASScanReportLists = () => {
       sortField: "ip",
       sortable: true,
       selector: (row) => (
-        <div>{row?.ip || ""}</div>
+        <div 
+        className="cursor-pointer"
+        onClick={() => navigate(`/admin/openvas-scan-reports/edit/${row?._id}`)}>{row?.ip || ""}</div>
       )
     },
     {
@@ -202,36 +209,43 @@ const OpenVASScanReportLists = () => {
       center: true,
       cell: (row) => (
         <Fragment>
-          {permission?.update ? (<>
-            <TiEdit
-              size={20}
-              cursor="pointer"
-              id={`tooltip-edit-${row?._id}`}
-              onClick={() => navigate(`/admin/openvas-scan-reports/edit/${row?._id}`)}
-            />
-            <UncontrolledTooltip
+          <div className="actions">
+            {permission?.update ? (<>
+              <img
+                height={22}
+                alt="Edit"
+                title="Edit"
+                src={editIcon}
+                className="cursor-pointer mr-2"
+                id={`tooltip-edit-${row?._id}`}
+                onClick={() => navigate(`/admin/openvas-scan-reports/edit/${row?._id}`)}
+              />
+              <UncontrolledTooltip
               placement="top"
               target={`tooltip-edit-${row?._id}`}
             >
               Edit
             </UncontrolledTooltip>
-          </>) : null}
+            </>) : null}
 
-          {permission?.delete ? (<>
-            <TiTrash
-              size={20}
-              cursor="pointer"
-              id={`tooltip-delete-${row?._id}`}
-              onClick={() => handleDelete(row?._id)}
-
-            />
-            <UncontrolledTooltip
+            {permission?.delete ? (<>
+              <img
+                height={22}
+                alt="Delete"
+                title="Delete"
+                src={deleteIcon}
+                className="cursor-pointer"
+                id={`tooltip-delete-${row?._id}`}
+                onClick={() => handleDelete(row?._id)}
+              />
+              <UncontrolledTooltip
               placement="top"
               target={`tooltip-delete-${row?._id}`}
             >
               Delete
             </UncontrolledTooltip>
-          </>) : null}
+              </>) : null}
+          </div>
         </Fragment>
       )
     }
@@ -252,12 +266,12 @@ const OpenVASScanReportLists = () => {
       <div className="container-fluid">
         <Row className="row-row">
           <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-            <div className="d-flex justify-content-between p-0 border-bottom card-header">
+            {/* <div className="d-flex justify-content-between p-0 border-bottom card-header">
               <h3 className="card-title">OpenVAS Scan Reports</h3>
-            </div>
+            </div> */}
 
-            <CardBody className="pl-0 pr-0">
-              <Row className="mt-2">
+            <CardBody>
+              <Row className="top-content">
                 <Col sm="6">
                   <InputGroup>
                     <input
@@ -265,7 +279,7 @@ const OpenVASScanReportLists = () => {
                       value={searchInput}
                       aria-label="Search"
                       placeholder="Search"
-                      className="form-control "
+                      className="col-input w-100"
                       onChange={(event) => onSearchKey(event?.target?.value)}
                     />
                     <span className="edit2-icons position-absolute">
@@ -275,19 +289,33 @@ const OpenVASScanReportLists = () => {
                 </Col>
 
                 <Col sm="6" className="text-right">
-                  {permission?.create ? (
-                    <button
-                      type="button"
-                      className="btn btn-primary my-2"
-                      onClick={() => AddOpenVASScanReport()}
-                    >
-                      Import CSV
-                    </button>
-                  ) : null}
+                    {/* <div className="buttons">
+                      {permission?.create ? (
+                        <button
+                        onClick={() => navigate('add')}
+                          className="btnprimary"
+                          type="button"
+                        >
+                          Add CSV
+                        </button>
+                      ) : null}
+                    </div> */}
+                  <div className="buttons">
+                      {permission?.create ? (
+                        <button
+                          onClick={() => AddOpenVASScanReport()}
+                          className="btnprimary"
+                          type="button"
+                        >
+                          Import CSV
+                          {/* <img alt="" src={userPlus} className="ml-2" /> */}
+                        </button>
+                      ) : null}
+                    </div>
                 </Col>
               </Row>
 
-              <Row className="userManagement mt-3">
+              <Row className="userManagement mt-3 openvas-table ">
                 <Col className="pb-2" md="12">
                   <DatatablePagination
                     data={store.openVASScanReportItems}

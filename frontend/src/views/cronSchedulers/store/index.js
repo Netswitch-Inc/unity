@@ -9,8 +9,7 @@ import { initCronSchedulerItem } from "utility/reduxConstant";
 
 async function getCronSchedulerListRequest(params) {
     return instance.get(`${API_ENDPOINTS.cronSchedulers.list}`, { params })
-        .then((items) => items.data)
-        .catch((error) => error)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const getCronSchedulerList = createAsyncThunk("appCronSchedulers/getCronSchedulerList", async (params) => {
@@ -21,6 +20,7 @@ export const getCronSchedulerList = createAsyncThunk("appCronSchedulers/getCronS
                 params,
                 cronSchedulerItems: response?.data || [],
                 pagination: response?.pagination || null,
+                cronSchedulerErrorItems: response?.cronSchedulerErrors || [],
                 actionFlag: "",
                 success: "",
                 error: ""
@@ -29,6 +29,7 @@ export const getCronSchedulerList = createAsyncThunk("appCronSchedulers/getCronS
             return {
                 params,
                 cronSchedulerItems: [],
+                cronSchedulerErrors: [],
                 actionFlag: "",
                 success: "",
                 error: response.message
@@ -38,6 +39,7 @@ export const getCronSchedulerList = createAsyncThunk("appCronSchedulers/getCronS
         return {
             params,
             cronSchedulerItems: [],
+            cronSchedulerErrors: [],
             actionFlag: "",
             success: "",
             error: error
@@ -47,11 +49,10 @@ export const getCronSchedulerList = createAsyncThunk("appCronSchedulers/getCronS
 
 async function getCronSchedulerRequest(params) {
     return instance.get(`${API_ENDPOINTS.cronSchedulers.get}/${params?.id}`)
-        .then((items) => items.data)
-        .catch((error) => error)
+        .then((items) => items.data).catch((error) => error)
 }
 
-export const getCronScheduler = createAsyncThunk("appCronSchedulers/editCronSchedulers", async (params) => {
+export const getCronScheduler = createAsyncThunk("appCronSchedulers/getCronScheduler", async (params) => {
     try {
         const response = await getCronSchedulerRequest(params);
         if (response && response.flag) {
@@ -81,8 +82,7 @@ export const getCronScheduler = createAsyncThunk("appCronSchedulers/editCronSche
 
 async function createCronSchedulerRequest(payload) {
     return instance.post(`${API_ENDPOINTS.cronSchedulers.create}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const createCronScheduler = createAsyncThunk("appCronSchedulers/createCronScheduler", async (payload) => {
@@ -116,8 +116,7 @@ export const createCronScheduler = createAsyncThunk("appCronSchedulers/createCro
 
 async function updateCronSchedulerRequest(payload) {
     return instance.put(`${API_ENDPOINTS.cronSchedulers.update}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const updateCronScheduler = createAsyncThunk("appCronSchedulers/updateCronScheduler", async (payload) => {
@@ -151,8 +150,7 @@ export const updateCronScheduler = createAsyncThunk("appCronSchedulers/updateCro
 
 async function deleteCronSchedulerRequest(id) {
     return instance.delete(`${API_ENDPOINTS.cronSchedulers.delete}/${id}`)
-        .then((items) => items.data)
-        .catch((error) => error)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const deleteCronScheduler = createAsyncThunk("appCronSchedulers/deleteCronScheduler", async (id) => {
@@ -183,12 +181,49 @@ export const deleteCronScheduler = createAsyncThunk("appCronSchedulers/deleteCro
     }
 })
 
+async function getCronSchedulerAlertWarningRequest(params) {
+    return instance.get(`${API_ENDPOINTS.cronSchedulers.alertWarning}`, { params })
+        .then((items) => items.data).catch((error) => error)
+}
+
+export const getCronSchedulerAlertWarning = createAsyncThunk("appCronSchedulers/getCronSchedulerAlertWarning", async (params) => {
+    try {
+        const response = await getCronSchedulerAlertWarningRequest(params);
+        if (response && response.flag) {
+            return {
+                cronSchedulerErrorItems: response?.data || [],
+                cronSchedulerItem: response?.cronScheduler || null,
+                actionFlag: "CRN_SCH_ART_WRNG",
+                success: "",
+                error: ""
+            }
+        } else {
+            return {
+                cronSchedulerErrorItems: [],
+                cronSchedulerItem: null,
+                actionFlag: "CRN_SCH_ART_WRNG_ERR",
+                success: "",
+                error: response.message
+            }
+        }
+    } catch (error) {
+        return {
+            cronSchedulerErrorItems: [],
+            cronSchedulerItem: null,
+            actionFlag: "CRN_SCH_ART_WRNG_ERR",
+            success: "",
+            error: error
+        }
+    }
+})
+
 // Create a slice
 const appCronScheduler = createSlice({
     name: 'appCronSchedulers',
     initialState: {
         cronSchedulerItems: [],
         pagination: null,
+        cronSchedulerErrorItems: [],
         cronSchedulerItem: initCronSchedulerItem,
         actionFlag: "",
         loading: true,
@@ -206,6 +241,7 @@ const appCronScheduler = createSlice({
         builder
             .addCase(getCronSchedulerList.pending, (state) => {
                 state.cronSchedulerItems = [];
+                state.cronSchedulerErrorItems = [];
                 state.loading = false;
                 state.success = "";
                 state.error = "";
@@ -213,6 +249,7 @@ const appCronScheduler = createSlice({
             .addCase(getCronSchedulerList.fulfilled, (state, action) => {
                 state.cronSchedulerItems = action.payload?.cronSchedulerItems || [];
                 state.pagination = action.payload?.pagination || null;
+                state.cronSchedulerErrorItems = action.payload?.cronSchedulerErrorItems || [];
                 state.loading = true;
                 state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload?.success;
@@ -289,6 +326,26 @@ const appCronScheduler = createSlice({
                 state.error = action.payload?.error;
             })
             .addCase(deleteCronScheduler.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getCronSchedulerAlertWarning.pending, (state) => {
+                state.cronSchedulerItem = initCronSchedulerItem;
+                state.cronSchedulerErrorItems = [];
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getCronSchedulerAlertWarning.fulfilled, (state, action) => {
+                state.cronSchedulerItem = action.payload?.cronSchedulerItem || initCronSchedulerItem;
+                state.cronSchedulerErrorItems = action.payload?.cronSchedulerErrorItems || [];
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(getCronSchedulerAlertWarning.rejected, (state) => {
                 state.loading = true;
                 state.success = "";
                 state.error = "";

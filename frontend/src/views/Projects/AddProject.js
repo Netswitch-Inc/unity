@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createProject } from "./store";
 import { getCompanyList } from "views/companies/store";
-import { getActionRequest } from "views/users/store";
+import { getUserList } from "views/users/store";
 import { getFrameworkList } from "views/CompilanceBuilders/store";
 
 import { Card, CardBody, FormGroup } from "reactstrap";
@@ -124,7 +124,7 @@ const AddProject = () => {
             dispatch(getCompanyList())
         }
         if (authUser?.company_id?._id)
-            dispatch(getActionRequest({ company_id: loginStore?.authUserItem?.company_id?._id }));
+            dispatch(getUserList({ company_id: loginStore?.authUserItem?.company_id?._id }));
     }, [dispatch]);
     useEffect(() => {
         if (controlId) {
@@ -134,7 +134,7 @@ const AddProject = () => {
 
     useEffect(() => {
         if (!loginStore?.authUserItem?.company_id?._id && companyVal?.value !== '') {
-            dispatch(getActionRequest({ company_id: companyVal?.value }));
+            dispatch(getUserList({ company_id: companyVal?.value }));
         }
     }, [companyVal])
 
@@ -153,14 +153,14 @@ const AddProject = () => {
             }));
             setInvolvedParties(() => list);
         }
-        if (companyStore?.CompanyItems?.length > 0) {
-            const list = companyStore?.CompanyItems?.map((item) => ({
+        if (companyStore?.companyItems?.length > 0) {
+            const list = companyStore?.companyItems?.map((item) => ({
                 label: item?.name,
                 value: item?._id,
             }));
             setCompaniesList(() => list);
         }
-    }, [complienceStore.frameworkItems, userStore?.userItems, companyStore?.CompanyItems]);
+    }, [complienceStore.frameworkItems, userStore?.userItems, companyStore?.companyItems]);
 
     useEffect(() => {
         if (store?.actionFlag === 'PROJECT_CREATED_SUCCESS') {

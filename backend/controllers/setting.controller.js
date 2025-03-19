@@ -25,7 +25,7 @@ exports.getSettings = async function (req, res, next) {
         }
 
         // Return the Settings list with the appropriate HTTP password Code and Message.
-        return res.status(200).json({ status: 200, flag: true, data: settingData, message: "Settings received successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: settingData, message: "Settings received successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -39,7 +39,7 @@ exports.getSetting = async function (req, res, next) {
         var setting = await SettingService.getSetting(id);
 
         // Return the Settings list with the appropriate HTTP password Code and Message.
-        return res.status(200).json({ status: 200, flag: true, data: setting, message: "Setting received successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: setting, message: "Setting received successfully." });
     } catch (e) {
         //Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -53,7 +53,7 @@ exports.getSettingSlug = async function (req, res, next) {
         var setting = await SettingService.getSettingBySlug(slug);
 
         // Return the Settings list with the appropriate HTTP password Code and Message.
-        return res.status(200).json({ status: 200, flag: true, data: setting, message: "Setting received successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: setting, message: "Setting received successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -64,7 +64,7 @@ exports.createSetting = async function (req, res, next) {
     try {
         // Calling the Service function with the new object from the Request Body
         var createdSetting = await SettingService.createSetting(req.body);
-        return res.status(200).json({ status: 200, flag: true, data: createdSetting, message: "Setting created successfully!" })
+        return res.status(200).json({ status: 200, flag: true, data: createdSetting, message: "Setting created successfully." })
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message })
@@ -75,7 +75,7 @@ exports.updateSetting = async function (req, res, next) {
     try {
         var data = req.body?.data || [];
         if (!data?.length && !req.body?._id) {
-            return res.status(200).json({ status: 200, flag: false, message: "Id must be present!" })
+            return res.status(200).json({ status: 200, flag: false, message: "Id must be present." })
         }
 
         if (data?.length) {
@@ -105,7 +105,7 @@ exports.updateSetting = async function (req, res, next) {
             status: 200,
             flag: true,
             data: updatedSetting,
-            message: "Setting updated successfully!"
+            message: "Setting updated successfully."
         });
     } catch (error) {
         return res.status(200).json({ status: 200, flag: false, message: error.message })
@@ -115,12 +115,12 @@ exports.updateSetting = async function (req, res, next) {
 exports.removeSetting = async function (req, res, next) {
     var id = req.params.id;
     if (!id) {
-        return res.status(200).json({ status: 200, flag: true, message: "Id must be present!" })
+        return res.status(200).json({ status: 200, flag: true, message: "Id must be present." })
     }
     try {
         // var deleted = await SettingService.deleteSetting(id);
         var deleted = await SettingService.softDeleteSetting(id);
-        return res.status(200).send({ status: 200, flag: true, message: "Setting deleted successfully!" });
+        return res.status(200).send({ status: 200, flag: true, message: "Setting deleted successfully." });
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message })
     }

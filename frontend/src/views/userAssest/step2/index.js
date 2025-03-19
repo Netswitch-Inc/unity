@@ -1,16 +1,24 @@
+// ** React Imports
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import OtpInput from "react-otp-input";
-import { Card, CardBody, FormGroup } from "reactstrap";
-import { Row, Col } from "react-bootstrap";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+
+// ** Store & Actions
+import { useDispatch, useSelector } from "react-redux";
 import {
     verifyCodeAssessmentReport,
-    editAssessmentReportRequest,
+    editAssessmentReportRequest
 } from "../store";
-// import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+
+// ** Reactstrap Imports
+import { Card, FormGroup } from "reactstrap";
+import { Row, Col } from "react-bootstrap";
+
+// ** Third Party Components
+import OtpInput from "react-otp-input";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
+
+// ** Logo
 import reactLogo from "assets/img/react-logo.png";
 
 const VarificationCode = () => {
@@ -149,19 +157,57 @@ const VarificationCode = () => {
     return (
         <div className="step-wise-content">
             <Row className="sticky--- m-0">
-                <Col className="personal-information left-side">
-                    <div className="steps">
+                <Card className="main-progress col-md-3 mb-0">
+                    <div className="main-logo-img">
                         <div className="logo">
                             <img alt="..." src={reactLogo} />
                         </div>
-                        <ul>
-                            <li className="active done">Company Information</li>
-                            <li className="active">Verification(Email & Mobile)</li>
-                            <li>Self Assessment</li>
-                            <li>Thank You</li>
-                        </ul>
                     </div>
-                </Col>
+                    <div className="mb-0">
+                        <div className="steps-mains">
+                            <div className="steps filled-step">
+                                <div className="borders step-line second-step">
+                                    <div className="step-icon">
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Company Info</h4>
+                                </div>
+                            </div>
+                            <div className="steps active-class">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>2</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Verification</h4>
+                                </div>
+                            </div>
+                            <div className="steps">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>3</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Self Assessment</h4>
+                                </div>
+                            </div>
+                            <div className="steps">
+                                <div className="borders">
+                                    <div className="step-icon">
+                                        <p>4</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Thank You</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
                 <Col className="right-side email-verifcation-or-mobile">
                     <ReactSnackBar
                         Icon={
@@ -173,69 +219,67 @@ const VarificationCode = () => {
                     >
                         {snakebarMessage}
                     </ReactSnackBar>
-                    <Card className="h-100">
-                        <div className="card-header">
-                            <h3 className="m-0">Verification(Email & Mobile)</h3>
+                    <div className="card-header">
+                        <h3 className="m-0">Verification(Email & Mobile)</h3>
+                    </div>
+                    {/* <Card className="h-100"> */}
+                    <Card className="pl-0 pr-0 varification-card">
+                        <div className="row-row">
+                            <div className="col-12 text-center">
+                                <label className="mb-3 varification-label">Email Verifiaction Code</label>
+                                <FormGroup>
+                                    <OtpInput
+                                        value={emailCode}
+                                        onChange={setEmailCode}
+                                        numInputs={6}
+                                        renderSeparator={<span> - </span>}
+                                        renderInput={(props) => <input {...props} />}
+                                    />
+                                    {errorMessage?.email && emailCode?.length < 6 && (
+                                        <div style={{ color: "red" }}>
+                                            Enter 6-digit code received in your email
+                                        </div>
+                                    )}
+                                </FormGroup>
+                            </div>
+                            <div className="col-12 text-center mt-3">
+                                <label className="mb-3 varification-label">Mobile Verification Code</label>
+                                <FormGroup>
+                                    <OtpInput
+                                        value={smsCode}
+                                        onChange={setSmsCode}
+                                        numInputs={6}
+                                        renderSeparator={<span> - </span>}
+                                        renderInput={(props) => <input {...props} />}
+                                    />
+                                    {errorMessage?.smsCode && smsCode?.length < 6 && (
+                                        <div style={{ color: "red" }}>
+                                            Enter 6-digit code received in your mobile via SMS
+                                        </div>
+                                    )}
+                                </FormGroup>
+                            </div>
                         </div>
-                        <CardBody className="pl-0 pr-0">
-                            <div className="row-row">
-                                <div className="col-12 text-center">
-                                    <label className="mb-3">Email Verifiaction Code</label>
-                                    <FormGroup>
-                                        <OtpInput
-                                            value={emailCode}
-                                            onChange={setEmailCode}
-                                            numInputs={6}
-                                            renderSeparator={<span> - </span>}
-                                            renderInput={(props) => <input {...props} />}
-                                        />
-                                        {errorMessage?.email && emailCode?.length < 6 && (
-                                            <div style={{ color: "red" }}>
-                                                Enter 6-digit code received in your email
-                                            </div>
-                                        )}
-                                    </FormGroup>
-                                </div>
-                                <div className="col-12 text-center mt-3">
-                                    <label className="mb-3">Mobile Verification Code</label>
-                                    <FormGroup>
-                                        <OtpInput
-                                            value={smsCode}
-                                            onChange={setSmsCode}
-                                            numInputs={6}
-                                            renderSeparator={<span> - </span>}
-                                            renderInput={(props) => <input {...props} />}
-                                        />
-                                        {errorMessage?.smsCode && smsCode?.length < 6 && (
-                                            <div style={{ color: "red" }}>
-                                                Enter 6-digit code received in your mobile via SMS
-                                            </div>
-                                        )}
-                                    </FormGroup>
-                                </div>
-                            </div>
 
-                            <div className="buttons justify-content-between">
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() =>
-                                        navigate(`/assessment-form/${id}?id=${assessmentId}`)
-                                    }
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={handleSubmit}
-
-                                // disabled={isSubmitting}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </CardBody>
+                        <div className="buttons justify-content-between d-flex btn-position">
+                            <button
+                                type="button"
+                                className="btnprimary ml-3"
+                                onClick={() =>
+                                    navigate(`/assessment-form/${id}?id=${assessmentId}`)
+                                }
+                            >
+                                Previous
+                            </button>
+                            <button
+                                className="btnprimary mr-3"
+                                onClick={handleSubmit}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </Card>
+                    {/* </Card> */}
                 </Col>
             </Row>
         </div>

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiArrowLeft } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 import * as Yup from "yup";
 
 const EditSection = () => {
@@ -90,7 +90,7 @@ const EditSection = () => {
                   onClick={() => navigate("/admin/sections")}
                 >
                   Back
-                  <TiArrowLeft size={25} title="Back" className="ml-2" />
+                  {/* <TiArrowLeft size={25} title="Back" className="ml-2" /> */}
                 </button>
               </div>
 

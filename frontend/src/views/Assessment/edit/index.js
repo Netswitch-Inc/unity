@@ -1,23 +1,26 @@
+// ** React Imports
 import React, { useLayoutEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
+
+// ** Reactstrap Imports
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
+
+// ** Third Party Components
 import classnames from "classnames";
-// import AssessmentForm from "./assessmentform";
+
 import EditAssessmentQuestion from "./editquestionassessmentform";
 import EditAssessmentForm from "./editassessmentform";
-import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 const Editassessment = () => {
-  const location = useLocation();
+  // ** Hooks
   const childFunc = useRef(null);
+  const location = useLocation();
 
   // Create a URLSearchParams object from the query string
-  const questionStore = useSelector((state) => state.questions);
-
   const queryParams = new URLSearchParams(location.search);
-
-  // Extract parameters from the query string
   const activateTab = queryParams.get("active_tab");
+
+  // ** States
   const [activeTab, setActiveTab] = useState("1");
   const [triggered, setTrigger] = useState(false);
 
@@ -25,7 +28,7 @@ const Editassessment = () => {
     if (activeTab !== tab) {
       setActiveTab(tab);
     }
-  };
+  }
 
   useLayoutEffect(() => {
     if (activateTab) {
@@ -40,47 +43,34 @@ const Editassessment = () => {
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}
-              onClick={() => {
-                toggle("1");
-              }}
+              onClick={() => toggle("1")}
             >
               Assesment Form
             </NavLink>
           </NavItem>
-          <NavItem>
+
+          <NavItem className="ml-3">
             <NavLink
               className={classnames({ active: activeTab === "2" })}
-              onClick={() => {
-                toggle("2");
-              }}
+              onClick={() => toggle("2")}
             >
               Sections & Questions
             </NavLink>
           </NavItem>
         </Nav>
 
-        {(questionStore?.questionItemsFilterd?.length > 0 && activeTab === '2') && (
+        {activeTab === '2' ? (
           <div className="buttons">
             <button
               type="button"
-              className="btn btn-primary mt-0"
+              className="btnprimary mt-0"
               onClick={() => setTrigger(true)}
             >
               Add Section
             </button>
           </div>
-        )}
+        ) : null}
       </div>
-      {/* <div className="p-0 border-bottom pb-2 row justify-content-end m-0">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => navigate("/admin/assessment-forms")}
-        >
-          Back
-          <TiArrowLeft size={25} title="Back" className="ml-2" />
-        </button>
-      </div> */}
 
       <TabContent activeTab={activeTab}>
         <TabPane tabId="1">
@@ -88,7 +78,6 @@ const Editassessment = () => {
         </TabPane>
 
         <TabPane tabId="2">
-          {" "}
           <EditAssessmentQuestion
             childFunc={childFunc}
             triggered={triggered}
@@ -98,7 +87,7 @@ const Editassessment = () => {
         </TabPane>
       </TabContent>
     </div>
-  );
-};
+  )
+}
 
 export default Editassessment;

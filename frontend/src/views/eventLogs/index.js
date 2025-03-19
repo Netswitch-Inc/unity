@@ -1,5 +1,6 @@
 // ** React Imports
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +23,8 @@ import SimpleSpinner from 'components/spinner/simple-spinner';
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
-import { TiEye, TiMessages } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
+import viewIcon from "assets/img/view.svg";
 
 // ** Constant
 import { defaultPerPageRow, masterGroupPermissionId, eventLogPermissionId } from "utility/reduxConstant";
@@ -30,9 +32,10 @@ import { defaultPerPageRow, masterGroupPermissionId, eventLogPermissionId } from
 // ** SVG Icons
 import { BiSearch } from 'components/SVGIcons';
 
-import EventLogDetailModal from './modals/EventLogDetailModal';
-
 const EventLogList = () => {
+    // ** Hooks
+    const navigate = useNavigate();
+
     // ** Store vars
     const dispatch = useDispatch();
     const store = useSelector((state) => state.eventLogs);
@@ -44,8 +47,6 @@ const EventLogList = () => {
     // ** States
     const [showSnackBar, setshowSnackbar] = useState(false);
     const [snackMessage, setSnackMessage] = useState("");
-    const [detailModalOpen, setDetailModalOpen] = useState(false);
-    const [eventLogDetailItem, setEventLogDetailItem] = useState(null);
 
     /* Pagination */
     const [sort, setSort] = useState("desc");
@@ -53,16 +54,6 @@ const EventLogList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(defaultPerPageRow);
     const [searchInput, setSearchInput] = useState("");
-
-    const openDetailModal = (item = null) => {
-        setEventLogDetailItem(item);
-        setDetailModalOpen(true);
-    }
-
-    const closeDetailModal = () => {
-        setDetailModalOpen(false);
-        setEventLogDetailItem(null);
-    }
 
     const handleEventLogLists = useCallback((sorting = sort,
         sortCol = sortColumn, page = currentPage, perPage = rowsPerPage, search = searchInput) => {
@@ -98,7 +89,7 @@ const EventLogList = () => {
 
     useLayoutEffect(() => {
         handleEventLogLists();
-    }, [handleEventLogLists, dispatch])
+    }, [handleEventLogLists])
 
     useEffect(() => {
         if (store?.actionFlag || store?.success || store?.error) {
@@ -122,24 +113,31 @@ const EventLogList = () => {
         }, 6000);
     }, [showSnackBar])
 
-    const handleEventLogView = (item = null) => {
-        openDetailModal(item);
-    }
-
     const columns = [
         {
             name: 'Date',
             sortField: "updatedAt",
             sortable: true,
             selector: (row) => (
-                row?.updatedAt ? (getFormatDate(row.updatedAt, "DD-MMM-YYYY HH:mm:ss")) : null
+                <div className="cursor-pointer"
+                    onClick={() => navigate(`detail/${row?._id || ""}`)}
+                >
+                    {row?.updatedAt ? (getFormatDate(row.updatedAt, "DD-MMM-YYYY HH:mm:ss")) : null}
+                </div>
             )
         },
         {
             name: 'Type',
             sortField: "type",
             sortable: true,
-            selector: (row) => (row?.type || "")
+            selector: (row) => (
+                <div className="cursor-pointer"
+                    onClick={() => navigate(`detail/${row?._id || ""}`)}
+                >
+                    {row?.type || ""}
+                </div>
+
+            )
         },
         {
             name: 'Event',
@@ -161,21 +159,24 @@ const EventLogList = () => {
             name: 'Action',
             center: true,
             cell: (row) => (
+
                 <Fragment>
                     {permission?.read ? (
-                        <TiEye
-                            size={20}
-                            color="#fff"
+                        <img
+                            alt="View"
+                            height={22}
+                            src={viewIcon}
                             title="View"
                             cursor="pointer"
-                            className="mr-1"
-                            onClick={() => handleEventLogView(row)}
+                            className="cursor-pointer mr-2"
+                            onClick={() => navigate(`detail/${row?._id || ""}`)}
                         />
+
                     ) : null}
                 </Fragment>
             )
         }
-    ];
+    ]
 
     return (
         <div className="content data-list">
@@ -192,15 +193,22 @@ const EventLogList = () => {
 
                 <Row className='row-row'>
                     <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-                        <div className="d-flex justify-content-between p-0 border-bottom card-header">
+                        {/* <div className="d-flex justify-content-between p-0 border-bottom card-header">
                             <h3 className="card-title">Event Logs</h3>
-                        </div>
+                        </div> */}
 
                         <CardBody className='pl-0 pr-0'>
                             <Row className="mt-2">
                                 <Col sm="6">
                                     <InputGroup>
-                                        <input className="form-control " type="search" placeholder="Search" aria-label="Search" value={searchInput} onChange={(event) => onSearchKey(event?.target?.value)} />
+                                        <input
+                                            type="search"
+                                            aria-label="Search"
+                                            placeholder="Search"
+                                            value={searchInput}
+                                            className="col-input w-100"
+                                            onChange={(event) => onSearchKey(event?.target?.value)}
+                                        />
                                         <span className="edit2-icons position-absolute">
                                             <BiSearch />
                                         </span>
@@ -210,7 +218,7 @@ const EventLogList = () => {
                                 <Col sm="6" className='text-right' />
                             </Row>
 
-                            <Row className="eventLogManagement mt-3">
+                            <Row className="eventLogManagement mt-3 event-table">
                                 <Col className="pb-2" md="12">
                                     <DatatablePagination
                                         data={store.eventLogItems}
@@ -223,12 +231,6 @@ const EventLogList = () => {
                                     />
                                 </Col>
                             </Row>
-
-                            <EventLogDetailModal
-                                open={detailModalOpen}
-                                closeModal={closeDetailModal}
-                                eventLogDetailItem={eventLogDetailItem}
-                            />
                         </CardBody>
                     </Card>
                 </Row>

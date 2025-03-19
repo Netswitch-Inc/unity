@@ -28,6 +28,10 @@ const useRoutesByRole = () => {
     function getFilteredRoutes(permission, routes) {
         const toolsPermission = permission?.toolsPermission || [];
         const filterRoutes = routes.reduce((acc, route) => {
+            if (route?.toolId && !toolsPermission.includes(route?.toolId)) {
+                return acc
+            }
+
             if (route?.permissionId) {
                 if (!permission[route.permissionId]) {
                     return acc
@@ -68,7 +72,7 @@ const useRoutesByRole = () => {
             getFilteredRoutes(permission, originalRoutes);
         }
 
-        if (loginStore?.error) {
+        if (loginStore?.error && loginStore?.actionFlag === "AUTH_ROLE_PERMISSION_ERR") {
             setError(true);
         }
     }, [loginStore.actionFlag, loginStore.success, loginStore.error, loginStore.authRolePermission, dispatch])

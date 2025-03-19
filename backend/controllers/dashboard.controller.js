@@ -6,21 +6,8 @@ var AgentService = require("../services/agent.service");
 var ConfigurationAssessmentService = require("../services/configurationAssessment.service");
 var WazuhIndexerService = require('../services/wazuhIndexer.service');
 var OpenVASScanReportService = require('../services/openVASScanReport.service');
-
-const {
-  lowSeverityGraph,
-  mediumSeverityGraph,
-  highSeverityGraph,
-  criticalSeverityGraph
-} = require('../helper/wazuhJson')
-
-const {
-  requestSummary,
-  requestReceived,
-  requestClosed,
-  slaViolated,
-  unassignedOpenRequest
-} = require('../helper/helpdeskJson')
+var NetswitchThreatIntelStatsService = require("../services/netswitchThreatIntelStats.service");
+var ConnectionService = require("../services/connection.service")
 
 const {
   wazuhToolAgentsData,
@@ -222,15 +209,19 @@ exports.configurationAssessmentStatsGraphData = async function (req, res, next) 
     switch (timeRange?.toLowerCase()) {
       case "day":
         startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // Last 24 hours
+        dateFormat = "%d-%m-%Y";
         break;
       case "month":
         startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
+        dateFormat = "%m-%Y";
         break;
       case "year":
         startTime = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // Last 1 year
+        dateFormat = "%Y";
         break;
       case "week":
         startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Last 7 days
+        dateFormat = "%d-%m-%Y";
         break;
       default:
         return res.status(200).json({ status: false, message: "Invalid time range. Supported values: 'day', 'month', 'year', 'week'." });
@@ -256,7 +247,7 @@ exports.openVASScanReportStatsGraphData = async function (req, res, next) {
   try {
     var query = { deletedAt: null }; // Ensure deletedAt handling is correct
 
-    var timeRange = req.query?.timeRange || "day";  // Default: 'day'
+    var timeRange = req.query?.timeRange || "year"; 
 
     // Determine time range dynamically
     const now = new Date(); // Current datetime
@@ -265,180 +256,30 @@ exports.openVASScanReportStatsGraphData = async function (req, res, next) {
     switch (timeRange?.toLowerCase()) {
       case "day":
         startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // Last 24 hours
-        break;
-      case "month":
-        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
-        break;
-      case "year":
-        startTime = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // Last 1 year
+        dateFormat = "%d-%m-%Y";
         break;
       case "week":
         startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Last 7 days
+        dateFormat = "%d-%m-%Y";
+        break;
+      case "month":
+        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
+        dateFormat = "%m-%Y";
+        break;
+      case "year":
+        startTime = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // Last 1 year
+        dateFormat = "%Y";
         break;
       default:
         return res.status(400).json({ status: false, message: "Invalid time range. Supported values: 'day', 'week', 'month', 'year'." });
     }
 
-    const result = await OpenVASScanReportService.getOpenVASScanReportGraph(startTime, now, query); // Pass startTime and endTime as arguments
+    const result = await OpenVASScanReportService.getOpenVASScanReportGraph(startTime, now, query, dateFormat); // Pass startTime and endTime as arguments
 
     return res.status(200).json({ status: 200, flag: true, data: result, message: "OpenVAS scan report statistics data received successfully." });
   } catch (error) {
     console.error("Error fetching severity count by IP:", error);
-    return res.status(500).json({ status: 200, flag: false, message: "Internal Server Error" });
-  }
-}
-
-
-exports.MediumWazuhGraphAPI = async function (req, res, next) {
-  try {
-    // console.log(typeof req.query.interval, "interval");
-    const agent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-    var userName = "admin";
-    var password = "q3dzcwCz3FwTAik+ZoiVSYZb?blD3+1I";
-    var credentials = new Buffer.from(`${userName}:${password}`, "utf8").toString("base64");
-
-    var url = `https://192.235.98.180:9200/wazuh-alerts*/_search?pretty=true`;
-    var headers = {
-      Authorization: `Basic ${credentials}`,
-    };
-
-    var data = {
-      query: {
-        bool: {
-          must: [],
-          filter: [
-            {
-              range: {
-                timestamp: {
-                  gte: "now-24h", // Adjusted to cover the last 24 hours
-                  lte: "now",
-                  format: "epoch_millis",
-                },
-              },
-            },
-            {
-              range: {
-                "rule.level": {
-                  gte: req.query.gte, // Level range filter from query
-                  lte: req.query.lte,
-                },
-              },
-            },
-          ],
-          should: [],
-          must_not: [],
-        },
-      },
-      aggs: {
-        date_histogram_aggregation: {
-          date_histogram: {
-            field: "timestamp",
-            min_doc_count: 1, // Ensure empty buckets are excluded
-          },
-        },
-      },
-      script_fields: {},
-      size: 500, // Ensure you're requesting enough documents
-      sort: [],
-      stored_fields: ["*"],
-    }
-
-    // Set the appropriate interval based on the query parameter
-    if (
-      req.query.interval === "1y" ||
-      req.query.interval === "1h" ||
-      req.query.interval === "1w" ||
-      req.query.interval === "1M" ||
-      req.query.interval === "1d"
-    ) {
-      // For calendar-based intervals
-      data.aggs.date_histogram_aggregation.date_histogram.calendar_interval =
-        req.query.interval;
-      console.log("1Y, 1H, 1W, 1M, 1D")
-    } else if (req.query.interval === "10m" || req.query.interval === "30m") {
-      // For fixed time intervals
-      data.aggs.date_histogram_aggregation.date_histogram.fixed_interval =
-        req.query.interval;
-      console.log("10M, 30M")
-    } else {
-      // Default to 1h (1 hour) if no valid interval is provided
-      data.aggs.date_histogram_aggregation.date_histogram.fixed_interval = "1h";
-      console.log("1H")
-    }
-
-    // Making the API POST request
-    // var apiResponse = await axios.get(url, { data, headers, httpsAgent: agent })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
-
-    var apiResponse = null;
-    if (req.query?.gte == 0 && req.query?.lte == 6) {
-      apiResponse = lowSeverityGraph.auto;
-      if (req.query.interval === "1y" || req.query.interval === "1h" || req.query.interval === "1w" || req.query.interval === "1M" || req.query.interval === "1d") {
-        // For calendar-based intervals
-        apiResponse = lowSeverityGraph["1h1d1w1M1y"];
-      } else if (req.query.interval === "10m" || req.query.interval === "30m") {
-        // For fixed time intervals
-        apiResponse = lowSeverityGraph["1030m"];
-      } else {
-        // Default to 1h (1 hour) if no valid interval is provided
-        apiResponse = lowSeverityGraph["1h1d1w1M1y"];
-      }
-    } else if (req.query?.gte == 7 && req.query?.lte == 11) {
-      apiResponse = mediumSeverityGraph.auto;
-      if (req.query.interval === "1y" || req.query.interval === "1h" || req.query.interval === "1w" || req.query.interval === "1M" || req.query.interval === "1d") {
-        // For calendar-based intervals
-        apiResponse = mediumSeverityGraph["1h1d1w1M1y"];
-      } else if (req.query.interval === "10m" || req.query.interval === "30m") {
-        // For fixed time intervals
-        apiResponse = mediumSeverityGraph["1030m"];
-      } else {
-        // Default to 1h (1 hour) if no valid interval is provided
-        apiResponse = mediumSeverityGraph["1h1d1w1M1y"];
-      }
-    } else if (req.query?.gte == 12 && req.query?.lte == 14) {
-      apiResponse = highSeverityGraph.auto;
-      if (req.query.interval === "1y" || req.query.interval === "1h" || req.query.interval === "1w" || req.query.interval === "1M" || req.query.interval === "1d") {
-        // For calendar-based intervals
-        apiResponse = highSeverityGraph["1h1d1w1M1y"];
-      } else if (req.query.interval === "10m" || req.query.interval === "30m") {
-        // For fixed time intervals
-        apiResponse = highSeverityGraph["1030m"];
-      } else {
-        // Default to 1h (1 hour) if no valid interval is provided
-        apiResponse = highSeverityGraph["1h1d1w1M1y"];
-      }
-    } else if (req.query?.gte == 15) {
-      apiResponse = criticalSeverityGraph.auto;
-      if (req.query.interval === "1y" || req.query.interval === "1h" || req.query.interval === "1w" || req.query.interval === "1M" || req.query.interval === "1d") {
-        // For calendar-based intervals
-        apiResponse = criticalSeverityGraph["1h1d1w1M1y"];
-      } else if (req.query.interval === "10m" || req.query.interval === "30m") {
-        // For fixed time intervals
-        apiResponse = criticalSeverityGraph["1030m"];
-      } else {
-        // Default to 1h (1 hour) if no valid interval is provided
-        apiResponse = criticalSeverityGraph["1h1d1w1M1y"];
-      }
-    }
-    // console.log("apiResponse >>> ", apiResponse);
-
-    // Sending the response to the client
-    return res.status(200).send({
-      status: 200,
-      flag: true,
-      data: apiResponse,
-      message: "Wazuh Test function called successfully!"
-    })
-  } catch (e) {
-    console.error("Error during API call: ", e.message);
-    return res.status(200).json({
-      status: 200,
-      flag: false,
-      message: e.message || "An error occurred while processing the request"
-    })
+    return res.status(200).json({ status: 200, flag: false, message: "Internal Server Error" });
   }
 }
 
@@ -555,137 +396,83 @@ exports.updateDashboardWidgetToggleUpdate = async (req, res) => {
   }
 }
 
-exports.helpdeskTicketsGraph = async function (req, res, next) {
+exports.getCountBasedOnStatsCountry = async (req, res, next) => {
   try {
-    var headers = { Authtoken: "7F63A0F6-3B95-473F-821B-77DAE8C8C6A0" }
-    let queryData = req.query.queryData;
+    const {limit=7, sort = -1, timeRange = "year" } = req.query;
 
-    // var params = {
-    //     list_info: {
-    //         row_count: 5,
-    //         get_total_count: true
-    //     }
-    // }
-    var params = queryData;
-    var encodeParams = encodeURIComponent(JSON.stringify(params));
-    var url = `https://helpdesk.netswitch.net/api/v3/requests?input_data=${encodeParams}`;
+    const startDate = new Date();
+    const endDate = new Date();
+    
+    switch (timeRange?.toLowerCase()) {
+      case "week":
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case "month":
+        startDate.setMonth(startDate.getMonth() - 1);
+        break;
+      case "year":
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        break;
+      case "day":
+      default:
+        startDate.setHours(startDate.getHours() - 24);
+        break;
+    }
 
-    // var apiResponse = await axios.get(url, { headers })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
+    const pipeline = [
+      {
+        $match: {
+          date: { $gte: startDate, $lte: endDate }
+        }
+      },
+      { 
+        $unwind: "$stats_data" 
+      },
+      {
+        $group: {
+          _id: "$stats_data.country_name",
+          totalCount: { $sum: "$stats_data.count" } 
+        }
+      },
+      {
+        $project: {
+          count: "$totalCount",
+          country_name: "$_id",
+          _id: 0
+        }
+      },
+      { $sort: { count: parseInt(sort) } }, 
+      { $limit: parseInt(limit) }
+    ];
 
-    var apiResponse = slaViolated;
-    console.log("apiResponse >>> ", apiResponse);
+    const netSwitchThreatIntels = await NetswitchThreatIntelStatsService.getTotalCountBasedOnCountryStats(pipeline);
 
-    return res.status(200).send({ status: 200, flag: true, data: apiResponse, message: "Helpdesk ticket function called successfully!" })
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message })
+    var connectionType = "netswitch-threat-intel-txt-file";
+    var connection = await ConnectionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
+    // console.log(connection.ip_address,"Adddd");
+
+    const link = connection ? connection.ip_address : null;
+    
+      const list = {
+        link : link,
+        data : netSwitchThreatIntels
+      }
+
+    return res.status(200).json({
+      status: 200,
+      flag: true,
+      data: list,
+      message: `Counted All ${timeRange} Data Successfully`
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: error.message,
+      flag: false
+    });
   }
-}
+};
 
-exports.helpdeskTicketsGraphForUnassigned = async function (req, res, next) {
-  try {
-    var headers = { Authtoken: "7F63A0F6-3B95-473F-821B-77DAE8C8C6A0" }
-    let queryData = req.query.queryData;
-
-    // var params = {
-    //     list_info: {
-    //         row_count: 5,
-    //         get_total_count: true
-    //     }
-    // }
-    var params = queryData;
-    var encodeParams = encodeURIComponent(JSON.stringify(params));
-    var url = `https://helpdesk.netswitch.net/api/v3/requests?input_data=${encodeParams}`;
-
-    // var apiResponse = await axios.get(url, { headers })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
-
-    var apiResponse = unassignedOpenRequest;
-    // console.log("apiResponse >>> ", apiResponse);
-
-    return res.status(200).send({ status: 200, flag: true, data: apiResponse, message: "Helpdesk ticket function called successfully!" })
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message })
-  }
-}
-
-exports.helpdeskTicketsGraphForRequestSummery = async function (req, res, next) {
-  try {
-    var headers = { Authtoken: "7F63A0F6-3B95-473F-821B-77DAE8C8C6A0" }
-    let queryData = req.query.queryData;
-
-    // var params = {
-    //     list_info: {
-    //         row_count: 5,
-    //         get_total_count: true
-    //     }
-    // }
-    var params = queryData;
-    var encodeParams = encodeURIComponent(JSON.stringify(params));
-    var url = `https://helpdesk.netswitch.net/api/v3/requests?input_data=${encodeParams}`;
-
-    // var apiResponse = await axios.get(url, { headers })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
-
-    var apiResponse = requestSummary;
-    // console.log("apiResponse >>> ", apiResponse);
-
-    return res.status(200).send({ status: 200, flag: true, data: apiResponse, message: "Helpdesk ticket function called successfully!" })
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message })
-  }
-}
-
-exports.helpdeskTicketsGraphForCloseRequest = async function (req, res, next) {
-  try {
-    var headers = { Authtoken: "7F63A0F6-3B95-473F-821B-77DAE8C8C6A0" }
-    let queryData = req.query.queryData;
-
-    // var params = {
-    //     list_info: {
-    //         row_count: 5,
-    //         get_total_count: true
-    //     }
-    // }
-    var params = queryData;
-    var encodeParams = encodeURIComponent(JSON.stringify(params));
-    var url = `https://helpdesk.netswitch.net/api/v3/requests?input_data=${encodeParams}`;
-
-    // var apiResponse = await axios.get(url, { headers })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
-
-    var apiResponse = requestClosed;
-    // console.log("apiResponse >>> ", apiResponse);
-
-    return res.status(200).send({ status: 200, flag: true, data: apiResponse, message: "Helpdesk ticket function called successfully!" });
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
-  }
-}
-
-exports.helpdeskTicketsGraphForRecivedRequest = async function (req, res, next) {
-  try {
-    var headers = { Authtoken: "7F63A0F6-3B95-473F-821B-77DAE8C8C6A0" }
-    let queryData = req.query.queryData;
-
-    var params = queryData;
-    var encodeParams = encodeURIComponent(JSON.stringify(params));
-    var url = `https://helpdesk.netswitch.net/api/v3/requests?input_data=${encodeParams}`;
-
-    // var apiResponse = await axios.get(url, { headers })
-    //   .then((res) => res.data)
-    //   .catch((error) => error);
-
-    var apiResponse = requestReceived;
-    // console.log("apiResponse >>> ", apiResponse);
-
-    return res.status(200).send({ status: 200, flag: true, data: apiResponse, message: "Helpdesk ticket function called successfully!" })
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message })
-  }
-}
 

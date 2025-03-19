@@ -6,9 +6,10 @@ import instance from "utility/AxiosConfig";
 
 // ** Constant
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
+import { initEventLogItem } from "utility/reduxConstant";
 
 async function getEventLogListRequest(params) {
-    return instance.get(`${API_ENDPOINTS.eventLog.listing}`, { params })
+    return instance.get(`${API_ENDPOINTS.eventLog.list}`, { params })
         .then((items) => items.data)
         .catch((error) => error)
 }
@@ -45,11 +46,46 @@ export const getEventLogList = createAsyncThunk("appEventLogs/getEventLogList", 
     }
 })
 
+async function getEventLogRequest(params) {
+    return instance.get(`${API_ENDPOINTS.eventLog.get}/${params?.id}`)
+        .then((items) => items.data)
+        .catch((error) => error)
+}
+
+export const getEventLog = createAsyncThunk("appCronSchedulers/getEventLog", async (params) => {
+    try {
+        const response = await getEventLogRequest(params);
+        if (response && response.flag) {
+            return {
+                eventLogItem: response.data,
+                actionFlag: "EVNT_LG_ITM",
+                success: "",
+                error: "",
+            }
+        } else {
+            return {
+                eventLogItem: null,
+                actionFlag: "EVNT_LG_ITM_ERR",
+                success: "",
+                error: "",
+            }
+        }
+    } catch (error) {
+        return {
+            eventLogItem: null,
+            actionFlag: "EVNT_LG_ITM_ERR",
+            success: "",
+            error: error
+        }
+    }
+})
+
 // Create a slice
 const appAuthSlice = createSlice({
     name: 'appEventLogs',
     initialState: {
         eventLogItems: [],
+        eventLogItem: initEventLogItem,
         pagination: null,
         actionFlag: "",
         loading: true,
@@ -80,6 +116,24 @@ const appAuthSlice = createSlice({
                 state.error = action.payload?.error;
             })
             .addCase(getEventLogList.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getEventLog.pending, (state) => {
+                state.eventLogItem = initEventLogItem;
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getEventLog.fulfilled, (state, action) => {
+                state.eventLogItem = action.payload?.eventLogItem || initEventLogItem;
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(getEventLog.rejected, (state) => {
                 state.loading = true;
                 state.success = "";
                 state.error = "";

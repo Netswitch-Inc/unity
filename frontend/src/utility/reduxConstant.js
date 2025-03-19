@@ -77,9 +77,22 @@ const statusEnum = {
 const roleItem = { _id: "", name: "", group: "", status: 1, deletedAt: null }
 /* /Role */
 
-/* /User */
 const userItem = { company_id: null, role_id: null, id: null, _id: "", name: "", first_name: "", last_name: "", email: "", phone: "", user_name: "", password: "", image: "", priviledges: [], status: 1 }
+const initUserItem = { company_id: null, role_id: null, id: null, _id: "", name: "", first_name: "", last_name: "", email: "", phone: "", user_name: "", password: "", image: "", priviledges: [], status: 1 }
 
+const initialValues = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  user_name: '',
+  password: '',
+  role: '',
+  status: 1,
+  image: '',
+  weightIndex: 1,
+  priviledges: [],
+};
 const initialSection = { name: "", description: "", order: "", status: 0 }
 
 const profileItem = { first_name: "", last_name: "", email: "", phone: "", user_name: "" }
@@ -141,8 +154,8 @@ const OptionsForGraph = [
 ]
 
 const OptionsForConfigrationAssessmentGraph = [
-  // { label: "Day", value: "day" },
-  // { label: "Week", value: "week" },
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
   { label: "Month", value: "month" },
   { label: "Year", value: "year" },
 ];
@@ -154,16 +167,23 @@ const OptionsForCriticalGraph = [
   { label: "Year", value: "year" }
 ]
 
+const OptionsForNetSwitchThreatIntelGraph = [
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" }
+]
+
 const OptionsForSIEMGraph = [
   { label: "Day", value: "day" },
   { label: "Week", value: "week" },
   { label: "Month", value: "month" },
-  // { label: "Year", value: "year" }
+  { label: "Year", value: "year" }
 ]
 
 const OptionsForVulnerGraph = [
-  // { label: "Day", value: "day" },
-  // { label: "Week", value: "week" },
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
   { label: "Month", value: "month" },
   { label: "Year", value: "year" }
 ]
@@ -173,9 +193,15 @@ const initCronSchedulerItem = { _id: "", tool_id: "", name: "", type: "", slug: 
 
 const initAgentItem = { _id: "", ref_id: "", os: null, group: null, name: "", ip: "", registerIP: "", version: "", node_name: "", manager: "", mergedSum: "", configSum: "", dateAdd: "", lastKeepAlive: "", disconnection_time: "", group_config_status: "", status: "", status_code: 0 }
 
+const initCompanyItem = { _id: "", user_name: "", password: "", name: "", logo: "", contact_no: "", email: "", address: "" }
+
 const initOpenVASScanReportItem = { _id: "", affected_software_os: "", bids: "", certs: "", cves: "", cvss: 0, hostname: "", impact: "", ip: "", nvt_name: "", nvt_oid: "", other_references: "", port: "", port_protocol: "", product_detection_result: "", qod: 0, result_id: "", severity: "", solution: "", solution_type: "", specific_result: "", summary: "", task_id: "", task_name: "", timestamp: "", vulnerability_detection_method: "", vulnerability_insight: "" }
 
 const initConfigurationAssessmentItem = { _id: "", agent_ref_id: "", policy_id: "", name: "", references: "", invalid: 0, description: "", hash_file: "", total_checks: 0, pass: 0, fail: 0, score: 0, date_in_string: "", start_scan: "", end_scan: "" }
+
+const initEventLogItem = { _id: "", company_id: null, module_id: null, action_user_id: null, user_id: null, reference_id: null, module_slug: "", type: "", action: "", description: "", previous_data: null, current_data: null }
+
+const initNetswitchThreatIntelItem = { _id: "", ip_address: "", as_number: "", company: "", country: "", time: "", date_in_string: "", date: null, date_time: null, status: true }
 
 export {
   hostRestApiUrl,
@@ -219,6 +245,8 @@ export {
   statusEnum,
   roleItem,
   userItem,
+  initUserItem,
+  initialValues,
   profileItem,
   initialConnectionItem,
   initialSection,
@@ -238,10 +266,14 @@ export {
   OptionsForGraph,
   OptionsForConfigrationAssessmentGraph,
   OptionsForCriticalGraph,
+  OptionsForNetSwitchThreatIntelGraph,
   OptionsForSIEMGraph,
   OptionsForVulnerGraph,
   initCronSchedulerItem,
+  initCompanyItem,
   initAgentItem,
   initConfigurationAssessmentItem,
   initOpenVASScanReportItem,
+  initEventLogItem,
+  initNetswitchThreatIntelItem
 }

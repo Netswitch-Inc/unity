@@ -9,20 +9,22 @@ export const API_ENDPOINTS = {
     verifyemail: `/users/forgotpassword`,
     verifyotp: `/users/verifyotp`,
     resetpassword: `/users/resetpassword`,
+    emailExist: `users/email-exist`,
+    usernamExist: `users/username-exist`
   },
-  customer: {
-    listing: `/users`,
+  users: {
+    list: `/users`,
+    get: `/users`,
     create: `/users`,
-    edit: `/users`,
     update: `/users`,
-    delete: `/users`,
+    delete: `/users`
   },
   role: {
     get: `/roles`,
     listing: `/roles`,
     create: `/roles`,
     update: `/roles`,
-    delete: `/roles`,
+    delete: `/roles`
   },
   permission: {
     create: `/permissions`,
@@ -38,12 +40,12 @@ export const API_ENDPOINTS = {
     emailunique: "/users/isemailunique",
     userunique: "/users/isusernameunique",
   },
-  Connection: {
-    listing: `/connections`,
+  connections: {
+    list: `/connections`,
+    get: `/connection`,
     create: `/connection`,
     update: `/connection`,
-    delete: `/connection`,
-    edit: `/connection`,
+    delete: `/connection`
   },
   Framework: {
     listing: `/compilance/frameworks`,
@@ -65,8 +67,8 @@ export const API_ENDPOINTS = {
     listingSubcontrols: "/cis-controls-with-frameworkIds",
   },
   eventLog: {
+    list: `/event-logs`,
     get: `/event-logs`,
-    listing: `/event-logs`,
     create: `/event-logs`,
     update: `/event-logs`,
     delete: `/event-logs`,
@@ -156,6 +158,7 @@ export const API_ENDPOINTS = {
     incidentTrendStats: `incident-trend-wazuh-stats-graph/filter`,
     configureAssesmntStats: `configuration-assessment-stats-graph/filter`,
     openVASScnReportStats: `/openvas-scan-report-stats-graph/filter`,
+    netSwitchThreatIntelCount: `/netswitch-threat-intels-stats-count/filter`
   },
   cronSchedulers: {
     list: `/cron-schedulers`,
@@ -163,6 +166,7 @@ export const API_ENDPOINTS = {
     create: `/cron-schedulers`,
     update: `/cron-schedulers`,
     delete: `/cron-schedulers`,
+    alertWarning: `/cron-schedulers/alert-warning`
   },
   agents: {
     list: `/agents`,
@@ -186,4 +190,11 @@ export const API_ENDPOINTS = {
     delete: `/openvas-scan-reports`,
     insert: `openvas-scan-reports/insert-multipal`,
   },
+  netswitchThreatIntels: {
+    list: `/netswitch-threat-intels`,
+    get: `/netswitch-threat-intels`,
+    create: `/netswitch-threat-intels`,
+    update: `/netswitch-threat-intels`,
+    delete: `/netswitch-threat-intels`,
+  }
 };

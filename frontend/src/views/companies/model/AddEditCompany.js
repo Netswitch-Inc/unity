@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  creatActionRequest,
+  createComapany,
   updateCompany,
   isEmailUniqueAction,
   isUserUniqueAction,
@@ -145,7 +145,7 @@ const CompanyProfileForm = ({ show, closePopup, initialValues, title }) => {
         return;
       }
       if (userErrMessage === "" && errMessage === "") {
-        const createCompany = await dispatch(creatActionRequest(values));
+        const createCompany = await dispatch(createComapany(values));
         if (createCompany.payload.error !== "") {
           setshowSnackbar(() => true);
           setSnakbarMessage(() => createCompany.payload.error);

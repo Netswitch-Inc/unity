@@ -39,7 +39,7 @@
     background-clip: content-box, border-box;
 }
 
-.selected-tile-container,
+/* .selected-tile-container,
 .selected-tile-container:hover {
     background: linear-gradient(135deg, #008BF3 0%, #57B7FF 100%);
-}
+} */

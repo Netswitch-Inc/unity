@@ -12,7 +12,7 @@ import {
   cleanProjectMessage,
   createProject,
 } from "./store";
-import { getActionRequest } from "views/users/store";
+import { getUserList } from "views/users/store";
 
 import { Card, CardBody, FormGroup } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
@@ -178,7 +178,7 @@ const EditProject = () => {
     }
     if (authUser?.company_id?._id)
       dispatch(
-        getActionRequest({
+        getUserList({
           company_id: loginStore?.authUserItem?.company_id?._id,
         })
       );
@@ -189,7 +189,7 @@ const EditProject = () => {
       !loginStore?.authUserItem?.company_id?._id &&
       companyVal?.value !== ""
     ) {
-      dispatch(getActionRequest({ company_id: companyVal?.value }));
+      dispatch(getUserList({ company_id: companyVal?.value }));
     }
   }, [companyVal]);
 
@@ -208,8 +208,8 @@ const EditProject = () => {
       }));
       setInvolvedParties(() => list);
     }
-    if (companyStore?.CompanyItems?.length > 0) {
-      const list = companyStore?.CompanyItems?.map((item) => ({
+    if (companyStore?.companyItems?.length > 0) {
+      const list = companyStore?.companyItems?.map((item) => ({
         label: item?.name,
         value: item?._id,
       }));
@@ -218,7 +218,7 @@ const EditProject = () => {
   }, [
     complienceStore.frameworkItems,
     userStore?.userItems,
-    companyStore?.CompanyItems,
+    companyStore?.companyItems,
   ]);
 
   useEffect(() => {

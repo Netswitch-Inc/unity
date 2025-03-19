@@ -1,237 +1,203 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 // ** React Imports
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+
 
 // ** Store & Actions
-import { useDispatch, useSelector } from 'react-redux';
-import { updatePassword } from 'views/login/store';
+import { useDispatch, useSelector } from "react-redux";
+import { updatePassword, cleanAuthMessage } from "views/login/store";
 
 // ** Reactstrap Imports
-import { Row, Col, Card, CardBody, FormGroup, Input, Button, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import {
+  Card,
+  Input,
+  CardBody,
+  InputGroup,
+  FormFeedback,
+  InputGroupText
+} from "reactstrap";
+import { Col, Row, Form as BootstrapForm } from "react-bootstrap";
+import { Formik, Field, Form } from "formik";
+import * as Yup from "yup";
 
 // ** Third Party Components
-import classnames from "classnames";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
 // ** SVG Icons
-import { EyeView, EyeSlash } from 'components/SVGIcons';
+import { EyeView, EyeSlash } from "components/SVGIcons";
 
 const ChangePassword = () => {
-    const dispatch = useDispatch();
-    const loginStore = useSelector((state) => state.login);
+  const dispatch = useDispatch();
+  const loginStore = useSelector((state) => state.login);
 
-    const validationSchema = Yup.object().shape({
-        old_password: Yup.string()
-            .required('Old Password is required'),
-        password: Yup.string()
-            .required('New Password is required')
-            .min(8, 'Password must be at least 8 characters long')
-            .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-            .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-            .matches(/[0-9]/, 'Password must contain at least one number')
-            .matches(/[!@#$%^&*]/, 'Password must contain at least one special character'),
-        confirmPassword: Yup.string()
-            .required('Confirm Password is required')
-            .oneOf([Yup.ref('password'), null], 'Passwords must match'),
-    });
+  const validationSchema = Yup.object().shape({
+    old_password: Yup.string().required("Old password is required."),
+    password: Yup.string().required("New Password is required.")
+      .min(8, "Password must be at least 8 characters long.")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
+      .matches(/[0-9]/, "Password must contain at least one number.")
+      .matches(/[!@#$%^&*]/, "Password must contain at least one special character."),
+    confirmPassword: Yup.string().required("Confirm password is required.")
+      .oneOf([Yup.ref("password"), null], "Passwords must match.")
+  })
 
-    const [state, setState] = useState({});
-    const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
-    const [newPasswordVisible, setNewPasswordVisible] = useState(false);
-    const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    const [showSnackBar, setshowSnackbar] = useState(false)
-    const [snakebarMessage, setSnakbarMessage] = useState("")
-    const [initialValues, setInitialValues] = useState({ old_password: '', password: '', confirmPassword: '' })
+  const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
+  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [showSnackBar, setshowSnackbar] = useState(false);
+  const [snakebarMessage, setSnakbarMessage] = useState("");
+  const [initialValues, setInitialValues] = useState({ old_password: "", password: "", confirmPassword: "" });
 
-    const toggleOldPasswordVisibility = () => {
-        setOldPasswordVisible(!oldPasswordVisible);
-    };
+  const toggleOldPasswordVisibility = () => {
+    setOldPasswordVisible(!oldPasswordVisible);
+  }
 
-    const toggleNewPasswordVisibility = () => {
-        setNewPasswordVisible(!newPasswordVisible);
-    };
+  const toggleNewPasswordVisibility = () => {
+    setNewPasswordVisible(!newPasswordVisible);
+  }
 
-    const toggleConfirmPasswordVisibility = () => {
-        setConfirmPasswordVisible(!confirmPasswordVisible);
-    };
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(!confirmPasswordVisible);
+  }
 
-    useEffect(() => {
-        if (loginStore?.actionFlag === 'PASSWORD_UPDATED' && loginStore.success) {
-            setshowSnackbar(true)
-            setSnakbarMessage(loginStore.success)
-            setInitialValues({ old_password: '', password: '', confirmPassword: '' })
-
-        }
-
-        if (loginStore?.actionFlag === 'PASSWORD_UPDATED' && loginStore.error) {
-            setshowSnackbar(true)
-            setSnakbarMessage(loginStore.error)
-            setInitialValues({ old_password: '', password: '', confirmPassword: '' })
-        }
-    }, [loginStore.success, loginStore.error, initialValues, loginStore?.actionFlag])
-
-    useEffect(() => {
-        setTimeout(() => {
-            setshowSnackbar(false);
-        }, 6000);
-    }, [showSnackBar])
-
-    const onSubmit = (values) => {
-        dispatch(updatePassword(values));
+  useEffect(() => {
+    if (loginStore?.actionFlag || loginStore?.success || loginStore?.error) {
+      dispatch(cleanAuthMessage(null));
     }
 
-    return (
-        <div className="content">
-            {showSnackBar && (
-                <ReactSnackBar
-                    Icon={(<span><TiMessages size={25} /></span>)}
-                    Show={showSnackBar}
-                >
-                    {snakebarMessage}
-                </ReactSnackBar>
-            )}
+    if (loginStore?.actionFlag === "PASSWORD_UPDATED") {
+      setInitialValues({ old_password: "", password: "", confirmPassword: "" });
+    }
 
-            <Row>
-                <Col md="12" className="mb-3">
-                    <Card className="mb-0">
-                        <div className="p-0 card-header">
-                            <h3 className="card-title border-bottom pb-2 mt-0">Change Password</h3>
-                        </div>
+    if (loginStore.success) {
+      setshowSnackbar(true);
+      setSnakbarMessage(loginStore.success);
+    }
 
-                        <CardBody className="pl-0 pr-0">
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={validationSchema}
-                                onSubmit={onSubmit}
-                            >
-                                {() => (
-                                    <Form>
-                                        <Row>
-                                            <Col md="12">
-                                                <FormGroup>
-                                                    <label>Old Password</label>
-                                                    <InputGroup
-                                                        className={classnames({
-                                                            "input-group-focus": state?.oldPass,
-                                                        })}
-                                                    >
-                                                        <InputGroupAddon addonType="prepend" style={{ padding: '3px 0px' }}>
-                                                            <InputGroupText>
-                                                                <i className="tim-icons icon-lock-circle" />
-                                                            </InputGroupText>
-                                                        </InputGroupAddon>
-                                                        <Field
-                                                            name="old_password"
-                                                            autoComplete="off"
-                                                            placeholder="Old Password"
-                                                            type={oldPasswordVisible ? 'text' : 'password'}
-                                                            as={Input}
-                                                            onFocus={(e) => setState({ ...state, oldPass: true })}
-                                                            onBlur={(e) => setState({ ...state, oldPass: false })}
-                                                        />
-                                                        <InputGroupText className='input-eyes-text'>
-                                                            <a onClick={toggleOldPasswordVisibility}>
-                                                                {oldPasswordVisible ? (
-                                                                    <EyeView />
-                                                                ) : (
-                                                                    <EyeSlash />
-                                                                )}
-                                                            </a>
-                                                        </InputGroupText>
-                                                    </InputGroup>
-                                                    <ErrorMessage name="old_password" component="span" style={{ color: 'red' }} />
-                                                </FormGroup>
-                                            </Col>
+    if (loginStore.error) {
+      setshowSnackbar(true);
+      setSnakbarMessage(loginStore.error);
+    }
+  }, [dispatch, loginStore.success, loginStore.error, loginStore?.actionFlag]);
+  console.log("loginStore?.actionFlag >>> ", loginStore?.actionFlag)
 
-                                            <Col md="12">
-                                                <FormGroup>
-                                                    <label>New Password</label>
-                                                    <InputGroup
-                                                        className={classnames({
-                                                            "input-group-focus": state?.newPass,
-                                                        })}
-                                                    >
-                                                        <InputGroupAddon addonType="prepend" style={{ padding: '3px 0px' }}>
-                                                            <InputGroupText>
-                                                                <i className="tim-icons icon-lock-circle" />
-                                                            </InputGroupText>
-                                                        </InputGroupAddon>
-                                                        <Field
-                                                            name="password"
-                                                            autoComplete="off"
-                                                            placeholder="New Password"
-                                                            type={newPasswordVisible ? 'text' : 'password'}
-                                                            as={Input}
-                                                            onFocus={(e) => setState({ ...state, newPass: true })}
-                                                            onBlur={(e) => setState({ ...state, newPass: false })}
-                                                        />
-                                                        <InputGroupText className='input-eyes-text'>
-                                                            <a onClick={toggleNewPasswordVisibility}>
-                                                                {newPasswordVisible ? (
-                                                                    <EyeView />
-                                                                ) : (
-                                                                    <EyeSlash />
-                                                                )}
-                                                            </a>
-                                                        </InputGroupText>
-                                                    </InputGroup>
-                                                    <ErrorMessage name="password" component="span" style={{ color: 'red' }} />
-                                                </FormGroup>
-                                            </Col>
+  useEffect(() => {
+    setTimeout(() => { setshowSnackbar(false); }, 6000);
+  }, [showSnackBar])
 
-                                            <Col md="12">
-                                                <FormGroup>
-                                                    <label>Confirm Password</label>
-                                                    <InputGroup
-                                                        className={classnames({
-                                                            "input-group-focus": state?.conPass,
-                                                        })}
-                                                    >
-                                                        <InputGroupAddon addonType="prepend" style={{ padding: '3px 0px' }}>
-                                                            <InputGroupText>
-                                                                <i className="tim-icons icon-lock-circle" />
-                                                            </InputGroupText>
-                                                        </InputGroupAddon>
-                                                        <Field
-                                                            autoComplete="off"
-                                                            name="confirmPassword"
-                                                            placeholder="Confirm Password"
-                                                            type={confirmPasswordVisible ? 'text' : 'password'}
-                                                            as={Input}
-                                                            onFocus={(e) => setState({ ...state, conPass: true })}
-                                                            onBlur={(e) => setState({ ...state, conPass: false })}
-                                                        />
-                                                        <InputGroupText className='input-eyes-text'>
-                                                            <a onClick={toggleConfirmPasswordVisibility}>
-                                                                {confirmPasswordVisible ? (
-                                                                    <EyeView />
-                                                                ) : (
-                                                                    <EyeSlash />
-                                                                )}
-                                                            </a>
-                                                        </InputGroupText>
-                                                    </InputGroup>
-                                                    <ErrorMessage name="confirmPassword" component="span" style={{ color: 'red' }} />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+  const onSubmit = (values) => {
+    dispatch(updatePassword(values))
+  }
 
-                                        <Button className="btn-fill" color="primary" type="submit">
-                                            Change Password
-                                        </Button>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-        </div>
-    )
+  return (
+    <div className="h-100">
+      <ReactSnackBar Icon={(
+        <span><TiMessages size={25} /></span>
+      )} Show={showSnackBar}>
+        {snakebarMessage}
+      </ReactSnackBar>
+
+      <div className="change-pass-profile">
+        <Card className="mb-0">
+          <CardBody className="pl-0 pr-0">
+            <Formik
+              initialValues={initialValues}
+              enableReinitialize={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={onSubmit}
+            >
+              {({ errors, touched }) => (
+                <Form>
+                  <Row>
+                    <Col xl={6} lg={12} as={BootstrapForm.Group} controlId="formGridPassword" className="full-width password">
+                      <BootstrapForm.Label className="col-label">Old Password</BootstrapForm.Label>
+                      <div className="position-relative">
+                        <InputGroup className="mb-0">
+                          <Field
+                            as={Input}
+                            autoComplete="off"
+                            name="old_password"
+                            className="col-input"
+                            placeholder="Old Password"
+                            type={oldPasswordVisible ? "text" : "password"}
+                          />
+                          <InputGroupText className="input-eyes-text">
+                            <a onClick={toggleOldPasswordVisibility}>
+                              {oldPasswordVisible ? <EyeView /> : <EyeSlash />}
+                            </a>
+                          </InputGroupText>
+                        </InputGroup>
+                        {errors.old_password && touched.old_password && (
+                          <FormFeedback className="d-block">{errors?.old_password}</FormFeedback>
+                        )}
+                      </div>
+                    </Col>
+
+                    <Col xl={6} lg={12} as={BootstrapForm.Group} controlId="formGridPassword" className="full-width password">
+                      <BootstrapForm.Label className="col-label">New Password</BootstrapForm.Label>
+                      <div className="position-relative">
+                        <InputGroup className="mb-0">
+                          <Field
+                            as={Input}
+                            name="password"
+                            autoComplete="off"
+                            className="col-input"
+                            placeholder="New Password"
+                            type={newPasswordVisible ? "text" : "password"}
+                          />
+                          <InputGroupText className="input-eyes-text">
+                            <a onClick={toggleNewPasswordVisibility}>
+                              {newPasswordVisible ? <EyeView /> : <EyeSlash />}
+                            </a>
+                          </InputGroupText>
+                        </InputGroup>
+                      </div>
+                      {errors.password && touched.password && (
+                        <FormFeedback className="d-block">{errors?.password}</FormFeedback>
+                      )}
+                    </Col>
+
+                    <Col xl={6} lg={12} as={BootstrapForm.Group} controlId="formGridPassword" className="full-width password">
+                      <BootstrapForm.Label className="col-label">Confirm Password</BootstrapForm.Label>
+                      <div className="position-relative">
+                        <InputGroup className="mb-0">
+                          <Field
+                            as={Input}
+                            autoComplete="off"
+                            name="confirmPassword"
+                            className="col-input"
+                            placeholder="Confirm Password"
+                            type={confirmPasswordVisible ? "text" : "password"}
+                          />
+                          <InputGroupText className="input-eyes-text">
+                            <a onClick={toggleConfirmPasswordVisibility}>
+                              {confirmPasswordVisible ? (<EyeView />) : (<EyeSlash />)}
+                            </a>
+                          </InputGroupText>
+                        </InputGroup>
+                      </div>
+                      {errors.confirmPassword && touched.confirmPassword && (
+                        <FormFeedback className="d-block">{errors?.confirmPassword}</FormFeedback>
+                      )}
+                    </Col>
+                  </Row>
+
+                  <div className="buttons">
+                    <button type="submit" className="btnprimary">
+                      Save
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </CardBody>
+        </Card>
+      </div>
+    </div>
+  )
 }
 
 export default ChangePassword;

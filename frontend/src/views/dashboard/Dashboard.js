@@ -9,7 +9,8 @@ import {
   updateWidgetsToggle,
   cleanDashboardMessage,
   getDashboardWidgetData,
-  wazuhIndexerSeverityCountData
+  wazuhIndexerSeverityCountData,
+  netSwitchThreatIntelCountryCount
 } from "./store/index.js";
 
 // ** Reactstrap Imports
@@ -37,7 +38,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { priviledgesObjectPermission } from "utility/reduxConstant.js";
 
 // ** Config
-import { wazuhKey, openVASKey } from "configs/toolConfig.js";
+import { wazuhKey, openVASKey, netswitchThreatIntelKey } from "configs/toolConfig.js";
 
 import Sixlayers from "./SixLayers.js";
 import ToggleComp from "./HOChiding.js";
@@ -49,6 +50,7 @@ import ManagementTable from "components/DashboardComp/ManagementTable.js";
 import ProjectBudgetByTask from "components/DashboardComp/projectBudgetTask.js";
 import ScoreHistoryLineChart from "components/DashboardComp/ScoreHistoryLine.js";
 import CritcalIncident from "./CriticalIncident.js";
+import NetSwitchThreatIntelChart from "./NetSwitchThreatIntelChart.js";
 
 import { CisSubControlHistoryData } from "../sampleData/ComplianceControlData.js";
 
@@ -64,13 +66,13 @@ const Dashboard = () => {
   const [toggleManagementTable, setToggleManagementTable] = useState(true);
   const [toggleProjectBudgetByTask, setToggleProjectBudgetByTask] = useState(true);
   const [toggleScoreHistoryLineChart, setToggleScoreHistoryLineChart] = useState(true);
-
   const [toggleIncidentTrending, setToggleIncidentTrending] = useState(true);
   const [toggleVulnerTrending, setToggleVulnerTrending] = useState(true);
   const [toggleIncidentByType, setToggleIncidentByType] = useState(true);
   const [toggleAgentChart, setToggleAgentChart] = useState(true);
   const [toggleSixLayers, setToggleSixLayers] = useState(true);
   const [toggleCritcalIncident, setToggleCritcalIncident] = useState(true);
+  const [toggleNetSwitchIntelChart, setToggleNetSwitchIntelChart] = useState(true);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggleDropdown = useCallback(() => setDropdownOpen((prevState) => !prevState), [])
@@ -84,9 +86,11 @@ const Dashboard = () => {
   const EnhancedAgentChart = ToggleComp(AgentChart);
   const EnhancedSixLayers = ToggleComp(Sixlayers);
   const EnhancedCritcalIncident = ToggleComp(CritcalIncident);
-
+  const EnhancedNetSwitchThreatIntel = ToggleComp(NetSwitchThreatIntelChart);
+  
   const enableWazuhGraph = toolsPermissions?.includes(wazuhKey) || false;
   const enableOpenVASGraph = toolsPermissions?.includes(openVASKey) || false;
+  const enableNetswitchThreatIntel = toolsPermissions?.includes(netswitchThreatIntelKey) || false;
 
   const widgetsCompoItems = [
     {
@@ -164,6 +168,15 @@ const Dashboard = () => {
       permission: previledgePermission?.technologist
     },
     {
+      name: "toggleNetSwitchIntelChart",
+      show: toggleNetSwitchIntelChart,
+      component: EnhancedNetSwitchThreatIntel,
+      className: "card-chart mb-0 h-100",
+      toggleFunc: setToggleNetSwitchIntelChart,
+      display: enableNetswitchThreatIntel || false,
+      permission: previledgePermission?.technologist
+    },
+    {
       name: "toggleIncidentByType",
       show: toggleIncidentByType,
       component: EnhancedIncidentType,
@@ -184,6 +197,10 @@ const Dashboard = () => {
     dispatch(wazuhIndexerSeverityCountData());
   }, [dispatch])
 
+  const handleGetNetSwitchThreatIntelCountData = useCallback(() => {
+    dispatch(netSwitchThreatIntelCountryCount());
+  }, [dispatch])
+
   const handleGetDashboardWidgets = useCallback(() => {
     dispatch(getDashboardWidgetData());
   }, [dispatch])
@@ -191,7 +208,8 @@ const Dashboard = () => {
   useLayoutEffect(() => {
     handleGetWazuhIndexerCountData();
     handleGetDashboardWidgets();
-  }, [handleGetWazuhIndexerCountData, handleGetDashboardWidgets]);
+    handleGetNetSwitchThreatIntelCountData();
+  }, [handleGetWazuhIndexerCountData, handleGetDashboardWidgets,handleGetNetSwitchThreatIntelCountData]);
 
   const handleToggleFunc = async (setDatafunc, name, show) => {
     setDatafunc(() => show);
@@ -251,7 +269,8 @@ const Dashboard = () => {
           toggleIncidentTrending: setToggleIncidentTrending,
           toggleIncidentByType: setToggleIncidentByType,
           toggleAgentChart: setToggleAgentChart,
-          toggleCritcalIncident: setToggleCritcalIncident
+          toggleCritcalIncident: setToggleCritcalIncident,
+          toggleNetSwitchIntelChart : setToggleNetSwitchIntelChart
         }
 
         if (widgetStateMap[widget.name]) {
@@ -362,6 +381,15 @@ const Dashboard = () => {
               Critcal Incident By Type
             </DropdownItem>
           )}
+
+          {!toggleNetSwitchIntelChart && (
+            <DropdownItem
+              className="text-wrap"
+              onClick={() => handleToggleFunc(setToggleNetSwitchIntelChart, "toggleNetSwitchIntelChart", true)}
+            >
+              Netswitch Threat Intel
+            </DropdownItem>
+          )}
         </DropdownMenu>
       </Dropdown>
     )
@@ -375,6 +403,7 @@ const Dashboard = () => {
     toggleIncidentByType,
     toggleAgentChart,
     toggleCritcalIncident,
+    toggleNetSwitchIntelChart,
     setToggleManagementTable,
     setToggleSixLayers,
     setToggleVulnerTrending,
@@ -384,6 +413,7 @@ const Dashboard = () => {
     setToggleIncidentByType,
     setToggleAgentChart,
     setToggleCritcalIncident,
+    setToggleNetSwitchIntelChart,
     dropdownOpen,
     toggleDropdown,
     authUserItem
@@ -424,7 +454,7 @@ const Dashboard = () => {
       {!store?.loading ? (<SimpleSpinner />) : null}
 
       <div className="accordian-toggle-button position-relative">
-        {(!toggleManagementTable || !toggleSixLayers || !toggleVulnerTrending || !toggleProjectBudgetByTask || !toggleScoreHistoryLineChart || !toggleIncidentTrending || !toggleIncidentByType || !toggleAgentChart || !toggleCritcalIncident) && dropDownItems}
+        {(!toggleManagementTable || !toggleSixLayers || !toggleVulnerTrending || !toggleProjectBudgetByTask || !toggleScoreHistoryLineChart || !toggleIncidentTrending || !toggleIncidentByType || !toggleAgentChart || !toggleCritcalIncident || !toggleNetSwitchIntelChart) && dropDownItems}
       </div>
 
       <Col lg="13" className="dashboard-content">

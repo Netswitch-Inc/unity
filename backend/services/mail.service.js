@@ -21,26 +21,17 @@ exports.sendEmail = async function (
     var rtemplate = fs.readFileSync("./templates/" + temFile, "utf-8");
     var compiledTemplate = Hogan.compile(rtemplate);
 
-    var mailServerHost =
-      (await SettingService.getSettingBySlug("mail_server_host")) || null;
-    var mailServerPort =
-      (await SettingService.getSettingBySlug("mail_server_port")) || null;
-    var mailAuthEmail =
-      (await SettingService.getSettingBySlug("mail_auth_email")) || null;
-    var mailAuthPassword =
-      (await SettingService.getSettingBySlug("mail_auth_password")) || null;
-    var mailFromEmail =
-      (await SettingService.getSettingBySlug("mail_from_email")) || null;
-    var mailFromName =
-      (await SettingService.getSettingBySlug("mail_from_name")) || null;
+    var mailServerHost = await SettingService.getSettingBySlug("mail_server_host") || null;
+    var mailServerPort = await SettingService.getSettingBySlug("mail_server_port") || null;
+    var mailAuthEmail = await SettingService.getSettingBySlug("mail_auth_email") || null;
+    var mailAuthPassword = await SettingService.getSettingBySlug("mail_auth_password") || null;
+    var mailFromEmail = await SettingService.getSettingBySlug("mail_from_email") || null;
+    var mailFromName = await SettingService.getSettingBySlug("mail_from_name") || null;
 
-    mailServerHost =
-      mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
-    mailServerPort =
-      mailServerPort?.value || process.env?.MAIL_SERVER_PORT || "";
+    mailServerHost = mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
+    mailServerPort = mailServerPort?.value || process.env?.MAIL_SERVER_PORT || "";
     mailAuthEmail = mailAuthEmail?.value || process.env?.MAIL_AUTH_EMAIL || "";
-    mailAuthPassword =
-      mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
+    mailAuthPassword = mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
     mailFromEmail = mailFromEmail?.value || process.env?.MAIL_FROM_EMAIL || "";
     mailFromName = mailFromName?.value || process.env?.MAIL_FROM_NAME || "";
 
@@ -93,26 +84,17 @@ exports.sendSimpleHtmlEmail = async function (
   filePath = ""
 ) {
   try {
-    var mailServerHost =
-      (await SettingService.getSettingBySlug("mail_server_host")) || null;
-    var mailServerPort =
-      (await SettingService.getSettingBySlug("mail_server_port")) || null;
-    var mailAuthEmail =
-      (await SettingService.getSettingBySlug("mail_auth_email")) || null;
-    var mailAuthPassword =
-      (await SettingService.getSettingBySlug("mail_auth_password")) || null;
-    var mailFromEmail =
-      (await SettingService.getSettingBySlug("mail_from_email")) || null;
-    var mailFromName =
-      (await SettingService.getSettingBySlug("mail_from_name")) || null;
+    var mailServerHost = await SettingService.getSettingBySlug("mail_server_host") || null;
+    var mailServerPort = await SettingService.getSettingBySlug("mail_server_port") || null;
+    var mailAuthEmail = await SettingService.getSettingBySlug("mail_auth_email") || null;
+    var mailAuthPassword = await SettingService.getSettingBySlug("mail_auth_password") || null;
+    var mailFromEmail = await SettingService.getSettingBySlug("mail_from_email") || null;
+    var mailFromName = await SettingService.getSettingBySlug("mail_from_name") || null;
 
-    mailServerHost =
-      mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
-    mailServerPort =
-      mailServerPort?.value || process.env?.MAIL_SERVER_PORT || "";
+    mailServerHost = mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
+    mailServerPort = mailServerPort?.value || process.env?.MAIL_SERVER_PORT || "";
     mailAuthEmail = mailAuthEmail?.value || process.env?.MAIL_AUTH_EMAIL || "";
-    mailAuthPassword =
-      mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
+    mailAuthPassword = mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
     mailFromEmail = mailFromEmail?.value || process.env?.MAIL_FROM_EMAIL || "";
     mailFromName = mailFromName?.value || process.env?.MAIL_FROM_NAME || "";
 
@@ -121,8 +103,8 @@ exports.sendSimpleHtmlEmail = async function (
       port: mailServerPort,
       auth: {
         user: mailAuthEmail,
-        pass: mailAuthPassword,
-      },
+        pass: mailAuthPassword
+      }
     });
 
     // console.log("transport ",transport)
@@ -158,24 +140,17 @@ exports.sendSimpleHtmlEmail = async function (
 };
 
 exports.sendEmailWithAttachment = async function (emailOptions) {
-  var mailServerHost =
-    (await SettingService.getSettingBySlug("mail_server_host")) || null;
-  var mailServerPort =
-    (await SettingService.getSettingBySlug("mail_server_port")) || null;
-  var mailAuthEmail =
-    (await SettingService.getSettingBySlug("mail_auth_email")) || null;
-  var mailAuthPassword =
-    (await SettingService.getSettingBySlug("mail_auth_password")) || null;
-  var mailFromEmail =
-    (await SettingService.getSettingBySlug("mail_from_email")) || null;
-  var mailFromName =
-    (await SettingService.getSettingBySlug("mail_from_name")) || null;
+  var mailServerHost = await SettingService.getSettingBySlug("mail_server_host") || null;
+  var mailServerPort = await SettingService.getSettingBySlug("mail_server_port") || null;
+  var mailAuthEmail = await SettingService.getSettingBySlug("mail_auth_email") || null;
+  var mailAuthPassword = await SettingService.getSettingBySlug("mail_auth_password") || null;
+  var mailFromEmail = await SettingService.getSettingBySlug("mail_from_email") || null;
+  var mailFromName = await SettingService.getSettingBySlug("mail_from_name") || null;
 
   mailServerHost = mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
   mailServerPort = mailServerPort?.value || process.env?.MAIL_SERVER_PORT || "";
   mailAuthEmail = mailAuthEmail?.value || process.env?.MAIL_AUTH_EMAIL || "";
-  mailAuthPassword =
-    mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
+  mailAuthPassword = mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
   mailFromEmail = mailFromEmail?.value || process.env?.MAIL_FROM_EMAIL || "";
   mailFromName = mailFromName?.value || process.env?.MAIL_FROM_NAME || "";
 
@@ -205,4 +180,4 @@ exports.sendEmailWithAttachment = async function (emailOptions) {
     console.error("Error sending email:", error);
     throw error; // Optionally throw an error for further handling
   }
-};
+}

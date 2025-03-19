@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Card, CardBody, FormGroup } from "reactstrap";
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiArrowLeft, TiTrash } from "react-icons/ti";
-import { Row, Col } from "react-bootstrap";
+import { TiMessages, TiTrash } from "react-icons/ti";
+import { Row, Col,Form as BootstrapForm } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getSectionList } from "views/section/store";
@@ -119,7 +119,7 @@ const Questions = () => {
         setshowSnackbar(false);
         setSnakbarMessage("");
         if (assessmentId) {
-          navigate(`/admin/assessment-forms/${assessmentId}?active_tab=2`);
+          navigate(`/admin/assessment-forms/edit/${assessmentId}?active_tab=2`);
         } else {
           navigate("/admin/questions");
         }
@@ -159,7 +159,7 @@ const Questions = () => {
 
   const goBack = () => {
     if (assessmentId) {
-      navigate(`/admin/assessment-forms/${assessmentId}?active_tab=2`);
+      navigate(`/admin/assessment-forms/edit/${assessmentId}?active_tab=2`);
     } else {
       navigate("/admin/questions");
     }
@@ -183,19 +183,6 @@ const Questions = () => {
         <Row>
           <Col>
             <Card>
-              <div className="p-0 border-bottom pb-2 card-header row justify-content-between align-items-center m-0 mb-2">
-                <h3 className="card-title mb-0 mt-0">Add Question</h3>
-                <button
-                  type="button"
-                  className="btn btn-primary mt-0"
-                  // onClick={() => navigate("/admin/sections")}
-                  onClick={() => goBack()}
-                >
-                  Back
-                  <TiArrowLeft size={25} title="Back" className="ml-2" />
-                </button>
-              </div>
-
               <CardBody className="pl-0 pr-0">
                 <Formik
                   initialValues={initialQuestionVal}
@@ -207,15 +194,13 @@ const Questions = () => {
                     <Form>
                       <Row className="mb-2">
                         <Col
-                          as={FormGroup}
-                          controlId="formGridRole"
-                          className="mb-0"
+                          xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridFirstName" className="full-width"
                         >
-                          <label>Section</label>
+                          <BootstrapForm.Label className="col-label">Section</BootstrapForm.Label>
                           {sectionList && (
                             <Select
                               name="section_id"
-                              className="react-select info"
+                              className="react-select col-select w-100"
                               classNamePrefix="react-select"
                               placeholder="Select Section..."
                               value={values.section_id}
@@ -234,57 +219,41 @@ const Questions = () => {
                         </Col>
                       </Row>
                       <Row className="mb-2">
-                        <Col md={12}>
-                          <FormGroup
-                            controlId="formGridContactNumber"
-                            className="mb-0"
-                          >
-                            <label>Question</label>
+                        <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
+                        <BootstrapForm.Label className="col-label">Question</BootstrapForm.Label>
                             <Field
                               as="textarea"
                               name="question"
-                              className="form-control mb-0"
-                              rows="3"
+                              className="col-input w-100"
                             />
                             <ErrorMessage
                               name="question"
                               component="div"
                               style={{ color: "red" }}
                             />
-                          </FormGroup>
                         </Col>
                       </Row>
                       <Row className="mb-2">
-                        <Col md={12}>
-                          <FormGroup
-                            controlId="formGridContactNumber"
-                            className="mb-0"
-                          >
-                            <label>Description</label>
+                        <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
+                            <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
                             <Field
                               as="textarea"
                               name="description"
-                              className="form-control mb-0"
-                              rows="3"
+                              className="col-input w-100"
                             />
                             <ErrorMessage
                               name="description"
                               component="div"
                               style={{ color: "red" }}
                             />
-                          </FormGroup>
                         </Col>
                       </Row>
                       <Row className="mb-2">
-                        <Col
-                          as={FormGroup}
-                          controlId="formGridRole"
-                          className="mb-0"
-                        >
-                          <label>Option Type</label>
+                        <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width">
+                          <BootstrapForm.Label className="col-label">Option Type</BootstrapForm.Label>
                           <Select
                             name="option_type"
-                            className="react-select info"
+                            className="react-select col-select w-100"
                             classNamePrefix="react-select"
                             placeholder="Select Section..."
                             options={questionTypeOptions}
@@ -306,15 +275,13 @@ const Questions = () => {
                       ) && (
                           <Row className="mb-2">
                             <Col
-                              as={FormGroup}
-                              controlId="formGridRole"
-                              className="mb-0"
+                              xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width"
                             >
-                              <label>Point</label>
+                              <BootstrapForm.Label className="col-label">Point</BootstrapForm.Label>
                               <Field
                                 name={`point`}
                                 type="number"
-                                className="form-control mb-0"
+                                className="col-input w-100"
                                 placeholder="Enter Points"
                               />
                               <ErrorMessage
@@ -327,7 +294,7 @@ const Questions = () => {
                         )}
                       {!["note", "textarea", "text"].includes(
                         values?.option_type?.value
-                      ) && <label>Options</label>}
+                      ) &&<BootstrapForm.Label className="col-label">Options</BootstrapForm.Label>}
                       {!["note", "textarea", "text",'date'].includes(
                         values?.option_type?.value
                       ) && (
@@ -336,11 +303,11 @@ const Questions = () => {
                               <div>
                                 {values.options.map((option, index) => (
                                   <Row key={index} className="mb-2">
-                                    <Col md={5} className="mb-2 mb-md-0">
+                                    <Col md={6} className="mb-2 mb-md-0">
                                       <Field
                                         name={`options.${index}.value`}
                                         type="text"
-                                        className="form-control"
+                                        className="col-input w-100"
                                         placeholder="Option Value"
                                       />
                                       <ErrorMessage
@@ -349,11 +316,11 @@ const Questions = () => {
                                         style={{ color: "red" }}
                                       />
                                     </Col>
-                                    <Col md={5} className="mb-2 mb-md-0">
+                                    <Col md={6} className="mb-2 mb-md-0">
                                       <Field
                                         name={`options.${index}.points`}
                                         type="number"
-                                        className="form-control"
+                                        className="col-input w-100"
                                         placeholder="Points"
                                       />
                                       <ErrorMessage
@@ -378,13 +345,15 @@ const Questions = () => {
                                       )}
                                   </Row>
                                 ))}
+                                <div className="buttons">
                                 <button
                                   type="button"
-                                  className="btn btn-primary mb-2"
+                                  className="btnprimary"
                                   onClick={() => push({ value: "", points: "" })}
                                 >
                                   Add Option
                                 </button>
+                                </div>
                               </div>
                             )}
                           </FieldArray>
@@ -410,7 +379,7 @@ const Questions = () => {
                           values?.option_type?.value
                         ) && (
                             <Col md={3} className="mb-2 mb-md-0">
-                              <label>Is Mandatory ?</label>
+                              <BootstrapForm.Label className="col-label">Is Mandatory ?</BootstrapForm.Label>
                               <div className="is-active-container col">
                                 <div className="is-active-checked form-check">
                                   <input
@@ -439,9 +408,9 @@ const Questions = () => {
                             </Col>
                           )}
 
-                        <Col md={3}>
-                          <label>Status</label>
-                          <div className="status-container d-flex row-cols-2">
+                        <Col xl={4} lg={6} as={BootstrapForm.Group} className="full-width">
+                          <BootstrapForm.Label className="col-label">Status</BootstrapForm.Label>
+                          <div className="radio-container d-flex">
                             <div className="form-check">
                               <input
                                 type="radio"
@@ -449,6 +418,7 @@ const Questions = () => {
                                 value={1}
                                 checked={values?.status === 1}
                                 id="Active"
+                                className="mx-2"
                                 onChange={(event) =>
                                   setFieldValue(
                                     "status",
@@ -469,6 +439,7 @@ const Questions = () => {
                                 type="radio"
                                 name="status" // Ensure the name is the same for both radio buttons
                                 value={0}
+                                className="mx-2"
                                 checked={values?.status === 0}
                                 id="InActive"
                                 onChange={(event) =>
@@ -490,13 +461,25 @@ const Questions = () => {
                         </Col>
                       </Row>
 
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={isSubmitting}
-                      >
-                        Submit
-                      </button>
+                      
+
+                      <div className="buttons">
+                        <button
+                          type="submit"
+                          className="btnprimary"
+                          disabled={isSubmitting}
+                        >
+                          Submit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btnsecondary ml-3"
+                          onClick={() => goBack()}
+                        >
+                          Back
+                        </button>
+                      </div>
                     </Form>
                   )}
                 </Formik>

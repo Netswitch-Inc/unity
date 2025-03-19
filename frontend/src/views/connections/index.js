@@ -1,14 +1,10 @@
 // ** React Imports
 import React, { useState, useCallback, useEffect, useLayoutEffect, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // ** Store & Actions
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    getConnectionList,
-    editConnectionRequest,
-    cleanConnectionMessage,
-    // deleteConnection
-} from './store';
+import { /* deleteConnection, */ getConnectionList, cleanConnectionMessage } from './store';
 
 // ** Reactstrap Imports
 import {
@@ -28,8 +24,9 @@ import DatatablePagination from 'components/DatatablePagination';
 
 // ** Third Party Components
 // import Swal from 'sweetalert2';
+// import withReactContent from 'sweetalert2-react-content';
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiEdit /*, TiTrash */ } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
 import {
@@ -41,9 +38,16 @@ import {
 // ** SVG Icons
 import { BiSearch } from 'components/SVGIcons';
 
-import ConnectionProfileForm from './model/AddEditConnection';
+// ** PNG Icons
+import editIcon from "assets/img/edit.svg";
+// import deleteIcon from "assets/img/delete.png";
 
 const ConnectionList = () => {
+    // ** Hooks
+    const navigate = useNavigate();
+    // const mySwal = withReactContent(Swal);
+
+    // ** Store vars
     const dispatch = useDispatch();
     const store = useSelector((state) => state.connection);
     const loginStore = useSelector((state) => state.login);
@@ -51,16 +55,11 @@ const ConnectionList = () => {
     // ** Const
     const permission = getModulePermissionData(loginStore?.authRolePermission, connectionPermissionId, settingGroupPermissionId);
 
-    const [openModel, setOpenModel] = useState(false);
-    const [title, setTitle] = useState('Add Connection');
-    const [loadFirst, setLoadFirst] = useState(true);
-
     /* Pagination */
     const [sort, setSort] = useState("desc");
     const [sortColumn, setSortColumn] = useState("_id");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(defaultPerPageRow);
-    const [isEdited, setIsEdited] = useState(false)
     const [searchInput, setSearchInput] = useState("");
 
     const [showSnackBar, setshowSnackbar] = useState(false)
@@ -99,14 +98,11 @@ const ConnectionList = () => {
     }
 
     useLayoutEffect(() => {
-        if (loadFirst) {
-            handleConnectionLists();
-            setLoadFirst(false)
-        }
-    }, [handleConnectionLists, loadFirst, dispatch])
+        handleConnectionLists()
+    }, [handleConnectionLists])
 
     useEffect(() => {
-        if (store.actionFlag === "CONNECTION_CREATED" || store.actionFlag === "Connection_UPDATED") {
+        if (store.actionFlag === "CONN_CRET" || store.actionFlag === "CONN_UPDT" || store.actionFlag === "CONN_DLT") {
             handleConnectionLists()
         }
 
@@ -132,22 +128,8 @@ const ConnectionList = () => {
         }, 6000);
     }, [showSnackBar])
 
-    // const AddConnection = () => {
-    //     setIsEdited(() => false)
-    //     setOpenModel(true);
-    //     setTitle('Add Connection');
-    // }
-
-    const EditConnection = (id) => {
-        const query = { id: id }
-        setIsEdited(() => true)
-        dispatch(editConnectionRequest(query));
-        setOpenModel(true);
-        setTitle('Edit Connection');
-    }
-
     // const deleteProfile = async (id) => {
-    //     const result = await Swal.fire({
+    //         mySwal.fire({
     //         title: 'Are you sure?',
     //         text: "You won't be able to revert this!",
     //         icon: 'warning',
@@ -155,39 +137,26 @@ const ConnectionList = () => {
     //         confirmButtonColor: '#3085d6',
     //         cancelButtonColor: '#d33',
     //         confirmButtonText: 'Yes, delete it!'
-    //     });
-
-    //     if (result.isConfirmed) {
-    //         try {
-    //             // Perform delete action here, e.g., call an API to delete the user
-    //             await dispatch(deleteConnection(id));
-    //             Swal.fire(
-    //                 'Deleted!',
-    //                 'Your user has been deleted.',
-    //                 'success'
-    //             );
-    //             // Refresh user list or update UI as needed
-    //             setLoadFirst(true)
-    //         } catch (error) {
-    //             Swal.fire(
-    //                 'Error!',
-    //                 'There was an error deleting the user.',
-    //                 'error'
-    //             );
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             dispatch(deleteConnection(id));
     //         }
-    //     }
-    // };
-
-    const closePopup = () => {
-        setOpenModel(() => false);
-    };
+    //     });
+    // }
 
     const columns = [
         {
             name: 'Name',
             sortField: "name",
             sortable: true,
-            selector: (row) => (row?.name || "")
+            selector: (row) => (
+                <div
+                className="cursor-pointer"
+                onClick={() => navigate(`edit/${row?._id || ""}`)}
+                >
+                   {row?.name || ""}
+                </div>
+            )
         },
         {
             name: 'Username',
@@ -212,25 +181,27 @@ const ConnectionList = () => {
             center: true,
             cell: (row) => (
                 <Fragment>
-                    {permission?.update ? (
-                        <TiEdit
-                            size={20}
-                            color="#fff"
-                            cursor="pointer"
-                            className="mr-1"
-                            onClick={() => EditConnection(row?._id)}
-                        />
-                    ) : null}
+                    <div className="actions">
+                        {permission?.update ? (
+                            <img
+                                alt="Edit"
+                                title="Edit"
+                                src={editIcon}
+                                className="cursor-pointer mr-2"
+                                onClick={() => navigate(`edit/${row?._id || ""}`)}
+                            />
+                        ) : null}
 
-                    {/* {!row?.is_default && permission?.delete ? (
-                        <TiTrash
-                            size={20}
-                            color="#fff"
-                            cursor="pointer"
-                            className="d-none"
-                            onClick={() => deleteProfile(row?._id)}
-                        />
-                    ) : null} */}
+                        {/* {!row?.is_default && permission?.delete ? (
+                            <img
+                                alt="Delete"
+                                title="Delete"
+                                src={deleteIcon}
+                                className="cursor-pointer"
+                                onClick={() => deleteProfile(row?._id)}
+                            />
+                        ) : null} */}
+                    </div>
                 </Fragment>
             )
         }
@@ -250,15 +221,15 @@ const ConnectionList = () => {
 
             <Row>
                 <Card className="col-md-12 col-xxl-10 ml-auto mr-auto tbl-height-container">
-                    <div className="d-flex justify-content-between p-0 border-bottom card-header">
+                    {/* <div className="d-flex justify-content-between p-0 border-bottom card-header">
                         <h3 className="card-title">Connections</h3>
-                    </div>
+                    </div> */}
 
                     <CardBody>
-                        <Row className="mt-2">
+                        <Row className="top-content">
                             <Col xs="6">
                                 <InputGroup>
-                                    <input className="form-control " type="search" placeholder="Search" aria-label="Search" value={searchInput} onChange={(e) => onSearchKey(e.target.value)} />
+                                    <input className="col-input w-100" type="search" placeholder="Search" aria-label="Search" value={searchInput} onChange={(e) => onSearchKey(e.target.value)} />
                                     <span className="edit2-icons position-absolute">
                                         <BiSearch />
                                     </span>
@@ -266,19 +237,21 @@ const ConnectionList = () => {
                             </Col>
 
                             <Col xs="6" className='text-right'>
-                                {/* {permission?.create ? (
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary d-none"
-                                        onClick={() => AddConnection()}
-                                    >
-                                        Add Connection
-                                    </button>
-                                ) : null} */}
+                                {/* <div className="buttons d-none">
+                                    {permission?.create ? (
+                                        <button
+                                            type="button"
+                                            className="btnprimary"
+                                            onClick={() => navigate(`add`)}
+                                        >
+                                            Add Connection
+                                        </button>
+                                    ) : null}
+                                </div> */}
                             </Col>
                         </Row>
 
-                        <Row className="userManagement mt-3">
+                        <Row className="userManagement mt-3 connection-table">
                             <Col className="pb-2" md="12">
                                 <DatatablePagination
                                     data={store.ConnectionItems}
@@ -295,7 +268,6 @@ const ConnectionList = () => {
                 </Card>
             </Row>
 
-            {openModel && (<ConnectionProfileForm show={openModel} closePopup={closePopup} title={title} initialValues={isEdited ? store.ConnectionItem : store.addConnectionItem} />)}
         </div>
     )
 }

@@ -144,6 +144,7 @@ exports.createUser = async function (user) {
         user_name: user.user_name ? user.user_name.toLowerCase() : "",
         email: user?.email ? user.email?.toLowerCase() : "",
         password: user.password ? bcrypt.hashSync(user.password, 8) : "",
+        country_code: user.country_code ? user.country_code : null,
         phone: user.phone ? user.phone : "",
         image: user.image ? user.image : "",
         retry_count: 0,
@@ -304,6 +305,10 @@ exports.updateUser = async function (user) {
 
     if (user.password) {
         oldUser.password = bcrypt.hashSync(user.password, 8);
+    }
+
+    if (user.country_code) {
+        oldUser.country_code = user.country_code;
     }
 
     if (user.phone) {

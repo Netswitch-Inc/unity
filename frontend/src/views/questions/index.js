@@ -120,7 +120,7 @@ const QuestionsList = () => {
           <TiEdit
             size={20}
             cursor="pointer"
-            onClick={() => navigate(`/admin/questions/${row?._id}`)}
+            onClick={() => navigate(`/admin/questions/edit/${row?._id}`)}
           />
           <TiTrash
             size={20}
@@ -174,13 +174,16 @@ const QuestionsList = () => {
                 </Col>
 
                 <Col sm="6" className="text-right">
+                <div className="buttons">
                   <button
                     onClick={() => navigate("/admin/questions/add")}
-                    className="btn btn-primary my-2"
+                    className="btnprimary"
                     type="button"
                   >
                     Add Question
                   </button>
+
+                  </div>
                 </Col>
               </Row>
 

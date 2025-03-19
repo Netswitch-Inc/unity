@@ -13,7 +13,6 @@ import {
   Navbar,
   Button,
   NavLink,
-  Collapse,
   Container,
   NavbarBrand,
   DropdownMenu,
@@ -43,7 +42,7 @@ function AdminNavbar(props) {
   const loginStore = useSelector((state) => state.login);
 
   // ** States
-  const [collapseOpen, setcollapseOpen] = useState(false);
+  const [collapseOpen] = useState(false);
   const [color, setcolor] = useState("navbar-transparent");
 
   useEffect(() => {
@@ -64,15 +63,15 @@ function AdminNavbar(props) {
   }
 
   // this function opens and closes the collapse on small devices
-  const toggleCollapse = () => {
-    if (collapseOpen) {
-      setcolor("navbar-transparent");
-    } else {
-      setcolor("bg-white");
-    }
+  // const toggleCollapse = () => {
+  //   if (collapseOpen) {
+  //     setcolor("navbar-transparent");
+  //   } else {
+  //     setcolor("bg-white");
+  //   }
 
-    setcollapseOpen(!collapseOpen);
-  }
+  //   setcollapseOpen(!collapseOpen);
+  // }
 
   const handleLogout = () => {
     dispatch(authUserLogout());
@@ -86,7 +85,7 @@ function AdminNavbar(props) {
       className={classNames("navbar-absolute navbar-fixed", {
         [color]: props.location.pathname.indexOf("full-screen-map") === -1
       })}
-      expand="lg"
+      expand="md"
     >
       <Container fluid>
         <div className="navbar-wrapper">
@@ -125,7 +124,7 @@ function AdminNavbar(props) {
           </NavbarBrand>
         </div>
 
-        <button
+        {/* <button
           type="button"
           data-toggle="collapse"
           aria-expanded="false"
@@ -137,22 +136,23 @@ function AdminNavbar(props) {
           <span className="navbar-toggler-bar navbar-kebab" />
           <span className="navbar-toggler-bar navbar-kebab" />
           <span className="navbar-toggler-bar navbar-kebab" />
-        </button>
+        </button> */}
 
-        <Collapse navbar isOpen={collapseOpen}>
-          <Row className="ml-auto w-100 alert-btn-toggle">
-            <div className="button">
-              <Button className="btn-simple btn btn-sm disabled" color="twitter">
+        <div>
+          <Row className="ml-auto alert-btn-toggle">
+            <div className="button d-sm-block d-none">
+              <Button className="btn-simple btn btn-sm borders disabled" color="twitter">
                 Alert Level: <strong>Guarded</strong>
               </Button>
             </div>
 
-            <Nav navbar>
+            <Nav navbar className="borders">
               <UncontrolledDropdown nav>
                 <DropdownToggle
                   nav
                   caret
                   color="default"
+                  className="pl-0"
                   onClick={(event) => event.preventDefault()}
                 >
                   <div className="photo">
@@ -172,7 +172,7 @@ function AdminNavbar(props) {
 
                   <div className="name-arrow">
                     <span className="d-block">{loginStore?.authUserItem?.user_name || ""}</span>
-                    <b className="caret d-lg-block d-xl-block" />
+                    <b className="caret d-md-block d-xl-block" />
                   </div>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
@@ -214,12 +214,17 @@ function AdminNavbar(props) {
                       Log out
                     </DropdownItem>
                   </NavLink>
+                  <div className="button d-sm-none d-block">
+                    <Button className="btn-simple btn btn-sm borders disabled mx-auto" color="twitter">
+                      Alert Level: <strong>Guarded</strong>
+                    </Button>
+                  </div>
                 </DropdownMenu>
               </UncontrolledDropdown>
-              <li className="separator d-lg-none" />
+              <li className="separator d-md-none" />
             </Nav>
           </Row>
-        </Collapse>
+        </div>
       </Container>
     </Navbar>
   </>)

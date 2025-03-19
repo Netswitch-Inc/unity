@@ -1,5 +1,9 @@
 var Setting = require('../models/Setting.model');
 
+var fs = require("fs");
+var publicPath = require("path").resolve("public");
+var ImageService = require("../services/image.service");
+
 // Saving the context of this module inside the _the variable
 _this = this
 
@@ -14,7 +18,7 @@ exports.getSettings = async function (query = {}, page = 1, limit = 0) {
 
         return settings;
     } catch (e) {
-        throw Error('Error occurred while finding Settings');
+        throw Error('Error occurred while finding Settings.');
     }
 }
 
@@ -26,7 +30,7 @@ exports.getSettingDistinct = async function (field, query) {
     } catch (e) {
         // console.log("Error ", e);
         // return a Error message describing the reason 
-        throw Error('Error while Distinct Setting');
+        throw Error('Error while Distinct Setting.');
     }
 }
 
@@ -37,7 +41,7 @@ exports.getSettingsByGroupName = async function (group) {
     } catch (e) {
         // console.log("Error ", e);
         // return a Error message describing the reason 
-        throw Error('Error while Finding Settings by Group Name');
+        throw Error('Error while Finding Settings by Group Name.');
     }
 }
 
@@ -48,11 +52,11 @@ exports.getSetting = async function (id) {
         if (_details._id) {
             return _details;
         } else {
-            throw Error("Setting not available");
+            throw Error("Setting not available.");
         }
     } catch (e) {
         // return a Error message describing the reason     
-        throw Error("Setting not available");
+        throw Error("Setting not available.");
     }
 }
 
@@ -80,14 +84,27 @@ exports.getSettingBySlug = async function (slug) {
 }
 
 exports.createSetting = async function (setting) {
+    if (!fs.existsSync(publicPath + "/images/settings")) {
+        fs.mkdirSync(publicPath + "/images/settings", { recursive: true });
+    }
+
+    if (setting?.value && setting?.type == "image") {
+        var isImage = await ImageService.saveImage(setting.value, "/images/settings/").then((data) => { return data; })
+
+        if (typeof isImage != "undefined" && isImage != null && isImage != "") {
+            setting.value = isImage;
+        }
+    }
+
     // console.log("createSetting ",setting)
     var newSetting = new Setting({
+        options: setting.options ? setting.options : null,
         group_name: setting.group_name ? setting.group_name : "",
         name: setting.name ? setting.name : "",
         slug: setting.slug ? setting.slug : "",
         type: setting.type ? setting.type : "",
+        note: setting.note ? setting.note : "",
         value: setting.value ? setting.value : "",
-        options: setting.options ? setting.options : null,
         deletedAt: null
     })
 
@@ -97,7 +114,7 @@ exports.createSetting = async function (setting) {
         return savedSetting;
     } catch (e) {
         // return a Error message describing the reason     
-        throw Error("Error occurred while creating Setting")
+        throw Error("Error occurred while creating Setting.")
     }
 }
 
@@ -107,13 +124,17 @@ exports.updateSetting = async function (setting) {
         // Find the old Setting Object by the Id
         var oldSetting = await Setting.findById(id);
     } catch (e) {
-        throw Error("Setting not found")
+        throw Error("Setting not found.")
     }
 
     // If no old Setting Object exists return false
     if (!oldSetting) { return false; }
 
     // Edit the Setting Object
+    if (setting.options) {
+        oldSetting.options = setting.options;
+    }
+
     if (setting.group_name) {
         oldSetting.group_name = setting.group_name;
     }
@@ -126,12 +147,31 @@ exports.updateSetting = async function (setting) {
         oldSetting.slug = setting.slug;
     }
 
-    if (setting?.value || setting.value == "") {
-        oldSetting.value = setting?.value || "";
+    if (setting?.note || setting.note == "") {
+        oldSetting.note = setting?.note || "";
     }
 
-    if (setting.options) {
-        oldSetting.options = setting.options;
+    if (setting?.value && oldSetting?.type == "image") {
+        if (!fs.existsSync(publicPath + "/images/settings")) {
+            fs.mkdirSync(publicPath + "/images/settings", { recursive: true });
+        }
+
+        var isImage = await ImageService.saveImage(setting.value, "/images/settings/").then((data) => { return data; })
+        if (typeof isImage != "undefined" && isImage != null && isImage != "") {
+            try {
+                var filePath = publicPath + "/" + oldSetting.value;
+                //console.log("\n filePath >>>>>>",filePath,"\n");
+                fs.unlinkSync(filePath);
+            } catch (e) {
+                //console.log("\n\nImage Remove Issues >>>>>>>>>>>>>>\n\n");
+            }
+
+            setting.value = isImage;
+        }
+    }
+
+    if (setting?.value || setting.value == "") {
+        oldSetting.value = setting?.value || "";
     }
 
     if (setting.deletedAt) {
@@ -143,22 +183,20 @@ exports.updateSetting = async function (setting) {
         return savedSetting;
     } catch (e) {
         console.log(e)
-        throw Error("Error occurred while updating the Setting");
+        throw Error("Error occurred while updating the Setting.");
     }
 }
 
 exports.deleteSetting = async function (id) {
     // Delete the Setting
     try {
-        var deleted = await Setting.remove({
-            _id: id
-        })
+        var deleted = await Setting.remove({ _id: id })
         if (deleted.n === 0 && deleted.ok === 1) {
-            throw Error("Setting Could not be deleted")
+            throw Error("Setting Could not be deleted.")
         }
         return deleted;
     } catch (e) {
-        throw Error("Error occurred while Deleting the Setting")
+        throw Error("Error occurred while Deleting the Setting.")
     }
 }
 
@@ -167,7 +205,7 @@ exports.softDeleteSetting = async function (id) {
         //Find the old Setting Object by the Id
         var oldSetting = await Setting.findById(id);
     } catch (e) {
-        throw Error("Error occur while Finding the Setting")
+        throw Error("Error occur while Finding the Setting.")
     }
 
     // If no old Setting Object exists return false
@@ -181,6 +219,6 @@ exports.softDeleteSetting = async function (id) {
         var savedSetting = await oldSetting.save()
         return savedSetting;
     } catch (e) {
-        throw Error("Error occur while Deleting the Setting");
+        throw Error("Error occur while Deleting the Setting.");
     }
 }

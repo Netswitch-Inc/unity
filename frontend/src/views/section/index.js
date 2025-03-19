@@ -131,7 +131,7 @@ const SectionsList = () => {
           <TiEdit
             size={20}
             cursor="pointer"
-            onClick={() => navigate(`/admin/sections/${row?._id}`)}
+            onClick={() => navigate(`/admin/sections/edit/${row?._id}`)}
           />
           <TiTrash
             size={20}

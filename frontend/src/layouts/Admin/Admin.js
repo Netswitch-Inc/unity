@@ -147,9 +147,10 @@ const Admin = (props) => {
           return collapseActiveRoute;
         }
       } else {
+        const routePath = routes[i]?.path?.replace("/:id", "");
         if (
           location.pathname.indexOf(
-            routes[i].layout + routes[i].path
+            routes[i].layout + routePath
           ) !== -1
         ) {
           return routes[i].name;

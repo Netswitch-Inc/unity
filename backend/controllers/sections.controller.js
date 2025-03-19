@@ -27,23 +27,11 @@ exports.getSections = async function (req, res, next) {
     }
 
     var count = await SectionService.getSectionsCount(query);
-    var sections = await SectionService.getSections(
-      query,
-      page,
-      limit,
-      sortColumn,
-      sort
-    );
+    var sections = await SectionService.getSections(query, page, limit, sortColumn, sort)
     if (!sections || !sections.length) {
       if (Number(req.query?.page || 0) > 0) {
         page = 1;
-        sections = await SectionService.getSections(
-          query,
-          page,
-          limit,
-          sortColumn,
-          sort
-        );
+        sections = await SectionService.getSections(query, page, limit, sortColumn, sort)
       }
     }
 
@@ -58,8 +46,8 @@ exports.getSections = async function (req, res, next) {
       total: count,
       pageIndex,
       startIndex,
-      endIndex,
-    };
+      endIndex
+    }
 
     // Return the Sections list with the appropriate HTTP password Code and Message.
     return res.status(200).json({
@@ -67,15 +55,13 @@ exports.getSections = async function (req, res, next) {
       flag: true,
       data: sections,
       pagination,
-      message: "Sections received successfully!",
+      message: "Sections received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message })
   }
-};
+}
 
 exports.getSection = async function (req, res, next) {
   // Check the existence of the query parameters, If doesn't exists assign a default value
@@ -88,15 +74,13 @@ exports.getSection = async function (req, res, next) {
       status: 200,
       flag: true,
       data: section,
-      message: "Section received successfully!",
+      message: "Section received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.createSection = async function (req, res, next) {
   try {
@@ -107,22 +91,18 @@ exports.createSection = async function (req, res, next) {
       status: 200,
       flag: true,
       data: createdSection,
-      message: "Section created successfully!",
+      message: "Section created successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.updateSection = async function (req, res, next) {
   // Id is necessary for the update
-  if (!req.body._id) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: "Id must be present!" });
+  if (!req.body?._id) {
+    return res.status(200).json({ status: 200, flag: false, message: "Id must be present." })
   }
 
   try {
@@ -133,33 +113,27 @@ exports.updateSection = async function (req, res, next) {
       status: 200,
       flag: true,
       data: updatedSection,
-      message: "Section updated successfully!",
+      message: "Section updated successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.removeSection = async function (req, res, next) {
   var id = req.params.id;
   if (!id) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: true, message: "Id must be present!" });
+    return res.status(200).json({ status: 200, flag: true, message: "Id must be present." });
   }
+
   try {
     var softDelete = false;
     var questions = await QuestionService.getQuestions({ section_id: id });
-    console.log(questions?.length, "questions length");
     if (questions?.length) {
       softDelete = true;
     } else if (!softDelete) {
-      var questionAns = await QuestionAnswerService.getQuestionAnswers({
-        section_id: id,
-      });
+      var questionAns = await QuestionAnswerService.getQuestionAnswers({ section_id: id });
       if (questionAns?.length) {
         softDelete = true;
       }
@@ -171,37 +145,28 @@ exports.removeSection = async function (req, res, next) {
       var deleted = await SectionService.deleteSection(id);
     }
 
-    return res
-      .status(200)
-      .send({ status: 200, flag: true, message: "Successfully Deleted... " });
+    return res.status(200).json({ status: 200, flag: true, message: "Successfully Deleted... " });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.getSectionByAssessment = async function (req, res) {
   try {
-    const queryData = {
-      assessment_id: req.query.assessment_id,
-    };
+    const queryData = { assessment_id: req.query.assessment_id }
     const sections = await SectionService.getFilteredSections(queryData);
     if (sections) {
       return res.status(200).json({
         status: 200,
         flag: true,
         data: sections,
-        message: "Successfully Get Sections",
-      });
+        message: "Section received successfully."
+      })
     }
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: "No sections found" });
+
+    return res.status(200).json({ status: 200, flag: false, message: "No sections found." });
   } catch (error) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: error.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}

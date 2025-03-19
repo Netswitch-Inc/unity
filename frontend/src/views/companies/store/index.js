@@ -1,40 +1,32 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import instance from '../../../utility/AxiosConfig';
 import { API_ENDPOINTS } from 'utility/ApiEndPoints';
+import { initCompanyItem } from 'utility/reduxConstant';
 
-const initialValues = {
-    user_name: '',
-    password: '',
-    name: "",
-    logo: "",
-    contact_no: "",
-    email: "",
-    address: "",
-    header_color: "#ffffff",
-    footer_color: "#ffffff",
-}
+
+
 async function getCompanyListRequest(params) {
     return instance.get(`${API_ENDPOINTS.company.listing}`, { params })
         .then((items) => items.data)
         .catch((error) => error);
 }
 
-export const getCompanyList = createAsyncThunk("appCompanys/getCompanyList", async (params) => {
+export const getCompanyList = createAsyncThunk("appCompany/getCompanyList", async (params) => {
     try {
         const response = await getCompanyListRequest(params);
         if (response && response.flag) {
             return {
                 params,
-                CompanyItems: response.data || [],
+                companyItems: response.data || [],
                 pagination: response?.pagination || null,
-                actionFlag: "",
+                actionFlag: "COMPANY_LISTING",
                 success: "",
                 error: ""
             };
         } else {
             return {
                 params,
-                CompanyItems: [],
+                companyItems: [],
                 actionFlag: "",
                 success: "",
                 error: ""
@@ -43,40 +35,41 @@ export const getCompanyList = createAsyncThunk("appCompanys/getCompanyList", asy
     } catch (error) {
         return {
             params,
-            CompanyItems: [],
+            companyItems: [],
             actionFlag: "",
             success: "",
             error: error.message // Ensure error message is string
         };
     }
 });
-async function editRequest(params) {
+
+async function getCompanyRequest(params) {
     return instance.get(`${API_ENDPOINTS.company.edit}/${params?.id}`)
         .then((items) => items.data)
         .catch((error) => error);
 }
 
-export const editActionRequest = createAsyncThunk("edit", async (params) => {
+export const getCompany = createAsyncThunk("edit", async (params) => {
     try {
-        const response = await editRequest(params);
+        const response = await getCompanyRequest(params);
         if (response && response.flag) {
             return {
-                editItem: response.data,
-                actionFlag: "",
+                companyItem: response.data,
+                actionFlag: "GET_COMPANY",
                 success: "",
                 error: "",
             };
         } else {
             return {
-                editItem: null,
-                actionFlag: "",
+                companyItem: null,
+                actionFlag: "GET_NOT_COMPANY",
                 success: "",
                 error: "",
             };
         }
     } catch (error) {
         return {
-            editItem: null,
+            companyItem: null,
             actionFlag: "",
             success: "",
             error: error,
@@ -85,24 +78,24 @@ export const editActionRequest = createAsyncThunk("edit", async (params) => {
 }
 );
 
-async function creatRequest(payload) {
+async function createComapanyRequest(payload) {
     return instance.post(`${API_ENDPOINTS.company.create}`, payload)
         .then((items) => items.data)
         .catch((error) => error);
 }
-export const creatActionRequest = createAsyncThunk("creat", async (params) => {
+export const createComapany = createAsyncThunk("creat", async (params) => {
     try {
-        const response = await creatRequest(params);
+        const response = await createComapanyRequest(params);
         if (response && response.flag) {
             return {
-                CompanyItems: response.data,
+                companyItems: response.data,
                 actionFlag: "CREAT",
                 success: response.message,
                 error: "",
             };
         } else {
             return {
-                CompanyItems: [],
+                companyItems: [],
                 actionFlag: "",
                 success: "",
                 error: response.message,
@@ -110,7 +103,7 @@ export const creatActionRequest = createAsyncThunk("creat", async (params) => {
         }
     } catch (error) {
         return {
-            CompanyItems: [],
+            companyItems: [],
             actionFlag: "",
             success: "",
             error: error,
@@ -118,7 +111,6 @@ export const creatActionRequest = createAsyncThunk("creat", async (params) => {
     }
 }
 );
-// emailunique
 
 async function updateCompanyRequest(payload) {
     return instance.put(`${API_ENDPOINTS.company.update}`, payload)
@@ -126,14 +118,14 @@ async function updateCompanyRequest(payload) {
         .catch((error) => error);
 }
 
-export const updateCompany = createAsyncThunk("appCompanys/updateCompany", async (payload) => {
+export const updateCompany = createAsyncThunk("appCompany/updateCompany", async (payload) => {
     try {
         const response = await updateCompanyRequest(payload);
         if (response && response.flag) {
             return {
                 payload,
-                editItem: response.data || null,
-                actionFlag: "",
+                companyItem: response.data || null,
+                actionFlag: "COMPANY_UPDATED",
                 success: response?.message || "",
                 error: ""
             };
@@ -155,94 +147,25 @@ export const updateCompany = createAsyncThunk("appCompanys/updateCompany", async
     }
 });
 
-async function isEmailUnique(payload) {
-    return instance.post(`${API_ENDPOINTS.company.emailunique}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
-}
-
-export const isEmailUniqueAction = createAsyncThunk("appCompanys/isEmailUnique", async (payload) => {
-    try {
-        const response = await isEmailUnique(payload);
-        if (response && response.flag) {
-            return {
-                isEmailUnique: response.flag,
-                actionFlag: "",
-                success: response?.message || "",
-                error: ""
-            };
-        } else {
-            return {
-                isEmailUnique: response.flag,
-                actionFlag: "",
-                success: "",
-                error: response?.message
-            };
-        }
-    } catch (error) {
-        return {
-            isEmailUnique: false,
-            actionFlag: "",
-            success: "",
-            error: error
-        };
-    }
-});
-
-async function isUserUnique(payload) {
-    return instance.post(`${API_ENDPOINTS.company.userunique}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
-}
-
-export const isUserUniqueAction = createAsyncThunk("appCompanys/isUserUnique", async (payload) => {
-    try {
-        const response = await isUserUnique(payload);
-        if (response && response.flag) {
-            return {
-                isUserUnique: response.flag,
-                actionFlag: "",
-                success: response?.message || "",
-                error: ""
-            };
-        } else {
-            return {
-                isUserUnique: response.flag,
-                actionFlag: "",
-                success: "",
-                error: response?.message
-            };
-        }
-    } catch (error) {
-        return {
-            isUserUnique: false,
-            actionFlag: "",
-            success: "",
-            error: error
-        };
-    }
-});
-
-
-async function deleteListRequest(params) {
+async function deleteComapanyRequest(params) {
     return instance.delete(`${API_ENDPOINTS.company.update}/${params}`)
         .then((items) => items.data)
         .catch((error) => error);
 }
 
-export const deleteActionRequest = createAsyncThunk("delete", async (params) => {
+export const deleteComapany = createAsyncThunk("delete", async (params) => {
     try {
-        const response = await deleteListRequest(params);
+        const response = await deleteComapanyRequest(params);
         if (response && response.flag) {
             return {
-                CompanyItem: response.data,
+                companyItem: response.data,
                 actionFlag: "COMPANY_DELETED",
                 success: response.message,
                 error: "",
             };
         } else {
             return {
-                CompanyItem: [],
+                companyItem: [],
                 actionFlag: "",
                 success: "",
                 error: response.message,
@@ -250,7 +173,7 @@ export const deleteActionRequest = createAsyncThunk("delete", async (params) => 
         }
     } catch (error) {
         return {
-            CompanyItem: [],
+            companyItem: [],
             actionFlag: "",
             success: "",
             error: error,
@@ -260,12 +183,11 @@ export const deleteActionRequest = createAsyncThunk("delete", async (params) => 
 );
 
 const appAuthSlice = createSlice({
-    name: 'appCompanys',
+    name: 'appCompany',
     initialState: {
-        CompanyItems: [],
+        companyItems: [],
         pagination: null,
-        editItem: initialValues,
-        addItem: initialValues,
+        companyItem: initCompanyItem,
         isEmailUnique: false,
         isUserUnique: false,
         actionFlag: "",
@@ -278,68 +200,110 @@ const appAuthSlice = createSlice({
             state.actionFlag = "";
             state.success = "";
             state.error = "";
-            state.editItem = ""
-        },
+        }
     },
     extraReducers: (builder) => {
         builder
             .addCase(getCompanyList.pending, (state) => {
-                state.type = 'LISTING';
                 state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
             })
             .addCase(getCompanyList.fulfilled, (state, action) => {
-                state.type = 'LISTING';
-                state.actionFlag = 'COMPANY_LISTING'
-                state.CompanyItems = action.payload.CompanyItems || [];
+                state.actionFlag = action.payload?.actionFlag;
+                state.companyItems = action.payload.companyItems || [];
                 state.pagination = action.payload?.pagination || null;
                 state.loading = true; // Change loading to false after data is fetched
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-            .addCase(isEmailUniqueAction.fulfilled, (state, action) => {
-                state.isEmailUnique = action.payload?.isEmailUnique
-                state.loading = true;
-                state.actionFlag = "CHECK_EMIAL_IS_UNIQUE";
-                state.success = action.payload?.success;
-                state.error = action.payload?.error;
+            .addCase(getCompanyList.rejected, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
             })
-            .addCase(isUserUniqueAction.fulfilled, (state, action) => {
-                state.isUserUnique = action.payload?.isUserUnique
-                state.loading = true;
-                state.actionFlag = "CHECK_USER_IS_UNIQUE";
-                state.success = action.payload?.success;
-                state.error = action.payload?.error;
+            .addCase(getCompany.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
             })
-            .addCase(editActionRequest.fulfilled, (state, action) => {
-                state.type = 'EDIT';
+            .addCase(getCompany.fulfilled, (state, action) => {
+                state.companyItem = action.payload.companyItem;
                 state.loading = true;
-                state.editItem = action.payload.editItem;
+                state.actionFlag = action.payload?.actionFlag;
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-            .addCase(creatActionRequest.fulfilled, (state, action) => {
-                state.actionFlag = 'CREAT';
+            .addCase(getCompany.rejected, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(createComapany.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(createComapany.fulfilled, (state, action) => {
+                state.companyItems = action.payload?.companyItems;
                 state.loading = true;
+                state.actionFlag = action.payload?.actionFlag;
                 state.success = action.payload.success;
                 state.error = action.payload.error;
-                state.editItem = initialValues
+            })
+            .addCase(createComapany.rejected, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(updateCompany.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
             })
             .addCase(updateCompany.fulfilled, (state, action) => {
-                state.editItem = action.payload?.editItem || null;
+                state.companyItem = action.payload?.companyItem || null;
                 state.loading = true;
-                state.actionFlag = "COMPANY_UPDATED";
+                state.actionFlag = action.payload?.actionFlag;
                 state.success = action.payload?.success;
                 state.error = action.payload?.error;
             })
-            .addCase(deleteActionRequest.fulfilled, (state, action) => {
+            .addCase(updateCompany.rejected, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(deleteComapany.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(deleteComapany.fulfilled, (state, action) => {
                 state.loading = true;
                 state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
+            .addCase(deleteComapany.rejected, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            
     },
 });
 
 export const { cleanCompanyMessage } = appAuthSlice.actions;
 
 export default appAuthSlice.reducer;
+

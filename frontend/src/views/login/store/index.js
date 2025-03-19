@@ -107,14 +107,14 @@ export const getAuthRolePermission = createAsyncThunk("appAuth/getAuthRolePermis
             }
         } else {
             return {
-                actionFlag: "",
+                actionFlag: "AUTH_ROLE_PERMISSION_ERR",
                 success: "",
                 error: response.message
             }
         }
     } catch (error) {
         return {
-            actionFlag: "",
+            actionFlag: "AUTH_ROLE_PERMISSION_ERR",
             success: "",
             error: error
         }
@@ -284,6 +284,75 @@ export const resetPassword = createAsyncThunk("appAuth/resetPassword", async (pa
     }
 })
 
+async function getEmailExistRequest(params) {
+    return instance.get(`${API_ENDPOINTS.auth.emailExist}`, { params })
+        .then((auth) => auth.data)
+        .catch((error) => error)
+}
+
+export const getEmailExist = createAsyncThunk("appAuth/getEmailExist", async (params) => {
+    try {
+        const response = await getEmailExistRequest(params);
+        if (response && response.flag) {
+            return {
+                isEmailExist: response?.data || false,
+                actionFlag: "EML_EXST",
+                success: response.message,
+                error: ""
+            }
+        } else {
+            return {
+                isEmailExist: response?.data || false,
+                actionFlag: "EML_EXST_ERR",
+                success: "",
+                error: response.message
+            }
+        }
+    } catch (error) {
+        console.log("getEmailExist catch >>> ", error);
+        return {
+            isEmailExist: false,
+            actionFlag: "",
+            success: "",
+            error: error
+        }
+    }
+})
+
+async function getUsernameExistRequest(params) {
+    return instance.get(`${API_ENDPOINTS.auth.usernamExist}`, { params })
+        .then((auth) => auth.data)
+        .catch((error) => error)
+}
+
+export const getUsernameExist = createAsyncThunk("appAuth/getUsernameExist", async (params) => {
+    try {
+        const response = await getUsernameExistRequest(params);
+        if (response && response.flag) {
+            return {
+                isUsernameExist: response?.data || false,
+                actionFlag: "USRNM_EXST",
+                success: response.message,
+                error: ""
+            }
+        } else {
+            return {
+                isUsernameExist: response?.data || false,
+                actionFlag: "USRNM_EXST_ERR",
+                success: "",
+                error: response.message
+            }
+        }
+    } catch (error) {
+        return {
+            isUsernameExist: false,
+            actionFlag: "USRNM_EXST_ERR",
+            success: "",
+            error: error
+        }
+    }
+})
+
 // Create a slice
 const appAuthSlice = createSlice({
     name: 'appAuth',
@@ -295,17 +364,21 @@ const appAuthSlice = createSlice({
         userItem: userItem,
         profile: '',
         forgotUserEmail: '',
+        isEmailExist: false,
+        isUsernameExist: false,
         actionFlag: "",
         sidebarLoading: true,
         loading: true,
         success: "",
-        error: ""
+        error: "",
+        connectError: ""
     },
     reducers: {
         authUserLogout: (state) => {
             logoutCurrentUser();
             state.authUserItem = null;
             state.accessToken = null;
+            state.authRolePermission = null;
         },
         cleanAuthMessage: (state) => {
             state.actionFlag = "";
@@ -408,8 +481,44 @@ const appAuthSlice = createSlice({
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-    },
-});
+            .addCase(getEmailExist.pending, (state) => {
+                state.isEmailExist = false;
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getEmailExist.fulfilled, (state, action) => {
+                state.isEmailExist = action.payload?.isEmailExist || false;
+                state.actionFlag = action.payload?.actionFlag || "";
+                state.loading = true;
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(getEmailExist.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getUsernameExist.pending, (state) => {
+                state.isUsernameExist = false;
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getUsernameExist.fulfilled, (state, action) => {
+                state.isUsernameExist = action.payload?.isUsernameExist || false;
+                state.actionFlag = action.payload?.actionFlag || "";
+                state.loading = true;
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(getUsernameExist.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+    }
+})
 
 
 export const {

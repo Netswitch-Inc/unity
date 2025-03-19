@@ -6,202 +6,189 @@ import { API_ENDPOINTS } from "utility/ApiEndPoints";
 import instance from "utility/AxiosConfig";
 
 // ** Constant
-import { userItem } from "utility/reduxConstant";
+import { initUserItem } from "utility/reduxConstant";
 
-const initialValues = {
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    user_name: '',
-    password: '',
-    role: '',
-    status: 1,
-    image: '',
-    weightIndex: 1,
-    priviledges: [],
-};
-
-/* All get */
-async function getListRequest(params) {
-    return instance.get(`${API_ENDPOINTS.customer.listing}`, { params })
+async function getUserListRequest(params) {
+    return instance.get(`${API_ENDPOINTS.users.list}`, { params })
         .then((items) => items.data)
-        .catch((error) => error);
+        .catch((error) => error)
 }
 
-export const getActionRequest = createAsyncThunk("getAll", async (params) => {
+export const getUserList = createAsyncThunk("appUsers/getUserList", async (params) => {
     try {
-        const response = await getListRequest(params);
+        const response = await getUserListRequest(params);
         if (response && response.flag) {
             return {
+                params,
                 userItems: response?.data || [],
-                customerItem: response.data,
-                pageData: response.pagination,
+                pagination: response?.pagination || null,
                 actionFlag: "",
                 success: "",
-                error: "",
-            };
+                error: ""
+            }
         } else {
             return {
+                params,
                 userItems: [],
                 actionFlag: "",
                 success: "",
-                error: response.message,
-            };
+                error: response.message
+            }
         }
     } catch (error) {
         return {
+            params,
             userItems: [],
             actionFlag: "",
             success: "",
-            error: error,
-        };
+            error: error
+        }
     }
-});
+})
 
-/*  delete */
-async function deleteListRequest(params) {
-    return instance.delete(`${API_ENDPOINTS.customer.delete}/${params}`)
+async function getUserRequest(params) {
+    return instance.get(`${API_ENDPOINTS.users.get}/${params?.id}`)
         .then((items) => items.data)
-        .catch((error) => error);
+        .catch((error) => error)
 }
 
-export const deleteActionRequest = createAsyncThunk("delete", async (params) => {
+export const getUser = createAsyncThunk("appUsers/getUser", async (params) => {
     try {
-        const response = await deleteListRequest(params);
+        const response = await getUserRequest(params);
         if (response && response.flag) {
             return {
-                customerItem: response.data,
-                actionFlag: "success",
-                success: response.message,
+                userItem: response.data,
+                actionFlag: "USR_ITM",
+                success: "",
                 error: "",
-            };
+            }
         } else {
             return {
-                customerItem: [],
-                actionFlag: "",
+                userItem: null,
+                actionFlag: "USR_ITM_ERR",
                 success: "",
-                error: response.message,
-            };
+                error: "",
+            }
         }
     } catch (error) {
         return {
-            customerItem: [],
-            actionFlag: "",
+            userItem: null,
+            actionFlag: "USR_ITM_ERR",
             success: "",
-            error: error,
-        };
+            error: error
+        }
     }
-});
+})
 
-async function creatRequest(payload) {
-    return instance.post(`${API_ENDPOINTS.customer.create}`, payload)
+async function createUserRequest(payload) {
+    return instance.post(`${API_ENDPOINTS.users.create}`, payload)
         .then((items) => items.data)
-        .catch((error) => error);
+        .catch((error) => error)
 }
 
-export const creatActionRequest = createAsyncThunk("creat", async (params) => {
+export const createUser = createAsyncThunk("appUsers/createUser", async (payload) => {
     try {
-        const response = await creatRequest(params);
+        const response = await createUserRequest(payload);
         if (response && response.flag) {
             return {
-                customerItem: response.data,
-                actionFlag: "CREAT",
-                success: response.message,
-                error: "",
-            };
+                payload,
+                userItem: response.data || null,
+                actionFlag: "USR_CRET",
+                success: response?.message || "",
+                error: ""
+            }
         } else {
             return {
-                customerItem: [],
+                payload,
                 actionFlag: "",
                 success: "",
-                error: response.message,
-            };
+                error: response.message
+            }
         }
     } catch (error) {
         return {
-            customerItem: [],
+            payload,
             actionFlag: "",
             success: "",
-            error: error,
-        };
+            error: error
+        }
     }
-});
+})
 
-async function editRequest(params) {
-    return instance.get(`${API_ENDPOINTS.customer.edit}/${params?.id}`)
+async function updateUserRequest(payload) {
+    return instance.put(`${API_ENDPOINTS.users.update}`, payload)
         .then((items) => items.data)
-        .catch((error) => error);
+        .catch((error) => error)
 }
 
-export const editActionRequest = createAsyncThunk("edit", async (params) => {
+export const updateUser = createAsyncThunk("appUsers/updateUser", async (payload) => {
     try {
-        const response = await editRequest(params);
+        const response = await updateUserRequest(payload);
         if (response && response.flag) {
             return {
-                editItem: response.data,
-                actionFlag: "",
-                success: "",
-                error: "",
-            };
+                payload,
+                userItem: response.data || null,
+                actionFlag: "USR_UPDT",
+                success: response?.message || "",
+                error: ""
+            }
         } else {
             return {
-                editItem: null,
+                payload,
                 actionFlag: "",
                 success: "",
-                error: "",
-            };
+                error: response.message
+            }
         }
     } catch (error) {
         return {
-            editItem: null,
+            payload,
             actionFlag: "",
             success: "",
-            error: error,
-        };
+            error: error
+        }
     }
-});
+})
 
-async function updateRequest(payload) {
-    return instance.put(`${API_ENDPOINTS.customer.update}`, payload)
+async function deleteUserRequest(id) {
+    return instance.delete(`${API_ENDPOINTS.users.delete}/${id}`)
         .then((items) => items.data)
-        .catch((error) => error);
+        .catch((error) => error)
 }
 
-export const updateActionRequest = createAsyncThunk("update", async (payload) => {
+export const deleteUser = createAsyncThunk("appUsers/deleteCronScheduler", async (id) => {
     try {
-        const response = await updateRequest(payload);
+        const response = await deleteUserRequest(id);
         if (response && response.flag) {
             return {
-                customerItem: response.data,
-                actionFlag: "UPDATE",
-                success: response.message,
-                error: "",
-            };
+                id,
+                actionFlag: "USR_DLT",
+                success: response?.message || "",
+                error: ""
+            }
         } else {
             return {
-                customerItem: [],
+                id,
+                actionFlag: "USR_DLT_ERR",
                 success: "",
-                actionFlag: "",
-                error: response.message,
-            };
+                error: response.message
+            }
         }
     } catch (error) {
         return {
+            id,
+            actionFlag: "USR_DLT_ERR",
             success: "",
-            actionFlag: "",
-            error: error,
-        };
+            error: error
+        }
     }
-});
+})
 
-// Create a slice
-const appAuthSlice = createSlice({
-    name: 'customer',
+const appUserSlice = createSlice({
+    name: 'appUsers',
     initialState: {
         userItems: [],
-        userItem: userItem,
-        customerItem: [],
+        userItem: initUserItem,
         getCountryItem: [],
         pagination: null,
         editItem: "",
@@ -211,61 +198,111 @@ const appAuthSlice = createSlice({
         error: "",
     },
     reducers: {
-        cleanMessage: (state) => {
+        cleanUserMessage: (state) => {
             state.actionFlag = "";
             state.success = "";
             state.error = "";
-            state.editItem = initialValues
         }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getActionRequest.pending, (state, action) => {
-                state.type = 'LISTING';
+            .addCase(getUserList.pending, (state) => {
                 state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
             })
-            .addCase(getActionRequest.fulfilled, (state, action) => {
-                state.type = 'LISTING';
+            .addCase(getUserList.fulfilled, (state, action) => {
                 state.userItems = action.payload?.userItems || []
-                state.customerItem = action.payload.customerItem
-                state.pagination = action.payload.pageData
+                state.pagination = action.payload?.pagination || null;
                 state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-            .addCase(deleteActionRequest.fulfilled, (state, action) => {
-                state.type = 'DELETE';
+            .addCase(getUserList.rejected, (state) => {
                 state.loading = true;
-                state.actionFlag = "success";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getUser.pending, (state) => {
+                state.userItem = initUserItem
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getUser.fulfilled, (state, action) => {
+                state.userItem = action.payload?.userItem || initUserItem
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-            .addCase(creatActionRequest.fulfilled, (state, action) => {
-                state.actionFlag = 'CREAT';
+            .addCase(getUser.rejected, (state) => {
                 state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(createUser.pending, (state) => {
+                state.userItem = initUserItem
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(createUser.fulfilled, (state, action) => {
+                state.userItem = action.payload?.userItem || initUserItem
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
-                state.editItem = initialValues
             })
-            .addCase(editActionRequest.fulfilled, (state, action) => {
-                state.type = 'EDIT';
+            .addCase(createUser.rejected, (state) => {
                 state.loading = true;
-                state.editItem = action.payload.editItem;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(updateUser.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.userItem = action.payload?.userItem || initUserItem
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-            .addCase(updateActionRequest.fulfilled, (state, action) => {
-                state.actionFlag = 'UPDATE';
+            .addCase(updateUser.rejected, (state) => {
                 state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(deleteUser.pending, (state) => {
+                state.loading = false;
+                state.actionFlag = "";
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
                 state.success = action.payload.success;
                 state.error = action.payload.error;
             })
-    },
-
+            .addCase(deleteUser.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+    }
 });
 
 export const {
-    cleanMessage,
-} = appAuthSlice.actions;
+    cleanUserMessage,
+} = appUserSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appUserSlice.reducer;

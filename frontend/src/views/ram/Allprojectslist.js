@@ -62,14 +62,14 @@ const AllprojectsTab = ({ currentTab }) => {
 
   useEffect(() => {
     let list = [];
-    if (companyStore?.CompanyItems?.length > 0) {
-      list = companyStore?.CompanyItems?.map((item) => ({
+    if (companyStore?.companyItems?.length > 0) {
+      list = companyStore?.companyItems?.map((item) => ({
         label: item?.name,
         value: item?._id,
       }));
     }
     setCompaniesList(() => list);
-  }, [companyStore?.CompanyItems]);
+  }, [companyStore?.companyItems]);
 
   useEffect(() => {
     if (projectStore.actionFlag === "PROJECT_UPDATED") {

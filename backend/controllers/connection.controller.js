@@ -78,10 +78,10 @@ exports.getConnection = async function (req, res, next) {
 
 exports.createConnection = async function (req, res, next) {
     try {
-        const { username, password, ip_address, port, type } = req.body
+        const { ip_address, type } = req.body
         // if (!username || !password || !ip_address || !port || !type) {
-        if (!username || !password || !ip_address || !type) {
-            return res.status(200).json({ status: 200, flag: false, message: "All fields are required" });
+        if (!ip_address || !type) {
+            return res.status(200).json({ status: 200, flag: false, message: "ip_address, type fields are required." });
         }
 
         var createdConnection = await ConnetionService.createConnection(req.body);
@@ -119,4 +119,3 @@ exports.softDeleteConnection = async function (req, res, next) {
         return res.status(200).json({ status: 200, flag: false, message: e.message });
     }
 }
-
