@@ -34,7 +34,7 @@ services:
       - 3000
 
   mongo:
-    image: mongo:5.0
+    image: mongo:6.0
     container_name: mongodb
     ports:
       - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
