@@ -15,6 +15,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-c
 4). download zip file and extract
 
 5). First clone code on your server
+git clone https://github.com/Netswitch-Inc
 
 6). Run below command on root directory
 domain1 is for backend.
