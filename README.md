@@ -1,37 +1,31 @@
-# Option 1: (Preferred)
-# Using auto installaton guide
-https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
+# Installation Guide for Unity Risk Indicator
 
+## Option 1: Preferred Method
+### Using the Automatic Installation Guide
+Please refer to the following link for the automatic installation guide:
+[Unity Risk Indicator Setup Guide](https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf)
 
-# Option 2: Manual Installation
-1) Install Nginx: 
-Check with whereis nginx; install via How to Install Nginx on Ubuntu 22.04 if needed.
+---
 
-2) Install Docker:
-Check with whereis docker; install via How to Install and Use Docker on Ubuntu 22.04 if needed.
+## Option 2: Manual Installation
 
-3) Install Docker Compose:
-Check with whereis docker-compose; install via How to Install and Use Docker Compose on Ubuntu 22.04 if needed.
+Follow these steps for a manual installation:
 
-4) Download and extract the zip file (ensure you have the correct file for Unity Risk Indicator).
+1. **Install Nginx:**
+   - Check if it's installed: `whereis nginx`
+   - If not, follow the guide: [How to Install Nginx on Ubuntu 22.04](https://example.com) (link to the guide).
 
-5) Clone the code repository using Git
-git clone https://github.com/Netswitch-Inc/unity
+2. **Install Docker:**
+   - Check if it's installed: `whereis docker`
+   - If not, follow the guide: [How to Install and Use Docker on Ubuntu 22.04](https://example.com) (link to the guide).
 
-6) Run sudo sh setup.sh, entering domain1 for backend and domain2 for frontend, and ensure ports 3006 and 8081 are open.
+3. **Install Docker Compose:**
+   - Check if it's installed: `whereis docker-compose`
+   - If not, follow the guide: [How to Install and Use Docker Compose on Ubuntu 22.04](https://example.com) (link to the guide).
 
-7) Configure the frontend .env file, updating REACT_APP_BACKEND_REST_API_URL to use your server IP.
+4. **Download and Extract the ZIP File:**
+   - Ensure you have the correct file for the Unity Risk Indicator.
 
-8) Configure the backend .env file, updating FRONT_WEB_URL and BACK_UNITY_URL with your server IP, and ensure port 3006 is open.
-
-9) Verify containers with sudo docker ps -a.
-
-10) Start with sudo docker-compose up --build -d.
-
-11) Stop with sudo docker-compose down.
-
-12) View logs with sudo docker logs --follow <container_id>.
-
-13) For code changes, pull updates and run docker-compose up -d --no-recreate --build <service-name> (use backend or frontend as needed).
-
-Notes: Replace <your_server_ip> with your actual server IP and ensure firewall settings allow necessary ports.
+5. **Clone the Code Repository Using Git:**
+   ```bash
+   git clone https://github.com/Netswitch-Inc/unity
