@@ -77,6 +77,7 @@ Follow these steps for a manual installation:
    ```
    - Use backend or frontend as <service-name> depending on where changes were made.
 
-Notes
-Replace <your_server_ip> with your actual server IP address.
-Ensure that your firewall settings allow access to the necessary ports (3006 and 8081).
+14. **Replace IP**
+   - Browse http://<your_server_ip>:8081
+   - Replace <your_server_ip> with your actual server IP address.
+   - Ensure that your firewall settings allow access to the necessary ports (3006 and 8081).
