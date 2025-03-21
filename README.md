@@ -3,8 +3,6 @@
 https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
 
 
-
-
 # Option 2:
 # Manually Installation Guide
 1). Install Nginx if not installed
