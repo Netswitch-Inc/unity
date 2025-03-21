@@ -1,8 +1,8 @@
-**Option 1: (Preferred)**
+# Option 1: (Preferred)
 # Using auto installaton guide
 https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
 
-**Option 2:**
+# Option 2:
 # Manually Installation Guide
 1). Install Nginx if not installed
 Check nginx installed or not: whereis nginx (Run command - response will display installed path)
