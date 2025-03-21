@@ -3,9 +3,7 @@
 https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
 
 
-Option 2: Manual Installation
-The manual installation steps have been improved for clarity and consistency:
-
+# Option 2: Manual Installation
 1) Install Nginx: 
 Check with whereis nginx; install via How to Install Nginx on Ubuntu 22.04 if needed.
 
