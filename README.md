@@ -1,10 +1,9 @@
-# Docker Installation guide document
-https://docs.google.com/document/d/1ZRjwYjm0zV53UzFgPYuu463LOOcOsCYE/edit?usp=sharing&ouid=117099388604405782143&rtpof=true&sd=true
+**Option 1: (Preferred)**
+# Using auto installaton guide
+https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
 
-# Docker Installation guide document option 2
-https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing
-
-# Installation Guide
+**Option 2:**
+# Manually Installation Guide
 1). Install Nginx if not installed
 Check nginx installed or not: whereis nginx (Run command - response will display installed path)
 https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
