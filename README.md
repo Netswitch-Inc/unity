@@ -3,50 +3,37 @@
 https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf
 
 
-# Option 2:
-# Manually Installation Guide
-1). Install Nginx if not installed
-Check nginx installed or not: whereis nginx (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
+Option 2: Manual Installation
+The manual installation steps have been improved for clarity and consistency:
 
-2). First install Docker and prefer in this link
-Check docker installed or not: whereis docker (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+1) Install Nginx: 
+Check with whereis nginx; install via How to Install Nginx on Ubuntu 22.04 if needed.
 
-3). Second install Docker-composer and prefer in this link
-Check docker-compose installed or not: whereis docker-compose (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04
+2) Install Docker:
+Check with whereis docker; install via How to Install and Use Docker on Ubuntu 22.04 if needed.
 
-4). download zip file and extract
+3) Install Docker Compose:
+Check with whereis docker-compose; install via How to Install and Use Docker Compose on Ubuntu 22.04 if needed.
 
-5). First clone code on your server
+4) Download and extract the zip file (ensure you have the correct file for Unity Risk Indicator).
 
-6). Run below command on root directory
-domain1 is for backend.
-domain2 is for frontend.
-sudo sh setup.sh then wirte domain1 and domain name2
-Please enable port (3006, 8081) for public access.
+5) Clone the code repository using Git
+git clone https://github.com/Netswitch-Inc/unity
 
-7). Inside unity docker go to frontend and configure .env file
-Update REACT_APP_BACKEND_REST_API_URL http://localhost:3006 from to http://< ip-address >:3006
+6) Run sudo sh setup.sh, entering domain1 for backend and domain2 for frontend, and ensure ports 3006 and 8081 are open.
 
-8). Inside unity docker go to backend and configure .env file
-Update FRONT_WEB_URL http://localhost:8081 from to http://< ip-address >:8081
-Update BACK_UNITY_URL http://localhost:3006 from to http://< ip-address >:3006
+7) Configure the frontend .env file, updating REACT_APP_BACKEND_REST_API_URL to use your server IP.
 
-Please open 3006 || <desired port> port on server.
+8) Configure the backend .env file, updating FRONT_WEB_URL and BACK_UNITY_URL with your server IP, and ensure port 3006 is open.
 
-9). now check container is running or not in this command
-sudo docker ps -a
+9) Verify containers with sudo docker ps -a.
 
-10). open terminal and run in this commmand
-sudo docker-compose up --build -d
+10) Start with sudo docker-compose up --build -d.
 
-11). Docker down or stop docker container
-sudo docker-compose down
+11) Stop with sudo docker-compose down.
 
-12). Docker container logs
-sudo docker logs --follow <container_id>
+12) View logs with sudo docker logs --follow <container_id>.
 
-13). In case any change on code side then pull code and run below command. So your changes is reflect on your running application.
-docker-compose up -d --no-recreate --build <service-name> (service name backend and frontend in case change in API then used service name backend and in case any changes with frontend then service name frontend)
+13) For code changes, pull updates and run docker-compose up -d --no-recreate --build <service-name> (use backend or frontend as needed).
+
+Notes: Replace <your_server_ip> with your actual server IP and ensure firewall settings allow necessary ports.
