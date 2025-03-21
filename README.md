@@ -32,7 +32,9 @@ Follow these steps for a manual installation:
 
 6. **Run the Setup Script:**
    - Navigate to the root directory of the cloned repository.
-   - Run: sudo sh setup.sh
+   ```bash
+   sudo sh setup.sh
+   ```
    - When prompted, enter domain1 for the backend and domain2 for the frontend.
    - Ensure ports 3006 and 8081 are open for public access.
 
@@ -46,3 +48,35 @@ Follow these steps for a manual installation:
    - FRONT_WEB_URL from http://localhost:8081 to http://<your_server_ip>:8081
    - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
    - Ensure port 3006 is open on your server.
+  
+9. **Verify Docker Containers**
+   - Check if containers are running:
+   ```bash
+   sudo docker ps -a
+   ```
+
+10. **Start the Application**
+   ```bash
+   sudo docker-compose up --build -d
+   ```
+
+11. **Stop the Application**
+   ```bash
+   sudo docker-compose down
+   ```
+
+12. **View Container Logs**
+   ```bash
+   sudo docker logs --follow <container_id>
+   ```
+
+13. **Update for Code Changes**
+   - Pull the latest code from the repository.
+   ```bash
+   docker-compose up -d --no-recreate --build <service-name>
+   ```
+   - Use backend or frontend as <service-name> depending on where changes were made.
+
+Notes
+Replace <your_server_ip> with your actual server IP address.
+Ensure that your firewall settings allow access to the necessary ports (3006 and 8081).
