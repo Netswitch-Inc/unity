@@ -1563,7 +1563,7 @@ const zendeskSupportTicketData = async () => {
             // Make the API calls with properly encoded queries
             var apiClosedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(closedQuery)}`, { headers, httpsAgent })
                 .then((res) => res.data).catch((error) => error);
-            if (!apiClosedResponse?.results?.length) {
+            if (!apiClosedResponse?.results && apiClosedResponse?.response) {
                 createCronErrorLog = true;
                 errorLogType = "connection_cron_error";
                 errorLogMessage = "Please check your connection and cron details.";
@@ -1582,7 +1582,7 @@ const zendeskSupportTicketData = async () => {
 
             var apiOpenResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(openQuery)}`, { headers, httpsAgent })
                 .then((res) => res.data).catch((error) => error);
-            if (!apiOpenResponse?.results?.length) {
+            if (!apiOpenResponse?.results && apiOpenResponse?.response) {
                 createCronErrorLog = true;
                 errorLogType = "connection_cron_error";
                 errorLogMessage = "Please check your connection and cron details.";
@@ -1601,7 +1601,7 @@ const zendeskSupportTicketData = async () => {
 
             var apiReceivedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(receivedQuery)}`, { headers, httpsAgent })
                 .then((res) => res.data).catch((error) => error);
-            if (!apiReceivedResponse?.results?.length) {
+            if (!apiReceivedResponse?.results && apiReceivedResponse?.response) {
                 createCronErrorLog = true;
                 errorLogType = "connection_cron_error";
                 errorLogMessage = "Please check your connection and cron details.";
@@ -1806,6 +1806,8 @@ module.exports = {
     wazuhToolAgentsData,
     wazuhToolAgentsConfigurationAssessmentData,
     manageCronNextAutorunErrorLogs,
+    helpdeskSupportTicketData,
     netswitchThreatIntelTxtData,
+    zendeskSupportTicketData,
     testScriptData
 }
