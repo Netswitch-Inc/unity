@@ -1,52 +1,87 @@
-# Docker Installation guide document
-https://docs.google.com/document/d/1ZRjwYjm0zV53UzFgPYuu463LOOcOsCYE/edit?usp=sharing&ouid=117099388604405782143&rtpof=true&sd=true
+# Installation Guide for Unity Risk Indicator
 
-# Docker Installation guide document option 2
-https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit?usp=sharing
+## Option 1: Preferred Method
+### Using the Automatic Installation Guide
+Please refer to the following link for the automatic installation guide:
+[Unity Risk Indicator Setup Guide](https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf)
 
-# Installation Guide
-1). Install Nginx if not installed
-Check nginx installed or not: whereis nginx (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04
+Option 2: [Unity Unity Risk Indicator Setup Guide Option 2](https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit)
 
-2). First install Docker and prefer in this link
-Check docker installed or not: whereis docker (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+---
 
-3). Second install Docker-composer and prefer in this link
-Check docker-compose installed or not: whereis docker-compose (Run command - response will display installed path)
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04
+## Option 2: Manual Installation
 
-4). download zip file and extract
+Follow these steps for a manual installation:
 
-5). First clone code on your server
+1. **Install Nginx:**
+   - Check if it's installed: `whereis nginx`
+   - If not, follow the guide: [How to Install Nginx on Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04).
 
-6). Run below command on root directory
-domain1 is for backend.
-domain2 is for frontend.
-sudo sh setup.sh then wirte domain1 and domain name2
-Please enable port (3006, 8081) for public access.
+2. **Install Docker:**
+   - Check if it's installed: `whereis docker`
+   - If not, follow the guide: [How to Install and Use Docker on Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
 
-7). Inside unity docker go to frontend and configure .env file
-Update REACT_APP_BACKEND_REST_API_URL http://localhost:3006 from to http://< ip-address >:3006
+3. **Install Docker Compose:**
+   - Check if it's installed: `whereis docker-compose`
+   - If not, follow the guide: [How to Install and Use Docker Compose on Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04).
 
-8). Inside unity docker go to backend and configure .env file
-Update FRONT_WEB_URL http://localhost:8081 from to http://< ip-address >:8081
-Update BACK_UNITY_URL http://localhost:3006 from to http://< ip-address >:3006
+4. **Download and Extract the ZIP File:**
+   - Ensure you have the correct file for the Unity Risk Indicator.
 
-Please open 3006 || <desired port> port on server.
+5. **Clone the Code Repository Using Git:**
+   ```bash
+   git clone https://github.com/Netswitch-Inc/unity
 
-9). now check container is running or not in this command
-sudo docker ps -a
+6. **Download the manually setup script:**
+   ```bash
+   wget https://raw.githubusercontent.com/Netswitch-Inc/unity/refs/heads/master/manuallysetup.sh
+   ```
+7. **Run the Setup Script:**
+   ```bash
+   sudo sh manuallysetup.sh
+   ```
+   - Ensure ports 3006 and 8081 are open for public access.
 
-10). open terminal and run in this commmand
-sudo docker-compose up --build -d
+8. **Configure the Frontend .env File**
+   - Inside the unity directory, go to the frontend directory.
+   - Update the REACT_APP_BACKEND_REST_API_URL in the .env file from http://localhost:3006 to http://<your_server_ip>:3006.
 
-11). Docker down or stop docker container
-sudo docker-compose down
+9. **Configure the Backend .env File**
+   - Inside the unity directory, go to the backend directory.
+   - Update the following in the .env file:
+   - FRONT_WEB_URL from http://localhost:8081 to http://<your_server_ip>:8081
+   - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
+   - Ensure port 3006 is open on your server.
+  
+10. **Verify Docker Containers**
+   - Check if containers are running:
+   ```bash
+   sudo docker ps -a
+   ```
 
-12). Docker container logs
-sudo docker logs --follow <container_id>
+11. **Start the Application**
+   ```bash
+   sudo docker-compose up --build -d
+   ```
 
-13). In case any change on code side then pull code and run below command. So your changes is reflect on your running application.
-docker-compose up -d --no-recreate --build <service-name> (service name backend and frontend in case change in API then used service name backend and in case any changes with frontend then service name frontend)
+12. **Stop the Application**
+   ```bash
+   sudo docker-compose down
+   ```
+
+13. **View Container Logs**
+   ```bash
+   sudo docker logs --follow <container_id>
+   ```
+
+14. **Update for Code Changes**
+   - Pull the latest code from the repository.
+   ```bash
+   docker-compose up -d --no-recreate --build <service-name>
+   ```
+   - Use backend or frontend as <service-name> depending on where changes were made.
+
+15. **Replace IP**
+   - Browse http://<your_server_ip>:8081
+   - Replace <your_server_ip> with your actual server IP address.
+   - Ensure that your firewall settings allow access to the necessary ports (3006 and 8081).
