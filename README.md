@@ -43,12 +43,17 @@ Follow these steps for a manual installation:
    - Ensure ports 3006 and 8081 are open for public access.
 
 8. **Configure the Frontend .env File**
-   - Inside the unity directory, go to the frontend directory.
+   - Inside the unity directory, edit the frontend .env file
+   ```bash
+   vi unity/frontend/.env
+   ```
    - Update the REACT_APP_BACKEND_REST_API_URL in the .env file from http://localhost:3006 to http://<your_server_ip>:3006.
 
 9. **Configure the Backend .env File**
-   - Inside the unity directory, go to the backend directory.
-   - Update the following in the .env file:
+   - Inside the unity directory, edit the backend .env file
+   ```bash
+   vi unity/backend/.env
+   ```
    - FRONT_WEB_URL from http://localhost:8081 to http://<your_server_ip>:8081
    - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
    - Ensure port 3006 is open on your server.
