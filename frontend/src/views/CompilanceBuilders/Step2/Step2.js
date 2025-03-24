@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
-import { Col, Table, UncontrolledTooltip } from "reactstrap";
+import { Col, UncontrolledTooltip } from "reactstrap";
 
-// import { TiMediaRecord } from "react-icons/ti";
-import { scrolTop } from "utility/Utils";
+import { scrollTop } from "utility/Utils";
 
 import SimpleSpinner from "components/spinner/simple-spinner";
 import iIcon from "assets/img/cis-icon.png";
@@ -41,7 +40,7 @@ const Step2 = React.forwardRef((props, ref) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      scrolTop();
+      scrollTop();
     }, 0); // delay in ms, 0 ensures it’s called right after the render
 
     return () => clearTimeout(timeoutId); // Cleanup
@@ -64,8 +63,8 @@ const Step2 = React.forwardRef((props, ref) => {
     const options = {
       root: null,
       rootMargin: "0px",
-      threshold: 1.0,
-    };
+      threshold: 1.0
+    }
 
     observer.current = new IntersectionObserver(handleLoadMore, options);
 
@@ -78,7 +77,7 @@ const Step2 = React.forwardRef((props, ref) => {
       if (observer.current) {
         observer.current.disconnect(); // Clean up observer
       }
-    };
+    }
   }, [handleLoadMore, visibleControls]);
 
   // Render the CIS Compliance Controls
@@ -91,32 +90,37 @@ const Step2 = React.forwardRef((props, ref) => {
       <div key={ind} className="cis-complinance-control mt-2">
         <div className="row justify-content-center">
           <Col md={6}>
-            <div className="content-wrap h-100">
-              <Table className="mb-0 h-100">
-                <tbody>
-                  <tr>
-                    <td className="tabletdstyle text-left">
-                      <span id={`selected-control-${item?._id}`}>
-                        {item?.name || "No Name"}
-                        <UncontrolledTooltip
-                          placement="top"
-                          target={`selected-control-${item?._id}`}
-                          container={`selected-control-${item?._id}`}
-                        >
-                          <div className="inner-desc">{item.description || "No Description"}</div>
-                        </UncontrolledTooltip>
-                      </span>
-                    </td>
-                    {/* <td className="tabletdsbtntyle text-right">
-                      <span> {item?.identifier}</span>
-                    </td> */}
-                    <td className="tabletdsbtntyle text-right">
-                      <span>{item?.framework_name || "No Framework"}</span>
-                      {item?.identifier && <span className="second-frame"> {item?.identifier}</span>}
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
+            <div className="content-wrap h-100 control-box">
+              {/* <div className="mb-0 "> */}
+              {/* <tbody> */}
+              <div className="main-table-row text-content w-100 d-flex justify-content-between">
+                <div className="tabletdstyle text-left  rows-td">
+                  <div id={`selected-control-${item?._id}`} >
+                    <div className="cis-icon">
+                      <img
+                        alt="icon"
+                        src={iIcon}
+                        height={17}
+                        id={`tooltip-icon-${item?._id}`}
+                        className="i-icon-img cursor-pointer"
+                      />
+                      <p>{item?.name || "No Name"}</p>
+                    </div>
+                    <UncontrolledTooltip
+                      placement="right"
+                      target={`tooltip-icon-${item?._id}`}
+                      container={`selected-control-${item?._id}`}
+                    >
+                      <div className="inner-desc">{item.description || "No Description"}</div>
+                    </UncontrolledTooltip>
+                  </div>
+                </div>
+
+                <div className="tabletdsbtntyle text-right rows-td">
+                  <span>{item?.framework_name || "No Framework"}</span>
+                  {item?.identifier && <span className="second-frame"> {item?.identifier}</span>}
+                </div>
+              </div>
             </div>
           </Col>
 
@@ -126,39 +130,33 @@ const Step2 = React.forwardRef((props, ref) => {
                 item.cis_control_id.map((cisControl, sbInd) => (
                   <div key={`${ind}-${sbInd}`} className="text-content w-100 d-flex justify-content-between">
                     <div className="pr-1" id={`complience-sub-control-${cisControl?._id}`}>
-                      {/* <TiMediaRecord size={20} color="#fff" /> */}
                       <div className="cis-icon">
-                        <img alt="icon" src={iIcon} height={17}/>
+                        <img
+                          alt="icon"
+                          src={iIcon}
+                          height={17}
+                          className="cursor-pointer"
+                          id={`tooltip-icon-${cisControl?._id}`}
+                        />{" "}
                         <p>{cisControl?.name || "Sub-control Name"}</p>
                       </div>
 
                       <UncontrolledTooltip
                         placement="auto"
-                        target={`complience-sub-control-${cisControl?._id}`}
+                        target={`tooltip-icon-${cisControl?._id}`}
                         container={`complience-sub-control-${cisControl?._id}`}
                       >
                         <div className="inner-desc">{cisControl.description || "No Description"}</div>
                       </UncontrolledTooltip>
                     </div>
-                    {cisControl?.cis_sub_control && <div className="number-img">
-                      <span className="tabletdsbtntyle text-right">
-                        {cisControl?.cis_sub_control}
-                      </span>
-                    </div>}
-                    {/* <img
-                      height={30}
-                      width={30}
-                      id={`complience-sub-control-${cisControl?._id}-image`}
-                      src={handleReturnIcon(cisControl.tool_icon)}
-                      alt={cisControl.tool_icon || "Tool Icon"}
-                    />
-                    <UncontrolledTooltip
-                      placement="auto"
-                      target={`complience-sub-control-${cisControl?._id}-image`}
-                    >
-                      {handleReturnIconFullName(cisControl?.tool_icon)}
-                    </UncontrolledTooltip> */}
 
+                    {cisControl?.cis_sub_control ? (
+                      <div className="number-img">
+                        <span className="tabletdsbtntyle text-right">
+                          {cisControl?.cis_sub_control}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 ))
               ) : (
@@ -168,38 +166,36 @@ const Step2 = React.forwardRef((props, ref) => {
           </Col>
         </div>
       </div>
-    ));
-  };
+    ))
+  }
 
   return (
-    <>
-      <div className="compliance-builder ps">
-        <div className="row compliance-builder-row">
-          <Col md={6} className="compliance-builder-col">
-            <div className="complaince-tab">Custom Compliance Framework</div>
-          </Col>
+    <div className="compliance-builder ps">
+      <div className="row compliance-builder-row">
+        <Col md={6} className="compliance-builder-col">
+          <div className="complaince-tab">Custom Compliance Framework</div>
+        </Col>
 
-          <Col md={6} className="compliance-builder-col">
-            <div className="complaince-tab">CIS Benchmark</div>
-          </Col>
-        </div>
-
-        {/* Show a loading spinner if the data is still loading */}
-        {loading ? (
-          <SimpleSpinner />
-        ) : (
-          <div className="compliance-builder-content">
-            {renderCISComplianceControl(visibleControls)}
-          </div>
-        )}
-
-        {/* "Load More" Element for Infinite Scroll */}
-        <div id="load-more" style={{ textAlign: "center", marginTop: "20px" }}>
-          {/* No spinner here, infinite scroll only triggers when the user scrolls */}
-        </div>
+        <Col md={6} className="compliance-builder-col">
+          <div className="complaince-tab">CIS Benchmark</div>
+        </Col>
       </div>
-    </>
-  );
-});
+
+      {/* Show a loading spinner if the data is still loading */}
+      {loading ? (
+        <SimpleSpinner />
+      ) : (
+        <div className="compliance-builder-content">
+          {renderCISComplianceControl(visibleControls)}
+        </div>
+      )}
+
+      {/* "Load More" Element for Infinite Scroll */}
+      <div id="load-more" style={{ textAlign: "center", marginTop: "20px" }}>
+        {/* No spinner here, infinite scroll only triggers when the user scrolls */}
+      </div>
+    </div>
+  )
+})
 
 export default Step2;

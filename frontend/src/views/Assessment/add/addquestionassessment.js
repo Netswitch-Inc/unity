@@ -4,7 +4,7 @@ import { Card, CardBody } from "reactstrap";
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuestionModel from "views/questions/model/AddQuestionModel";
-import { initialQuestion } from "utility/reduxConstant";
+import { initQuestion } from "utility/reduxConstant";
 import {
   updateBulkOrderQuestion,
   deleteQuestion,
@@ -24,13 +24,13 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
 
   const [openModel, setOpenModel] = useState(false);
   const [openQuestionModel, setOpenQuestionModel] = useState(false);
-  const [initialQuestionState] = useState(initialQuestion);
+  const [initQuestionState] = useState(initQuestion);
 
   const [questionItems, setQuestionsItems] = useState([]);
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const [initialSectionValues, setInitialSectionValues] =
+  const [initSectionValues, setInitialSectionValues] =
     useState(initialValues);
   const [title, setTitle] = useState("");
 
@@ -51,7 +51,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
   }, [assessmentStore?.assessmentItem, dispatch]);
 
   useEffect(() => {
-    if (sectionStore?.actionFlag === "SECTION_CREATED") {
+    if (sectionStore?.actionFlag === "SCTN_CRTD") {
       handleQuestionsList();
     }
   }, [sectionStore?.actionFlag, handleQuestionsList]);
@@ -59,13 +59,13 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
   useEffect(() => {
     if (
       questionStore?.questionItemsFilterd &&
-      (questionStore.actionFlag === "QUESTION_CREATED_SUCCESS" ||
-        questionStore.actionFlag === "QUESTION_BULK_ORDER_UPDATED_SUCCESS" ||
-        questionStore.actionFlag === "QUESTION_UPDATED_SUCCESS")
+      (questionStore.actionFlag === "QESTN_CRTD_SCS" ||
+        questionStore.actionFlag === "QESTN_BLK_ODR_UPDT_SCS" ||
+        questionStore.actionFlag === "QESTN_UPDT_SCS")
     ) {
       handleQuestionsList();
     }
-    if (questionStore.actionFlag === "QUESTION_LIST_FILTERED_SUCCESS") {
+    if (questionStore.actionFlag === "QESTN_LST_FLTRD_SCS") {
       setQuestionsItems(
         () => questionStore?.questionItemsFilterd,
         handleQuestionsList
@@ -226,7 +226,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
           closePopup={closePopup}
           title={title}
           isEditing={isEditing}
-          initialValues={initialSectionValues}
+          initialValues={initSectionValues}
         />
       )}
       {openQuestionModel && (
@@ -234,7 +234,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
           show={openQuestionModel}
           closePopup={closeQuestionPopup}
           title={title}
-          initialQuestion={initialQuestionState}
+          initQuestion={initQuestionState}
           isEditing={isEditing}
         />
       )}

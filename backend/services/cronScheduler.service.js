@@ -56,7 +56,7 @@ exports.getCronSchedulerOne = async function (query = {}) {
 
 exports.createCronScheduler = async function (cronScheduler) {
     var newCronScheduler = new CronScheduler({
-        tool_id: cronScheduler.tool_id ? cronScheduler.tool_id : "",
+        tool_slug: cronScheduler.tool_slug ? cronScheduler.tool_slug : "",
         name: cronScheduler.name ? cronScheduler.name : "",
         type: cronScheduler.type ? cronScheduler.type : "",
         slug: cronScheduler.slug ? cronScheduler.slug : "",
@@ -89,8 +89,8 @@ exports.updateCronScheduler = async function (cronScheduler) {
 
     if (!oldCronScheduler) { return false; }
 
-    if (cronScheduler.tool_id) {
-        oldCronScheduler.tool_id = cronScheduler.tool_id;
+    if (cronScheduler.tool_slug) {
+        oldCronScheduler.tool_slug = cronScheduler.tool_slug;
     }
 
     if (cronScheduler.name) {

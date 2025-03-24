@@ -31,7 +31,7 @@ const Attachments = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (store?.actionFlag === 'ATTACHMENT_CREATED_SUCCESS') {
+    if (store?.actionFlag === 'ATACHMNT_CRTD_SCS') {
       dispatch(getAttachmentList({ project_id: id }))
       dispatch(getHistoryList({ project_id: id }))
     }

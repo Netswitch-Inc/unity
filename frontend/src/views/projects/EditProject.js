@@ -7,15 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCompanyList } from "views/companies/store";
 import { getFrameworkList } from "views/CompilanceBuilders/store";
 import {
-  editProjectRequest,
+  getProject,
   updateProject,
   cleanProjectMessage,
   createProject,
 } from "./store";
 import { getUserList } from "views/users/store";
 
-import { Card, CardBody, FormGroup } from "reactstrap";
-import { Row, Col } from "react-bootstrap";
+import { Card, CardBody } from "reactstrap";
+import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
 import Select from "react-select";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -35,9 +35,8 @@ import {
   //   pipFormats2,
   superAdminRole,
   projectsPermissionId,
-  governanceGroupPermissionId
+  governanceGroupPermissionId,
 } from "utility/reduxConstant";
-
 
 const EditProject = () => {
   const dispatch = useDispatch();
@@ -55,7 +54,7 @@ const EditProject = () => {
     loginStore?.authRolePermission,
     projectsPermissionId,
     governanceGroupPermissionId
-  )
+  );
 
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
@@ -123,13 +122,13 @@ const EditProject = () => {
 
   useEffect(() => {
     if (!permission?.update) {
-      navigate(`/admin/dashboard`)
+      navigate(`/admin/dashboard`);
     }
-  }, [permission])
+  }, [permission]);
 
   useEffect(() => {
     const query = { id: id };
-    dispatch(editProjectRequest(query));
+    dispatch(getProject(query));
     dispatch(cleanProjectMessage());
   }, [dispatch, id]);
 
@@ -223,15 +222,15 @@ const EditProject = () => {
 
   useEffect(() => {
     if (
-      store?.actionFlag === "PROJECT_UPDATED" ||
-      store?.actionFlag === "PROJECT_CREATED_SUCCESS"
+      store?.actionFlag === "PRJCT_UPDT_SCS" ||
+      store?.actionFlag === "PRJCT_CRTD_SCS"
     ) {
       setshowSnackbar(true);
       setSnakbarMessage(store.success);
     }
     if (
-      store?.actionFlag === "PROJECT_UPDATED_ERROR" ||
-      store?.actionFlag === "PROJECT_CREATED_ERROR"
+      store?.actionFlag === "PRJCT_UPDT_ERR" ||
+      store?.actionFlag === "PRJCT_CRTD_ERR"
     ) {
       setshowSnackbar(true);
       setSnakbarMessage(store.error);
@@ -240,8 +239,8 @@ const EditProject = () => {
 
   useEffect(() => {
     if (
-      (store?.actionFlag === "PROJECT_UPDATED" ||
-        store?.actionFlag === "PROJECT_CREATED_SUCCESS") &&
+      (store?.actionFlag === "PRJCT_UPDT_SCS" ||
+        store?.actionFlag === "PRJCT_CRTD_SCS") &&
       showSnackBar
     ) {
       setTimeout(() => {
@@ -252,8 +251,8 @@ const EditProject = () => {
     }
 
     if (
-      (store?.actionFlag === "PROJECT_UPDATED_ERROR" ||
-        store?.actionFlag === "PROJECT_CREATED_ERROR") &&
+      (store?.actionFlag === "PRJCT_UPDT_ERR" ||
+        store?.actionFlag === "PRJCT_CRTD_ERR") &&
       showSnackBar
     ) {
       setTimeout(() => {
@@ -325,21 +324,7 @@ const EditProject = () => {
         <Row>
           <Col>
             <Card>
-              <div className="p-0 border-bottom pb-2 card-header row align-items-center justify-content-between m-0">
-                <h3 className="card-title mb-0 mt-0">
-                  {" "}
-                  {reCreate ? "Add Project" : "Edit Project"}{" "}
-                </h3>
-                <button
-                  type="button"
-                  className="btn btn-primary mt-0"
-                  onClick={() => navigate("/admin/risk-assessment")}
-                >
-                  {/* Back
-                                    <TiArrowLeft size={25} title="Back" className="ml-2" /> */}
-                  <i className="tim-icons icon-minimal-left top-0" />
-                </button>
-              </div>
+              
 
               <CardBody className="pl-0 pr-0 mt-2">
                 <Formik
@@ -351,29 +336,43 @@ const EditProject = () => {
                   {({ setFieldValue, values, errors, isSubmitting }) => (
                     <Form>
                       <Row>
-                        <Col md={6}>
-                          <FormGroup>
-                            <label>Name</label>
-                            <Field
-                              type="text"
-                              name="name"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="name"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Name
+                          </BootstrapForm.Label>
+                          <Field
+                            type="text"
+                            name="name"
+                            className="col-input w-100"
+                          />
+                          <ErrorMessage
+                            name="name"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
                         {companiesList?.length > 0 && (
-                          <Col md={6}>
-                            <label>Location</label>
+                          <Col
+                            xl={6}
+                            lg={6}
+                            as={BootstrapForm.Group}
+                            controlId="formGridLocationName"
+                            className="full-width"
+                          >
+                            <BootstrapForm.Label className="col-label">
+                              Location
+                            </BootstrapForm.Label>
 
                             {companiesList?.length > 0 && (
                               <Select
                                 name="company_id"
-                                className="react-select info"
+                                className="react-select col-select w-100"
                                 classNamePrefix="react-select"
                                 placeholder="Select Location..."
                                 options={companiesList}
@@ -393,159 +392,209 @@ const EditProject = () => {
                             />
                           </Col>
                         )}
-                        <Col md={6}>
-                          <FormGroup className="multi-select">
-                            <label>Compliance</label>
-                            {frameworkList && (
-                              <Select
-                                name="framework_id"
-                                className="react-select info"
-                                classNamePrefix="react-select"
-                                placeholder="Select Compliance..."
-                                isMulti
-                                value={values?.framework_id}
-                                options={frameworkList}
-                                onChange={(secVal) => {
-                                  setFieldValue("framework_id", secVal);
-                                }}
-                              />
-                            )}
-                            <ErrorMessage
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Compliance
+                          </BootstrapForm.Label>
+                          {frameworkList && (
+                            <Select
                               name="framework_id"
-                              component="div"
-                              style={{ color: "red" }}
+                              className="react-select info col-select w-100"
+                              classNamePrefix="react-select"
+                              placeholder="Select Compliance..."
+                              isMulti
+                              value={values?.framework_id}
+                              options={frameworkList}
+                              onChange={(secVal) => {
+                                setFieldValue("framework_id", secVal);
+                              }}
                             />
-                          </FormGroup>
+                          )}
+                          <ErrorMessage
+                            name="framework_id"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
-                        <Col md={6}>
-                          <FormGroup className="multi-select">
-                            <label>Involved Parties</label>
 
-                            {involvedParties && (
-                              <Select
-                                name="involved_parties"
-                                className="react-select info"
-                                classNamePrefix="react-select"
-                                placeholder="Select Involved Parties..."
-                                isMulti
-                                options={involvedParties}
-                                value={values?.involved_parties}
-                                onChange={(secVal) => {
-                                  setFieldValue("involved_parties", secVal);
-                                }}
-                              />
-                            )}
-                            <ErrorMessage
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridLastName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Involved Parties
+                          </BootstrapForm.Label>
+                          {involvedParties && (
+                            <Select
                               name="involved_parties"
-                              component="div"
-                              style={{ color: "red" }}
+                              className="react-select info col-select w-100"
+                              classNamePrefix="react-select"
+                              placeholder="Select Involved Parties..."
+                              isMulti
+                              options={involvedParties}
+                              value={values?.involved_parties}
+                              onChange={(secVal) => {
+                                setFieldValue("involved_parties", secVal);
+                              }}
                             />
-                          </FormGroup>
+                          )}
+                          <ErrorMessage
+                            name="involved_parties"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
                       </Row>
                       <Row className="mb-2">
-                        <Col md={12}>
-                          <FormGroup controlId="formGridContactNumber">
-                            <label>Description</label>
-                            <Field
-                              as="textarea"
-                              name="description"
-                              className="form-control"
-                              rows="3"
-                            />
-                            <ErrorMessage
-                              name="description"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={12}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridLastName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Description
+                          </BootstrapForm.Label>
+                          <Field
+                            as="textarea"
+                            name="description"
+                            className="col-input w-100"
+                            rows="3"
+                          />
+                          <ErrorMessage
+                            name="description"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
                       </Row>
                       <Row>
-                        <Col md={6}>
-                          <FormGroup controlId="formGridContactNumber">
-                            <label>Cost Of Risk</label>
-                            <Field
-                              type="number"
-                              name="cost_of_risk"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="cost_of_risk"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridContactNumber"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Cost Of Risk
+                          </BootstrapForm.Label>
+                          <Field
+                            type="number"
+                            name="cost_of_risk"
+                            className="col-input w-100"
+                          />
+                          <ErrorMessage
+                            name="cost_of_risk"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
-                        <Col md={6}>
-                          <FormGroup controlId="formGridContactNumber">
-                            <label>Fix Cost Risk Ratio</label>
-                            <Field
-                              type="number"
-                              name="fix_cost_risk_ratio"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="fix_cost_risk_ratio"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            {" "}
+                            Fix Cost Risk Ratio
+                          </BootstrapForm.Label>
+                          <Field
+                            type="number"
+                            name="fix_cost_risk_ratio"
+                            className="col-input w-100"
+                          />
+                          <ErrorMessage
+                            name="fix_cost_risk_ratio"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
                       </Row>
                       <Row>
-                        <Col md={4}>
-                          <FormGroup controlId="formGridCompanyName">
-                            <label>Affected Scope</label>
-                            <Field
-                              type="text"
-                              name="affected_scope"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="affected_scope"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            {" "}
+                            Affected Scope
+                          </BootstrapForm.Label>
+                          <Field
+                            type="text"
+                            name="affected_scope"
+                            className="col-input w-100"
+                          />
+                          <ErrorMessage
+                            name="affected_scope"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <label>Priority</label>
-                            {priority && (
-                              <Select
-                                name="priority"
-                                className="react-select info"
-                                classNamePrefix="react-select"
-                                placeholder="Select Priority..."
-                                value={values?.priority}
-                                options={priority}
-                                onChange={(secVal) => {
-                                  setFieldValue("priority", secVal);
-                                }}
-                              />
-                            )}
-                            <ErrorMessage
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Priority
+                          </BootstrapForm.Label>
+                          {priority && (
+                            <Select
                               name="priority"
-                              component="div"
-                              style={{ color: "red" }}
+                              className="react-select info col-select w-100"
+                              classNamePrefix="react-select"
+                              placeholder="Select Priority..."
+                              value={values?.priority}
+                              options={priority}
+                              onChange={(secVal) => {
+                                setFieldValue("priority", secVal);
+                              }}
                             />
-                          </FormGroup>
+                          )}
+                          <ErrorMessage
+                            name="priority"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
-                        <Col md={4}>
-                          <FormGroup controlId="formGridContactNumber">
-                            <label>Fix Projected Cost</label>
-                            <Field
-                              type="number"
-                              name="fix_projected_cost"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="fix_projected_cost"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
+                        <Col
+                          xl={6}
+                          lg={6}
+                          as={BootstrapForm.Group}
+                          controlId="formGridFirstName"
+                          className="full-width"
+                        >
+                          <BootstrapForm.Label className="col-label">
+                            Fix Projected Cost
+                          </BootstrapForm.Label>
+                          <Field
+                            type="number"
+                            name="fix_projected_cost"
+                            className="col-input w-100"
+                          />
+                          <ErrorMessage
+                            name="fix_projected_cost"
+                            component="div"
+                            style={{ color: "red" }}
+                          />
                         </Col>
                       </Row>
                       {/* <Row>
@@ -643,13 +692,24 @@ const EditProject = () => {
                                                     />
                                                 </Col> */}
                       {/* </Row> */}
-                      <button
-                        type="submit"
-                        className="btn btn-primary mt-3"
-                        disabled={isSubmitting}
-                      >
-                        Submit
-                      </button>
+                     
+                      <div className="buttons">
+                        <button
+                          type="submit"
+                          className="btnprimary"
+                          disabled={isSubmitting}
+                        >
+                          Submit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btnsecondary ml-3"
+                          onClick={() => navigate("/admin/risk-assessment")}
+                        >
+                          Back
+                        </button>
+                      </div>
                     </Form>
                   )}
                 </Formik>

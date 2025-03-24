@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 import { superAdminRole } from "utility/reduxConstant";
 import { createMultipleCompanyComplianceControl } from "views/companyComplianceControls/store";
-import { scrolTop } from "utility/Utils";
+import { scrollTop } from "utility/Utils";
 
 const steps = [
   {
@@ -47,7 +47,7 @@ const ComplianceBuilder = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      scrolTop();
+      scrollTop();
     }, 0); // delay in ms, 0 ensures it’s called right after the render
 
     return () => clearTimeout(timeoutId); // Cleanup

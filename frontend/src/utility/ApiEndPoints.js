@@ -19,26 +19,24 @@ export const API_ENDPOINTS = {
     update: `/users`,
     delete: `/users`
   },
-  role: {
+  roles: {
+    list: `/roles`,
     get: `/roles`,
-    listing: `/roles`,
     create: `/roles`,
     update: `/roles`,
     delete: `/roles`
   },
-  permission: {
+  permissions: {
     create: `/permissions`,
     update: `/permissions`,
     rolePermission: `/role-permissions`,
   },
-  company: {
-    listing: `/company`,
-    edit: `/company`,
+  companies: {
+    list: `/company`,
+    get: `/company`,
     create: `/company`,
     update: `/company`,
-    delete: `/company`,
-    emailunique: "/users/isemailunique",
-    userunique: "/users/isusernameunique",
+    delete: `/company`
   },
   connections: {
     list: `/connections`,
@@ -66,7 +64,7 @@ export const API_ENDPOINTS = {
     download: "/downloadfromstorage",
     listingSubcontrols: "/cis-controls-with-frameworkIds",
   },
-  eventLog: {
+  eventLogs: {
     list: `/event-logs`,
     get: `/event-logs`,
     create: `/event-logs`,
@@ -81,72 +79,77 @@ export const API_ENDPOINTS = {
     lists: `/settings`,
     update: `/settings`,
   },
-  Section: {
-    edit: `/sections`,
-    listing: `/sections`,
+  sections: {
+    list: `/sections`,
+    get: `/sections`,
     create: `/sections`,
     update: `/sections`,
     delete: `/sections`,
-    byAssessment: `/section/byassessment`,
+    byAssessment: `/section/byassessment`
   },
-  question: {
+  questions: {
+    list: `/questions`,
+    get: `/questions`,
     create: `/questions`,
-    listing: `/questions`,
     update: `/questions`,
     delete: `/questions`,
-    edit: `/questions`,
     questionFilter: `/questionfilters`,
     bulkorderupdate: `/questions/bulk-order-update`,
   },
-  Assessment: {
+  assessments: {
     listing: `/assessments`,
-    create: `/assessments`,
     edit: `/assessments`,
-    delete: `/assessments`,
+    list: `/assessments`,
+    get: `/assessments`,
+    create: `/assessments`,
     update: `/assessments`,
+    delete: `/assessments`
   },
-  Project: {
-    listing: `/projects`,
+  projects: {
+    list: `/projects`,
+    get: `/projects`,
     create: `/projects`,
-    edit: `/projects`,
-    delete: `/projects`,
     update: `/projects`,
+    delete: `/projects`
   },
-  Attachment: {
-    listing: `/attachments`,
+  attachments: {
+    list: `/attachments`,
+    get: `/attachments`,
     create: `/upload`,
-    delete: `/attachments`,
-    edit: `/attachments`,
+    update: `/attachments`,
+    delete: `/attachments`
   },
-  Comment: {
-    listing: `/comments`,
+  comments: {
+    list: `/comments`,
+    get: `/comments`,
     create: `/comments`,
-    edit: `/comments`,
-    delete: `/comments`,
+    update: `/comments`,
+    delete: `/comments`
   },
-  History: {
-    listing: `/project_histories`,
+  histories: {
+    list: `/project_histories`,
+    get: `/project_histories`,
     create: `/project_histories`,
-    edit: `/project_histories`,
-    delete: `/project_histories`,
+    update: `/project_histories`,
+    delete: `/project_histories`
   },
-  AssessmentReport: {
-    listing: `/assessment-reports`,
+  assessmentReports: {
+    list: `/assessment-reports`,
+    get: `/assessment-reports`,
     create: `/assessment-reports`,
-    edit: `/assessment-reports`,
-    delete: `/assessment-reports`,
     update: `/assessment-reports`,
+    delete: `/assessment-reports`,
     verify: `/assessment-code-verification`,
     assessmentAnswers: `/assessment-reports-questions`,
     pdfcreate: `/assessment-report-pdf`,
-    sendpdfemail: `/assessment-report-email`,
+    sendpdfemail: `/assessment-report-email`
   },
-  Answer: {
-    listing: `/question-answers`,
+  answers: {
+    list: `/question-answers`,
+    get: `/question-answers`,
     create: `/question-answers`,
-    edit: `/question-answers`,
-    delete: `/question-answers`,
     update: `/question-answers`,
+    delete: `/question-answers`
   },
   dashboard: {
     widgetsOrder: `/dashboard-widgets-order`,
@@ -173,14 +176,14 @@ export const API_ENDPOINTS = {
     get: `/agents`,
     create: `/agents`,
     update: `/agents`,
-    delete: `/agents`,
+    delete: `/agents`
   },
   configurationAssessments: {
     list: `/configuration-assessments`,
     get: `/configuration-assessments`,
     create: `/configuration-assessments`,
     update: `/configuration-assessments`,
-    delete: `/configuration-assessments`,
+    delete: `/configuration-assessments`
   },
   openVASScanReports: {
     list: `/openvas-scan-reports`,
@@ -188,13 +191,13 @@ export const API_ENDPOINTS = {
     create: `/openvas-scan-reports`,
     update: `/openvas-scan-reports`,
     delete: `/openvas-scan-reports`,
-    insert: `openvas-scan-reports/insert-multipal`,
+    insert: `openvas-scan-reports/insert-multipal`
   },
   netswitchThreatIntels: {
     list: `/netswitch-threat-intels`,
     get: `/netswitch-threat-intels`,
     create: `/netswitch-threat-intels`,
     update: `/netswitch-threat-intels`,
-    delete: `/netswitch-threat-intels`,
+    delete: `/netswitch-threat-intels`
   }
-};
+}

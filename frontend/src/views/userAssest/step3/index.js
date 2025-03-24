@@ -28,9 +28,7 @@ const AsessmentReport = () => {
   const assessmentReportId = queryParams.get("id");
   const dispatch = useDispatch();
   const assessmentReport = useSelector((state) => state.assessmentReport);
-  const assessmentReportAnswerList = useSelector(
-    (state) => state.questionAnswer
-  );
+  const assessmentReportAnswerList = useSelector((state) => state.questionAnswer)
 
   const [show, setShow] = useState(true);
   const [sectionIndex, setSectionIndex] = useState(0);
@@ -298,8 +296,8 @@ const AsessmentReport = () => {
 
   useEffect(() => {
     if (
-      assessmentReportAnswerList?.actionFlag === "ANSWER_CREATED_SUCCESS" ||
-      assessmentReportAnswerList?.actionFlag === "ANSWER_UPDATED"
+      assessmentReportAnswerList?.actionFlag === "ANSR_CRTD_SCS" ||
+      assessmentReportAnswerList?.actionFlag === "ANSR_UPDT_SCS"
     ) {
       const params = {
         assessment_id: id,
@@ -309,8 +307,7 @@ const AsessmentReport = () => {
       dispatch(cleanAnswerMessage());
     }
   }, [assessmentReportAnswerList?.actionFlag]);
-  console.log(childVal, "childVal");
-  console.log(childOptions, "childOptions");
+
   return (
     <div className="step-wise-content">
       <Row className="sticky--- m-0">
@@ -320,6 +317,7 @@ const AsessmentReport = () => {
               <img alt="..." src={reactLogo} />
             </div>
           </div>
+
           <div className="mb-0">
             <div className="steps-mains">
               <div className="steps filled-step">
@@ -332,6 +330,7 @@ const AsessmentReport = () => {
                   <h4>Company Info</h4>
                 </div>
               </div>
+
               <div className="steps filled-step">
                 <div className="borders step-line">
                   <div className="step-icon ">
@@ -342,6 +341,7 @@ const AsessmentReport = () => {
                   <h4>Verification</h4>
                 </div>
               </div>
+              
               <div className="steps active-class">
                 <div className="borders step-line">
                   <div className="step-icon ">
@@ -352,6 +352,7 @@ const AsessmentReport = () => {
                   <h4>Self Assessment</h4>
                 </div>
               </div>
+
               <div className="steps">
                 <div className="borders">
                   <div className="step-icon">
@@ -365,6 +366,7 @@ const AsessmentReport = () => {
             </div>
           </div>
         </Card>
+
         <Col className="right-side self-assesement col-md-9">
           <div className="card-header">
             <h3 className="m-0">Self Assessment
@@ -540,8 +542,6 @@ const AsessmentReport = () => {
                       handleNextClick();
                       setShow(() => false);
                     }}
-                  // onClick={handleSubmit}
-                  // disabled={isSubmitting}
                   >
                     Next
                   </button>
@@ -552,7 +552,7 @@ const AsessmentReport = () => {
         </Col>
       </Row>
     </div>
-  );
-};
+  )
+}
 
 export default AsessmentReport;

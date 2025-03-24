@@ -25,7 +25,7 @@ const Comments = () => {
 
 
   useEffect(() => {
-    if (store?.actionFlag === 'COMMENT_CREATED_SUCCESS') {
+    if (store?.actionFlag === 'COMMENT_CRTD_SCS') {
       dispatch(getCommentList({ project_id: id }))
       dispatch(getHistoryList({ project_id: id }))
     }

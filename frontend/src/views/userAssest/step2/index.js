@@ -6,7 +6,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
     verifyCodeAssessmentReport,
-    editAssessmentReportRequest
+    getAssessmentReport
 } from "../store";
 
 // ** Reactstrap Imports
@@ -30,10 +30,7 @@ const VarificationCode = () => {
     const dispatch = useDispatch();
     const [emailCode, setEmailCode] = useState("");
     const [smsCode, setSmsCode] = useState("");
-    const [errorMessage, setErrorMessage] = useState(
-        { email: false },
-        { smsCode: false }
-    );
+    const [errorMessage, setErrorMessage] = useState({ email: false }, { smsCode: false })
     const [showSnackBar, setshowSnackbar] = useState(false);
     const [snakebarMessage, setSnakbarMessage] = useState("");
 
@@ -42,12 +39,12 @@ const VarificationCode = () => {
     useLayoutEffect(() => {
         if (assessmentId) {
             const query = { id: assessmentId };
-            dispatch(editAssessmentReportRequest(query));
+            dispatch(getAssessmentReport(query));
         }
     }, [assessmentId, dispatch]);
 
     // useEffect(() => {
-    //     if (assessmentReport?.actionFlag === 'VARIFIED') {
+    //     if (assessmentReport?.actionFlag === 'CD_VRFYD_SCS') {
     //         navigate(`/asessment-report/${id}?id=${assessmentId}`)
     //     }
     // }, [assessmentReport?.actionFlag])
@@ -64,7 +61,7 @@ const VarificationCode = () => {
     useEffect(() => {
         if (
             assessmentReport?.success &&
-            assessmentReport?.actionFlag === "VARIFIED"
+            assessmentReport?.actionFlag === "CD_VRFYD_SCS"
         ) {
             setshowSnackbar(true);
             setSnakbarMessage(assessmentReport.success);
@@ -82,14 +79,14 @@ const VarificationCode = () => {
     ]);
 
     useEffect(() => {
-        if (assessmentReport.actionFlag === "VARIFIED" && showSnackBar) {
+        if (assessmentReport.actionFlag === "CD_VRFYD_SCS" && showSnackBar) {
             setTimeout(() => {
                 setshowSnackbar(false);
                 setSnakbarMessage("");
                 navigate(`/asessment-report/${id}?id=${assessmentId}`);
             }, 3000);
         }
-        if (assessmentReport.actionFlag === "VARIFIED_ERROR" && showSnackBar) {
+        if (assessmentReport.actionFlag === "CD_VRFYD_ERR" && showSnackBar) {
             setTimeout(() => {
                 setshowSnackbar(false);
                 setSnakbarMessage("");
@@ -103,36 +100,17 @@ const VarificationCode = () => {
         }, 2000);
     }, [showSnackBar]);
 
-    // const handleSubmit = () => {
-    //     if (
-    //         emailCode?.length === 4 &&
-    //         smsCode?.length === 4 &&
-    //         (!assessmentReport?.assessmentReportItem?.email_verified ||
-    //             !assessmentReport.assessmentReportItem?.mobile_verified)
-    //     ) {
-    //         setErrorMessage({ email: false, smsCode: false });
-    //         dispatch(
-    //             verifyCodeAssessmentReport({
-    //                 _id: assessmentId,
-    //                 email_code: emailCode,
-    //                 mobile_code: smsCode,
-    //             })
-    //         );
-    //     } else {
-    //         setErrorMessage({ email: true, smsCode: true });
-    //         navigate(`/asessment-report/${id}?id=${assessmentId}`);
-    //     }
-    // };
-
     const handleSubmit = () => {
         if (emailCode?.length !== 6 && smsCode?.length !== 6) {
             setErrorMessage({ email: true, smsCode: true });
             return;
         }
+
         if (emailCode?.length !== 6) {
             setErrorMessage({ ...errorMessage, email: true });
             return;
         }
+
         if (smsCode?.length !== 6) {
             setErrorMessage({ ...errorMessage, smsCode: true });
             return;
@@ -153,7 +131,8 @@ const VarificationCode = () => {
                 })
             );
         }
-    };
+    }
+
     return (
         <div className="step-wise-content">
             <Row className="sticky--- m-0">
@@ -163,6 +142,7 @@ const VarificationCode = () => {
                             <img alt="..." src={reactLogo} />
                         </div>
                     </div>
+
                     <div className="mb-0">
                         <div className="steps-mains">
                             <div className="steps filled-step">
@@ -175,6 +155,7 @@ const VarificationCode = () => {
                                     <h4>Company Info</h4>
                                 </div>
                             </div>
+
                             <div className="steps active-class">
                                 <div className="borders step-line">
                                     <div className="step-icon ">
@@ -185,6 +166,7 @@ const VarificationCode = () => {
                                     <h4>Verification</h4>
                                 </div>
                             </div>
+
                             <div className="steps">
                                 <div className="borders step-line">
                                     <div className="step-icon ">
@@ -195,6 +177,7 @@ const VarificationCode = () => {
                                     <h4>Self Assessment</h4>
                                 </div>
                             </div>
+
                             <div className="steps">
                                 <div className="borders">
                                     <div className="step-icon">
@@ -208,6 +191,7 @@ const VarificationCode = () => {
                         </div>
                     </div>
                 </Card>
+
                 <Col className="right-side email-verifcation-or-mobile">
                     <ReactSnackBar
                         Icon={
@@ -222,7 +206,7 @@ const VarificationCode = () => {
                     <div className="card-header">
                         <h3 className="m-0">Verification(Email & Mobile)</h3>
                     </div>
-                    {/* <Card className="h-100"> */}
+                    
                     <Card className="pl-0 pr-0 varification-card">
                         <div className="row-row">
                             <div className="col-12 text-center">
@@ -279,11 +263,10 @@ const VarificationCode = () => {
                             </button>
                         </div>
                     </Card>
-                    {/* </Card> */}
                 </Col>
             </Row>
         </div>
-    );
-};
+    )
+}
 
 export default VarificationCode;

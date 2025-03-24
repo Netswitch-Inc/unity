@@ -51,7 +51,7 @@ const CompilanceController = () => {
   const [controlledBack, setControlledBack] = useState(false);
 
   // useEffect(() => {
-  //   scrolTop();
+  //   scrollTop();
   // });
 
   useLayoutEffect(() => {

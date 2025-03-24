@@ -8,7 +8,6 @@ import {
   CardTitle,
   CardHeader,
   InputGroup,
-  UncontrolledTooltip,
 } from "reactstrap";
 import React, { useState, useCallback, useEffect } from "react";
 import "../../assets/customcss/customWork.css";
@@ -24,16 +23,18 @@ import {
 import {
   getProjectList,
   updateProject,
-  editProjectRequest,
-} from "views/Projects/store";
+  getProject,
+} from "views/projects/store";
 import DatatablePagination from "components/DatatablePagination";
 import SimpleSpinner from "components/spinner/simple-spinner";
 import Swal from "sweetalert2";
 import { getCompanyList } from "views/companies/store";
 import Select from "react-select";
-
-import { TiEye, TiTick, TiTimes, TiPlus } from "react-icons/ti";
 import { BiSearch } from "components/SVGIcons";
+import crossIcon from "assets/img/cross.svg"
+import viewIcon from "assets/img/view.svg"
+import checkIcon from "assets/img/check.svg"
+import addIcon from "assets/img/add.svg"
 
 import FrappeGanttView from "./FrappeGanttView";
 import { useNavigate } from "react-router-dom";
@@ -170,7 +171,7 @@ function GeneralCard(props) {
   }, [dispatch]);
 
   useEffect(() => {
-    if (projectStore.actionFlag === "PROJECT_UPDATED") {
+    if (projectStore.actionFlag === "PRJCT_UPDT_SCS") {
       handleProjectLists(sort, sortColumn, currentPage, rowsPerPage, statusval);
     }
     if (companyStore?.companyItems?.length > 0) {
@@ -209,7 +210,7 @@ function GeneralCard(props) {
   const handleGetCurrentProject = async (displayID) => {
     if (displayID) {
       const query = { id: displayID };
-      await dispatch(editProjectRequest(query));
+      await dispatch(getProject(query));
     }
     navigate(`/admin/project/edit/${displayID}`, {
       state: { reCreate: true },
@@ -315,126 +316,103 @@ function GeneralCard(props) {
           center: true,
           cell: (row) => (
             <div className="text-center">
-              <TiEye
-                size={20}
-                color="#fff"
-                cursor="pointer"
-                className="mr-1"
+              <img
+                alt=""
+                height={22}
+                title="Detail"
+                src={viewIcon}
+                className="cursor-pointer mr-2"
                 id={`tooltip-detail-${row?._id}`}
                 onClick={() => handleRowClicked(row)}
               />
 
-              <UncontrolledTooltip
+              {/* <UncontrolledTooltip
                 placement="top"
                 target={`tooltip-detail-${row?._id}`}
               >
                 Detail
-              </UncontrolledTooltip>
+              </UncontrolledTooltip> */}
 
-              {row?.status === "created" ? (
-                <>
-                  <TiTick
-                    size={20}
-                    color="#fff"
-                    cursor="pointer"
-                    className="mr-1"
-                    id={`tooltip-approve-${row?._id}`}
-                    onClick={() =>
-                      updateStatus(
-                        { _id: row?._id, status: "approved" },
-                        "created",
-                        "Approve"
-                      )
-                    }
-                  />
+              {row?.status === "created" ? (<>
+                <img
+                  alt=""
+                  height={22}
+                  src={checkIcon}
+                  title="Approve"
+                  className="cursor-pointer mr-2"
+                  id={`tooltip-approve-${row?._id}`}
+                  onClick={() => updateStatus({ _id: row?._id, status: "approved" }, "created", "Approve")}
+                />
 
-                  <UncontrolledTooltip
+                {/* <UncontrolledTooltip
                     placement="top"
                     target={`tooltip-approve-${row?._id}`}
                   >
                     Approve
-                  </UncontrolledTooltip>
-                </>
-              ) : null}
+                  </UncontrolledTooltip> */}
+              </>) : null}
 
-              {row?.status === "approved" ? (
-                <>
-                  <TiTick
-                    size={20}
-                    color="#fff"
-                    cursor="pointer"
-                    className="mr-1"
-                    id={`tooltip-complete-${row?._id}`}
-                    onClick={() =>
-                      updateStatus(
-                        { _id: row?._id, status: "completed" },
-                        "approved",
-                        "Complete"
-                      )
-                    }
-                  />
+              {row?.status === "approved" ? (<>
+                <img
+                  alt=""
+                  height={22}
+                  src={checkIcon}
+                  title="Complete"
+                  className="cursor-pointer mr-2"
+                  id={`tooltip-complete-${row?._id}`}
+                  onClick={() => updateStatus({ _id: row?._id, status: "completed" }, "approved", "Complete")}
+                />
 
-                  <UncontrolledTooltip
+                {/* <UncontrolledTooltip
                     placement="top"
                     target={`tooltip-complete-${row?._id}`}
                   >
                     Complete
-                  </UncontrolledTooltip>
-                </>
-              ) : null}
+                  </UncontrolledTooltip> */}
+              </>) : null}
 
-              {row?.status === "created" || row?.status === "approved" ? (
-                <>
-                  <TiTimes
-                    size={20}
-                    color="#fff"
-                    cursor="pointer"
-                    className="mr-1"
-                    id={`tooltip-cancel-${row?._id}`}
-                    onClick={() =>
-                      updateStatus(
-                        { _id: row?._id, status: "cancelled" },
-                        "created",
-                        "Cancel"
-                      )
-                    }
-                  />
+              {row?.status === "created" || row?.status === "approved" ? (<>
+                <img
+                  alt=""
+                  height={22}
+                  title="Cancel"
+                  src={crossIcon}
+                  className="cursor-pointer mr-2"
+                  id={`tooltip-cancel-${row?._id}`}
+                  onClick={() => updateStatus({ _id: row?._id, status: "cancelled" }, "created", "Cancel")}
+                />
 
-                  <UncontrolledTooltip
+                {/* <UncontrolledTooltip
                     placement="top"
                     target={`tooltip-cancel-${row?._id}`}
                   >
                     Cancel
-                  </UncontrolledTooltip>
-                </>
-              ) : null}
-              {row.status === "cancelled" ? (
-                <>
-                  <TiPlus
-                    size={20}
-                    color="#fff"
-                    cursor="pointer"
-                    className="mr-1"
-                    id={`tooltip-create-${row?._id}`}
-                    onClick={() =>
-                      handleGetCurrentProject(row?._id)
+                  </UncontrolledTooltip> */}
+              </>) : null}
 
-                    }
-                  />
+              {row.status === "cancelled" ? (<>
+                <img
+                  alt=""
+                  height={18}
+                  src={addIcon}
+                  title="Create"
+                  className="cursor-pointer ml-1"
+                  id={`tooltip-create-${row?._id}`}
+                  onClick={() => handleGetCurrentProject(row?._id)}
+                />
 
-                  <UncontrolledTooltip
+                {/* <UncontrolledTooltip
                     placement="top"
                     target={`tooltip-create-${row?._id}`}
                   >
                     Create
-                  </UncontrolledTooltip>
-                </>
-              ) : null}
+                  </UncontrolledTooltip> */}
+              </>) : null}
             </div>
-          ),
-        },
+          )
+        }
       ]
-      : []),
+      : [])
   ];
 
   return (
@@ -452,7 +430,7 @@ function GeneralCard(props) {
                 <div className="d-flex justify-content-end col-md-9 filters">
                   <InputGroup className="mb-0">
                     <input
-                      className="form-control mt-0 mr-1"
+                      className="col-input w-100 mt-0 mr-1"
                       type="search"
                       placeholder="Search"
                       aria-label="Search"
@@ -466,7 +444,7 @@ function GeneralCard(props) {
                   {authUser?.role_id?._id === superAdminRole ? (
                     <Select
                       name="company_id"
-                      className="react-select mx-1"
+                      className="react-select col-select w-100 mx-1"
                       classNamePrefix="react-select"
                       placeholder="Select Location"
                       value={companyVal}
@@ -480,7 +458,7 @@ function GeneralCard(props) {
 
                   <Select
                     name="status"
-                    className="react-select mx-1"
+                    className="react-select col-select w-100 mx-1"
                     classNamePrefix="react-select"
                     placeholder="Select Priority"
                     value={selectedPriority}

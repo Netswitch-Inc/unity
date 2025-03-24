@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, useLayoutEffect } from "re
 import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateProject, cleanProjectMessage } from "../Projects/store/index";
+import { updateProject, cleanProjectMessage } from "../projects/store/index";
 
 import {
   Col,
@@ -47,19 +47,13 @@ const ProjectDetailsCard = (props) => {
   const store = useSelector((state) => state.comments);
 
   // ** Const
-  const permission = getModulePermissionData(
-    loginStore?.authRolePermission,
-    projectsPermissionId,
-    governanceGroupPermissionId
-  )
+  const permission = getModulePermissionData(loginStore?.authRolePermission, projectsPermissionId, governanceGroupPermissionId)
 
   const frameworks = riskData.framework_id?.map((framework) => framework?.label)
   const InvolvedParties = riskData.involved_parties?.map((party) => party?.user_name)
 
   const [likelihood, setLikelihood] = useState(riskData?.likelyhood || 0);
-  const [impactAssessment, setImpactAssessment] = useState(
-    riskData?.impact_assessment || 0
-  );
+  const [impactAssessment, setImpactAssessment] = useState(riskData?.impact_assessment || 0)
   const [page] = useState(1);
   const [complianceTags] = useState(frameworks);
   const [partiesTags] = useState(InvolvedParties);
@@ -200,7 +194,7 @@ const ProjectDetailsCard = (props) => {
         const payload = {
           _id: id,
           impact_assessment: value,
-          projectHistoryDescription: `Impact Assessment changed by`,
+          projectHistoryDescription: `Impact changed by`,
           type: 'Affected Risk',
           company_id: loginStore?.authUserItem?.company_id?._id,
           user_id: loginStore?.authUserItem?._id,
@@ -315,7 +309,7 @@ const ProjectDetailsCard = (props) => {
                       className="btn btn-primary mb-0 mt-0"
                       onClick={() => updateStatus({ _id: id, status: "cancelled" }, "created", "Cancel")}
                     >
-                      Cancel
+                      Decline
                     </Button>
                   </>) : null}
                 </>) : null}
@@ -489,7 +483,7 @@ const ProjectDetailsCard = (props) => {
 
                     <Row>
                       <Col xs={"4"}>
-                        <h6>Impact Assessment</h6>
+                        <h6>Impact</h6>
                         <h2 className="text-center">
                           <u>{impactAssessment}</u>
                         </h2>
@@ -518,7 +512,7 @@ const ProjectDetailsCard = (props) => {
                               <option value={5}>Catastrophic</option>
                             </select>
                             <button className="dropbtn w-100 dropdown-toggle btn">
-                              Impact Assessment
+                              Impact
                             </button>
                             <div className="dropdown-content">
                               <span>Negligible</span>

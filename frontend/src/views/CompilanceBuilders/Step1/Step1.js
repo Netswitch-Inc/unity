@@ -9,7 +9,8 @@ import { getCompanyComplianceControlList } from "views/companyComplianceControls
 import { Row, Col, FormGroup, Button, UncontrolledTooltip } from "reactstrap";
 import Select from "react-select";
 
-import { scrolTop } from "utility/Utils";
+import { scrollTop } from "utility/Utils";
+import iIcon from "assets/img/cis-icon.png";
 
 // ** Third Party Components
 import classnames from "classnames";
@@ -49,7 +50,7 @@ const Step1 = React.forwardRef((props, ref) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      scrolTop();
+      scrollTop();
     }, 0); // delay in ms, 0 ensures it’s called right after the render
 
     return () => clearTimeout(timeoutId); // Cleanup
@@ -59,30 +60,30 @@ const Step1 = React.forwardRef((props, ref) => {
 
   const GenericTile = ({ header, footer, footer2, description, keyVal }) => {
     return (
-      <>
-        {/* <div className="tile-header">{header}</div>
-        <div className="tile-footer">{footer}</div>
-        <div className="tile-footer">{footer2}</div>
-        {description && <UncontrolledTooltip placement="top" target={`map-tile-${keyVal}`}>
-          {description}
-        </UncontrolledTooltip>} */}
-        <div id={`map-tile-${keyVal}`}> {/* Ensure matching id */}
-          <div className="tile-header">{header}</div>
-          <div className="tile-footer">
-            <span>{footer}</span>
-            <span>{footer2}</span>
-          </div>
-          {description && (
-            <UncontrolledTooltip placement="auto" target={`map-tile-${keyVal}`} container={`map-tile-${keyVal}`}>
-              <div className="inner-desc">{description}</div>
-            </UncontrolledTooltip>
-          )}
+      <div id={`map-tile-${keyVal}`}> {/* Ensure matching id */}
+        <div className="tile-header">
+          <img
+            alt="icon"
+            src={iIcon}
+            className="i-icon-img"
+            id={`tooltip-icon-${keyVal}`}
+          />
+          <p> {header}</p>
         </div>
-      </>
-    );
-  };
 
+        <div className="tile-footer">
+          <span>{footer}</span>
+          <span>{footer2}</span>
+        </div>
 
+        {description && (
+          <UncontrolledTooltip placement="auto" target={`tooltip-icon-${keyVal}`} container={`map-tile-${keyVal}`}>
+            <div className="inner-desc">{description}</div>
+          </UncontrolledTooltip>
+        )}
+      </div>
+    )
+  }
 
   React.useImperativeHandle(ref, () => ({
     isValidated: () =>
@@ -111,15 +112,13 @@ const Step1 = React.forwardRef((props, ref) => {
   }, [dispatch])
 
   const handleSetTiles = useCallback((complience) => {
-    const filteredData = selectedTiles.filter((tile) =>
-      complience.some((item) => tile?.framework_id?._id === item?._id)
-    );
-    setSelectedTiles(filteredData);
+    const filteredData = selectedTiles.filter((tile) => complience.some((item) => tile?.framework_id?._id === item?._id))
+    setSelectedTiles(filteredData)
 
     if (allSelected) {
-      setAllSelected(false);
+      setAllSelected(false)
     }
-  }, [allSelected, selectedTiles]);
+  }, [allSelected, selectedTiles])
 
   useEffect(() => {
     if (store?.controllerItem) {
@@ -130,9 +129,10 @@ const Step1 = React.forwardRef((props, ref) => {
           value: item._id,
           label: item.name,
           framework_name: item.framework_id.label,
-          description: item.description,
-        }));
-      setTiles(() => data);
+          description: item.description
+        }))
+
+      setTiles(() => data)
     }
 
     if (companyComplianceControls?.companyComplianceControlList && companyComplianceControls?.companyComplianceControlList?.length > 0 && !loadFirst) {
@@ -170,7 +170,7 @@ const Step1 = React.forwardRef((props, ref) => {
         }
       }
     }
-  }, [store?.controllerItem, companyComplianceControls?.companyComplianceControlList, handleControllerLists, tiles?.length]);
+  }, [store?.controllerItem, companyComplianceControls?.companyComplianceControlList, handleControllerLists, tiles?.length])
 
   useEffect(() => {
     if (store.actionFlag === "CONTROL_VIA_FRAMEWORK_ID" && store?.error) {
@@ -178,7 +178,7 @@ const Step1 = React.forwardRef((props, ref) => {
       setSelectedTiles(() => []);
       setCompliance([]);
     }
-  }, [store.actionFlag, store.error]);
+  }, [store.actionFlag, store.error])
 
   useEffect(() => {
     if (companyComplianceControls?.actionFlag === 'CMPN_CONTRL_LST' && companyComplianceControls?.companyComplianceControlList?.length === 0) {
@@ -205,9 +205,8 @@ const Step1 = React.forwardRef((props, ref) => {
   }
 
   function generateComplianceTile(compliance, index) {
-    const isComplianceSelected = selectedTiles && selectedTiles.some(
-      (selected) => selected.value === compliance.value
-    );
+    const isComplianceSelected = selectedTiles && selectedTiles.some((selected) => selected.value === compliance.value)
+
     return (
       <div
         key={compliance.value}
@@ -230,7 +229,7 @@ const Step1 = React.forwardRef((props, ref) => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   function handleSelectAll() {
@@ -244,9 +243,9 @@ const Step1 = React.forwardRef((props, ref) => {
           value: tile.value,
           label: tile.label,
           framework_name: tile.framework_name,
-          description: tile.description,
-        };
-      });
+          description: tile.description
+        }
+      })
 
       setSelectedTiles(updatedSelectedTiles);
       setAllSelected(true);
@@ -255,81 +254,77 @@ const Step1 = React.forwardRef((props, ref) => {
 
   function updateComplianceTiles(selectedCompliances) {
     setLoadFirst(() => true)
-    const selectedFrameworkIds = selectedCompliances.map(
-      (element) => element._id
-    );
+    const selectedFrameworkIds = selectedCompliances.map((element) => element._id)
     handleControllerLists(selectedFrameworkIds);
     setCompliance(() => selectedCompliances);
   }
 
-  return (
-    <>
-      <h5 className="info-text ps">Let's start with the basic information.</h5>
-      <div className="text-center buttons">
-        <button type="button" className="btnprimary" onClick={() => openModal()}>
-          Select Framework
-        </button>
+  return (<>
+    <h5 className="info-text ps">Let's start with the basic information.</h5>
+    <div className="text-center buttons">
+      <button type="button" className="btnprimary" onClick={() => openModal()}>
+        Select Framework
+      </button>
+    </div>
+
+    <Row className="justify-content-center mt-5">
+      {/*  sm="10" */}
+      <Col sm="12" className="mb-3">
+        <FormGroup className="d-none">
+          <label>Compliance</label>
+          <Select
+            isMulti
+            value={compliance}
+            name="frameworks-select"
+            closeMenuOnSelect={false}
+            className="react-select info"
+            classNamePrefix="react-select"
+            options={store?.frameworkItems || []}
+            placeholder="Choose Compliance (Multiple Options)"
+            onChange={(selectedCompliances) => {
+              updateComplianceTiles(selectedCompliances);
+              handleSetTiles(selectedCompliances)
+            }}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          {compliance?.length && tiles?.length > 0 ? (
+            <Button
+              id="selectAll"
+              className="text-white border rounded-pill btn-simple btn-sm btnSelect float-left"
+              onClick={handleSelectAll}
+            >
+              {allSelected ? "Unselect All" : "Select All"}
+            </Button>
+          ) : null}
+
+          <label className="float-right">
+            {selectedTiles.length} Controls selected
+          </label>
+        </FormGroup>
+      </Col>
+    </Row>
+
+    {compliance?.length ? (
+      // col-sm-10
+      <div className="col-sm-12 mx-auto compliance-box-content">
+        <Row className="complianceTilesRow">
+          {tiles?.length > 0 &&
+            tiles.map((compliance, index) => generateComplianceTile(compliance, index))}
+        </Row>
       </div>
+    ) : null}
 
-      <Row className="justify-content-center mt-5">
-        {/*  sm="10" */}
-        <Col sm="12" className="mb-3">
-          <FormGroup className="d-none">
-            <label>Compliance</label>
-            <Select
-              isMulti
-              value={compliance}
-              name="frameworks-select"
-              closeMenuOnSelect={false}
-              className="react-select info"
-              classNamePrefix="react-select"
-              options={store?.frameworkItems || []}
-              placeholder="Choose Compliance (Multiple Options)"
-              onChange={(selectedCompliances) => {
-                updateComplianceTiles(selectedCompliances);
-                handleSetTiles(selectedCompliances)
-              }}
-            />
-          </FormGroup>
-
-          <FormGroup>
-            {compliance?.length && tiles?.length > 0 ? (
-              <Button
-                id="selectAll"
-                className="text-white border rounded-pill btn-simple btn-sm btnSelect float-left"
-                onClick={handleSelectAll}
-              >
-                {allSelected ? "Unselect All" : "Select All"}
-              </Button>
-            ) : null}
-
-            <label className="float-right">
-              {selectedTiles.length} Controls selected
-            </label>
-          </FormGroup>
-        </Col>
-      </Row>
-
-      {compliance?.length ? (
-        // col-sm-10
-        <div className="col-sm-12 mx-auto compliance-box-content">
-          <Row className="complianceTilesRow">
-            {tiles?.length > 0 &&
-              tiles.map((compliance, index) => generateComplianceTile(compliance, index))}
-          </Row>
-        </div>
-      ) : null}
-
-      <SelectFramewroksModal
-        open={modalOpen}
-        closeModal={closeModal}
-        handleSetTiles={handleSetTiles}
-        updateComplianceTiles={updateComplianceTiles}
-        compliance={compliance}
-        frameworkItems={store?.frameworkItems}
-      />
-    </>
-  )
+    <SelectFramewroksModal
+      open={modalOpen}
+      closeModal={closeModal}
+      handleSetTiles={handleSetTiles}
+      updateComplianceTiles={updateComplianceTiles}
+      compliance={compliance}
+      frameworkItems={store?.frameworkItems}
+    />
+  </>)
 })
 
 export default Step1;

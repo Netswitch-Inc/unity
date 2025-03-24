@@ -57,8 +57,8 @@ import AddAssessmentForm from "views/Assessment/add";
 import EditAssessmentForm from "views/Assessment/edit";
 import AssessmentFormDetail from "views/Assessment/detail";
 
-import AddProject from "views/Projects/AddProject";
-import EditProject from "views/Projects/EditProject";
+import AddProject from "views/projects/AddProject";
+import EditProject from "views/projects/EditProject";
 import ProjectDetails from "views/ram/ProjectDetails";
 
 import HelpdeskGraphs from "views/helpdesks";
@@ -176,7 +176,7 @@ var routes = [
       },
       {
         path: "/questions/edit/:id",
-        name: "Questions",
+        name: "Edit Question",
         mini: "QUE",
         layout: "/admin",
         component: (<EditQuestion />),

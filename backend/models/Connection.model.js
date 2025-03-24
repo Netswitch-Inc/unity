@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 
 var ConnectionSchema = new mongoose.Schema({
-    tool_id: String,
+    tool_slug: String,
     name: String,
     type: { type: String, unique: true },
     description: String,

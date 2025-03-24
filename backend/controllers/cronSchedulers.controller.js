@@ -32,8 +32,8 @@ exports.getCronSchedulers = async function (req, res, next) {
         cronErrorQuery.date = { $gte: previousDates, $lte: currentEndDate }
 
         var toolsPermission = await getToolsPermissions() || [];
-        query.tool_id = { $in: toolsPermission }
-        cronErrorQuery.tool_id = { $in: toolsPermission }
+        query.tool_slug = { $in: toolsPermission }
+        cronErrorQuery.tool_slug = { $in: toolsPermission }
 
         if (search) {
             search = search.trim();
@@ -162,7 +162,7 @@ exports.getCronSchedulerAlertWarning = async function (req, res, next) {
         cronErrorQuery.date = { $gte: previousDates, $lte: currentEndDate }
 
         var toolsPermission = await getToolsPermissions() || [];
-        cronErrorQuery.tool_id = { $in: toolsPermission }
+        cronErrorQuery.tool_slug = { $in: toolsPermission }
 
         var cronScheduler = null;
         if (id) {

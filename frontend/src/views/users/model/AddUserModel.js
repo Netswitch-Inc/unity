@@ -266,10 +266,10 @@ const AddUser = ({ lgshow, closePopup, title, initialValues, isEditing }) => {
   };
 
   useEffect(() => {
-    if (store.actionFlag === "ROLE_LISTING") {
+    if (store.actionFlag === "ROLE_LST") {
       setRoleOptions(store?.roleItems, setRoleData);
     }
-    if (companyStore?.actionFlag === "COMPANY_LISTING") {
+    if (companyStore?.actionFlag === "COMPANY_LST") {
       setCompOptions(companyStore?.companyItems, setCompanyDropdown);
     }
   }, [store?.roleItems, store.actionFlag, companyStore?.actionFlag]);

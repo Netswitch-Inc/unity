@@ -190,7 +190,7 @@ const manageConnectionAndCronSchedulers = async () => {
         var toolsPermission = await getToolsPermissions();
         /* Connection Enable/Disable */
         // var updateCnStatusDisableIds = [];
-        // var disableConnections = await ConnetionService.getConnections({ status: true, deletedAt: null, tool_id: { $nin: toolsPermission } })
+        // var disableConnections = await ConnetionService.getConnections({ status: true, deletedAt: null, tool_slug: { $nin: toolsPermission } })
         // if (disableConnections?.length) {
         //     for (let i = 0; i < disableConnections.length; i++) {
         //         let disableConnItm = disableConnections[i]
@@ -203,7 +203,7 @@ const manageConnectionAndCronSchedulers = async () => {
         // }
 
         // var updateCnStatusEnableIds = [];
-        // var enableConnections = await ConnetionService.getConnections({ status: false, deletedAt: { $ne: null }, tool_id: { $in: toolsPermission } })
+        // var enableConnections = await ConnetionService.getConnections({ status: false, deletedAt: { $ne: null }, tool_slug: { $in: toolsPermission } })
         // if (enableConnections?.length) {
         //     for (let i = 0; i < enableConnections.length; i++) {
         //         let enableConnItm = enableConnections[i]
@@ -218,7 +218,7 @@ const manageConnectionAndCronSchedulers = async () => {
 
         /* Cron Scheduler Enable/Disable */
         var updateCrnStatusDisableIds = [];
-        var stopCronSchedulers = await CronSchedulerService.getCronSchedulers({ status: true, deletedAt: null, tool_id: { $nin: toolsPermission } })
+        var stopCronSchedulers = await CronSchedulerService.getCronSchedulers({ status: true, deletedAt: null, tool_slug: { $nin: toolsPermission } })
         if (stopCronSchedulers?.length) {
             for (let i = 0; i < stopCronSchedulers.length; i++) {
                 let stopCronItm = stopCronSchedulers[i]
@@ -234,7 +234,7 @@ const manageConnectionAndCronSchedulers = async () => {
         }
 
         var updateCrnStatusEnableIds = [];
-        var startCronSchedulers = await CronSchedulerService.getCronSchedulers({ status: false, deletedAt: { $ne: null }, tool_id: { $in: toolsPermission } })
+        var startCronSchedulers = await CronSchedulerService.getCronSchedulers({ status: false, deletedAt: { $ne: null }, tool_slug: { $in: toolsPermission } })
         if (startCronSchedulers?.length) {
             for (let i = 0; i < startCronSchedulers.length; i++) {
                 let startCronItm = startCronSchedulers[i]
@@ -314,7 +314,7 @@ const manageCronNextAutorunErrorLogs = async () => {
                             if (moment(cronTime.current).isAfter(jobDetails.nextTime)) {
                                 const payload = {
                                     cron_scheduler_id: cronScheduler?._id || null,
-                                    tool_id: cronScheduler.tool_id || "",
+                                    tool_slug: cronScheduler.tool_slug || "",
                                     date: new Date(),
                                     slug: slug,
                                     cron_style: cronScheduler?.cron_style || "",
@@ -623,7 +623,7 @@ const wazuhIndexerSeverityData = async () => {
             const payload = {
                 connection_id: connection?._id || null,
                 cron_scheduler_id: cronScheduler?._id || null,
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 cron_style: cronScheduler?.cron_style || "",
@@ -659,7 +659,7 @@ const wazuhIndexerSeverityData = async () => {
 
         if (createCronErrorLog) {
             const payload = {
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 connection_type: connectionType,
@@ -787,7 +787,7 @@ const wazuhToolAgentsData = async () => {
             const payload = {
                 connection_id: connection?._id || null,
                 cron_scheduler_id: cronScheduler?._id || null,
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 cron_style: cronScheduler?.cron_style || "",
@@ -823,7 +823,7 @@ const wazuhToolAgentsData = async () => {
 
         if (createCronErrorLog) {
             const payload = {
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 connection_type: connectionType,
@@ -962,7 +962,7 @@ const wazuhToolAgentsConfigurationAssessmentData = async () => {
             const payload = {
                 connection_id: connection?._id || null,
                 cron_scheduler_id: cronScheduler?._id || null,
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 cron_style: cronScheduler?.cron_style || "",
@@ -998,7 +998,7 @@ const wazuhToolAgentsConfigurationAssessmentData = async () => {
 
         if (createCronErrorLog) {
             const payload = {
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 connection_type: connectionType,
@@ -1249,7 +1249,7 @@ const helpdeskSupportTicketData = async () => {
             const payload = {
                 connection_id: connection?._id || null,
                 cron_scheduler_id: cronScheduler?._id || null,
-                tool_id: cronScheduler?.tool_id || wazuhKey,
+                tool_slug: cronScheduler?.tool_slug || wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 cron_style: cronScheduler?.cron_style || "",
@@ -1285,7 +1285,7 @@ const helpdeskSupportTicketData = async () => {
 
         if (createCronErrorLog) {
             const payload = {
-                tool_id: wazuhKey,
+                tool_slug: wazuhKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 connection_type: connectionType,
@@ -1406,7 +1406,7 @@ const netswitchThreatIntelTxtData = async () => {
             const payload = {
                 connection_id: connection?._id || null,
                 cron_scheduler_id: cronScheduler?._id || null,
-                tool_id: cronScheduler?.tool_id || netswitchThreatIntelKey,
+                tool_slug: cronScheduler?.tool_slug || netswitchThreatIntelKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 cron_style: cronScheduler?.cron_style || "",
@@ -1442,7 +1442,7 @@ const netswitchThreatIntelTxtData = async () => {
 
         if (createCronErrorLog) {
             const payload = {
-                tool_id: netswitchThreatIntelKey,
+                tool_slug: netswitchThreatIntelKey,
                 date: currentDate,
                 slug: cronSchdlSlug,
                 connection_type: connectionType,

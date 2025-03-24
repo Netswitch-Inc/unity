@@ -31,9 +31,9 @@ import SimpleSpinner from 'components/spinner/simple-spinner';
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
-// images
-import Opened from "../../assets/img/openpolygon.png"
-import Closed from "../../assets/img/closedpolygon.png"
+// ** SVG Icons
+import openedIcon from "../../assets/img/openedPolygon.svg"
+import closedIcon from "../../assets/img/closedPolygon.svg"
 
 const ModulePermission = () => {
     // ** Hooks
@@ -91,7 +91,8 @@ const ModulePermission = () => {
             can_create: row?.can_create || false,
             can_update: row?.can_update || false,
             can_delete: row?.can_delete || false
-        };
+        }
+
         if (row?.company_id) {
             payload.company_id = row?.company_id?._id || row?.company_id;
         }
@@ -130,8 +131,6 @@ const ModulePermission = () => {
     }
 
     const handleChangeSelectAll = async (checked = false, row) => {
-        console.log("handleChangeSelectAll >>> ",checked);
-        
         const payload = {
             _id: row?._id,
             can_all: checked,
@@ -207,7 +206,7 @@ const ModulePermission = () => {
                                                             }
                                                         }}>
                                                             <span className="check-box-permission user-select-none">
-                                                                <span>{selectedGroup === key ? <img alt="" src={Opened} /> : <img alt="" src={Closed} />}</span>
+                                                                <span>{selectedGroup === key ? (<img alt="" src={openedIcon} />) : (<img alt="" src={closedIcon} />)}</span>
                                                             </span>
                                                             <div className="title text-capitalize mb-0" title={key} htmlFor={key}>{key}</div>
                                                         </div>
@@ -259,14 +258,14 @@ const ModulePermission = () => {
                                                                                 /> */}
 
                                                                                 <label className="checkbox-box text-center">
-                                                                                <input
-                                                                                    id={`can_read-${key}-${index}`}
-                                                                                    name={`can_read-${key}-${index}`}
-                                                                                    type="checkbox"
-                                                                                    className="form-check-input pointer "
-                                                                                    checked={item?.can_read || false}
-                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_read", item)}
-                                                                                />
+                                                                                    <input
+                                                                                        id={`can_read-${key}-${index}`}
+                                                                                        name={`can_read-${key}-${index}`}
+                                                                                        type="checkbox"
+                                                                                        className="form-check-input pointer "
+                                                                                        checked={item?.can_read || false}
+                                                                                        onChange={(event) => handleChange(event?.target?.checked, "can_read", item)}
+                                                                                    />
                                                                                     <span className="checkmark" for={`can_read-${key}-${index}`}></span>
                                                                                 </label>
                                                                             </td>
@@ -280,44 +279,44 @@ const ModulePermission = () => {
                                                                                     onChange={(event) => handleChange(event?.target?.checked, "can_create", item)}
                                                                                 /> */}
                                                                                 <label className="checkbox-box text-center">
-                                                                                <input
-                                                                                    id={`can_create-${key}-${index}`}
-                                                                                    name={`can_create-${key}-${index}`}
-                                                                                    type="checkbox"
-                                                                                    className="form-check-input pointer "
-                                                                                    checked={item?.can_create || false}
-                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_create", item)}
-                                                                                />
+                                                                                    <input
+                                                                                        id={`can_create-${key}-${index}`}
+                                                                                        name={`can_create-${key}-${index}`}
+                                                                                        type="checkbox"
+                                                                                        className="form-check-input pointer "
+                                                                                        checked={item?.can_create || false}
+                                                                                        onChange={(event) => handleChange(event?.target?.checked, "can_create", item)}
+                                                                                    />
                                                                                     <span className="checkmark" for={`can_create-${key}-${index}`}></span>
                                                                                 </label>
                                                                             </td>
 
                                                                             <td className="text-center">
-                                                                            <label className="checkbox-box text-center">
-                                                                                <input
-                                                                                    id={`can_update-${key}-${index}`}
-                                                                                    name={`can_update-${key}-${index}`}
-                                                                                    type="checkbox"
-                                                                                    className="form-check-input pointer "
-                                                                                    checked={item?.can_update || false}
-                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_update", item)}
-                                                                                />
-                                                                                <span className="checkmark" for={`can_update-${key}-${index}`}></span>
-                                                                            </label>
+                                                                                <label className="checkbox-box text-center">
+                                                                                    <input
+                                                                                        id={`can_update-${key}-${index}`}
+                                                                                        name={`can_update-${key}-${index}`}
+                                                                                        type="checkbox"
+                                                                                        className="form-check-input pointer "
+                                                                                        checked={item?.can_update || false}
+                                                                                        onChange={(event) => handleChange(event?.target?.checked, "can_update", item)}
+                                                                                    />
+                                                                                    <span className="checkmark" for={`can_update-${key}-${index}`}></span>
+                                                                                </label>
                                                                             </td>
 
                                                                             <td className="text-center">
-                                                                            <label className="checkbox-box text-center">
-                                                                                <input
-                                                                                    id={`can_delete-${key}-${index}`}
-                                                                                    name={`can_delete-${key}-${index}`}
-                                                                                    type="checkbox"
-                                                                                    className="form-check-input pointer "
-                                                                                    checked={item?.can_delete || false}
-                                                                                    onChange={(event) => handleChange(event?.target?.checked, "can_delete", item)}
-                                                                                />
-                                                                                <span className="checkmark" for={`can_delete-${key}-${index}`}></span>
-                                                                            </label>
+                                                                                <label className="checkbox-box text-center">
+                                                                                    <input
+                                                                                        id={`can_delete-${key}-${index}`}
+                                                                                        name={`can_delete-${key}-${index}`}
+                                                                                        type="checkbox"
+                                                                                        className="form-check-input pointer "
+                                                                                        checked={item?.can_delete || false}
+                                                                                        onChange={(event) => handleChange(event?.target?.checked, "can_delete", item)}
+                                                                                    />
+                                                                                    <span className="checkmark" for={`can_delete-${key}-${index}`}></span>
+                                                                                </label>
                                                                             </td>
                                                                         </tr>
                                                                     ))}

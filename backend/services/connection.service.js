@@ -56,7 +56,7 @@ exports.getConnectionOne = async function (query = {}) {
 
 exports.createConnection = async function (connection) {
     var newConnection = new Connection({
-        tool_id: connection.tool_id ? connection.tool_id : "",
+        tool_slug: connection.tool_slug ? connection.tool_slug : "",
         name: connection.name ? connection.name : "",
         type: connection.type ? connection.type : "",
         description: connection.description ? connection.description : "",
@@ -91,8 +91,8 @@ exports.updateConnection = async function (connection) {
 
     if (!oldConnection) { return false; }
 
-    if (connection.tool_id) {
-        oldConnection.tool_id = connection.tool_id;
+    if (connection.tool_slug) {
+        oldConnection.tool_slug = connection.tool_slug;
     }
 
     if (connection.name) {

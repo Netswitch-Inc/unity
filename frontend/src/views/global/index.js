@@ -37,9 +37,9 @@ import { hostRestApiUrl, superAdminRole } from "utility/reduxConstant";
 // ** Default Avatar
 import defaultAvatar from "assets/img/avatar-default.jpg";
 
-// ** PNG Icons
-import openedIcon from "../../assets/img/openpolygon.png"
-import closedIcon from "../../assets/img/closedpolygon.png"
+// ** SVG Icons
+import openedIcon from "../../assets/img/openedPolygon.svg"
+import closedIcon from "../../assets/img/closedPolygon.svg"
 
 const GlobalSetting = () => {
     const navigate = useNavigate()
@@ -260,7 +260,7 @@ const GlobalSetting = () => {
         }
     }
 
-    return (<>
+    return (
         <div className="content global-management">
             {!store?.loading ? (
                 <SimpleSpinner />
@@ -289,8 +289,9 @@ const GlobalSetting = () => {
 
                                 <CardBody className='m-0 p-0'>
                                     {store?.globalSettingsList.map((group, indexTab) => (
-                                        <div className={`accrodion-permi mt-2 ${selectedAccordion === indexTab ? 'accordion-border-left' : ''}`}
-                                            key={`div_${indexTab}_${group.group_name}`}>
+                                        <div key={`div_${indexTab}_${group.group_name}`} className={classnames("accrodion-permi mt-2", {
+                                            "accordion-border-left": selectedAccordion === indexTab
+                                        })}>
                                             <Button
                                                 color="link"
                                                 className='permission-accordion d-flex align-items-center'
@@ -313,9 +314,8 @@ const GlobalSetting = () => {
                                                 <Row>
                                                     {group.settings.map((setting, ind) => (
                                                         <Col xxs="12" lg="12" xl="12" key={`custom_${setting.slug}`}>
-                                                            <div className={classnames({
-                                                                'full-width': true,
-                                                                '': setting?.type === "select"
+                                                            <div className={classnames("full-width", {
+                                                                "": setting?.type === "select"
                                                             })}>
                                                                 <Label className="col-label w-100">{setting.name}</Label>
                                                                 {setting?.type === "text" ? (
@@ -422,7 +422,7 @@ const GlobalSetting = () => {
                 ) : null}
             </div>
         </div>
-    </>)
+    )
 }
 
 export default GlobalSetting;

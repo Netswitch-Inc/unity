@@ -1,51 +1,48 @@
-import React, { useLayoutEffect, useState } from "react";
-import { Chart } from "react-google-charts";
+import React, { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { netSwitchThreatIntelCountryCount } from "./store/index";
 
+import { Chart } from "react-google-charts";
+
 import {
   CardBody,
+  Dropdown,
   CardTitle,
   CardHeader,
-  Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownToggle,
+  DropdownToggle
 } from "reactstrap";
-import { useNavigate } from "react-router-dom";
+
 import { OptionsForNetSwitchThreatIntelGraph } from "utility/reduxConstant";
-import { useCallback } from "react";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import { useEffect } from "react";
+
+// ** SVG Icons
+import downloadIcon from "assets/img/download.svg";
 
 const NetSwitchThreatIntelChart = () => {
-  const dispatch = useDispatch();
+  // ** Hooks
   const navigate = useNavigate();
+
+  // ** Store Vars
+  const dispatch = useDispatch();
   const store = useSelector((state) => state.dashboard);
   const link = store?.netSwitchThreatIntelCount?.link || "";
 
-  const [timeInterval, setTimeInterval] = useState({
-    label: "Day",
-    value: "day",
-  });
+  // ** States
+  const [timeInterval, setTimeInterval] = useState({ label: "Day", value: "day" });
   const [chartData, setChartData] = useState(["Country", "Threat Count"]);
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggleDropdown = useCallback(
-    () => setDropdownOpen((prevState) => !prevState),
-    []
-  );
 
-  const handleNetSwitchThreatIntelCountData = useCallback(
-    (filterType = timeInterval) => {
-      dispatch(
-        netSwitchThreatIntelCountryCount({
-          timeRange: filterType?.value || "",
-        })
-      );
-    },
-    [dispatch, timeInterval]
-  );
+  const toggleDropdown = useCallback(() => setDropdownOpen((prevState) => !prevState), [])
+
+  const handleNetSwitchThreatIntelCountData = useCallback((filterType = timeInterval, refreshType = "") => {
+    const payload = { timeRange: filterType?.value || "" }
+    if (refreshType) { payload.refresh_type = refreshType; }
+
+    dispatch(netSwitchThreatIntelCountryCount(payload))
+  }, [dispatch, timeInterval])
 
   useLayoutEffect(() => {
     handleNetSwitchThreatIntelCountData();
@@ -54,7 +51,7 @@ const NetSwitchThreatIntelChart = () => {
   const handleFilterGraphData = (values) => {
     setTimeInterval(values);
     handleNetSwitchThreatIntelCountData(values);
-  };
+  }
 
   useEffect(() => {
     if (
@@ -101,22 +98,22 @@ const NetSwitchThreatIntelChart = () => {
       "#34A853",
       "#FF6D00",
       "#8E44AD",
-      "#1ABC9C",
-    ],
-  };
+      "#1ABC9C"
+    ]
+  }
 
-  return (
-    <>
-      <CardHeader>
-        <CardTitle>
-          <div
-            tag="h3"
-            className="cursor-pointer"
-            onClick={() => navigate("/admin/netswitch-threat-intels")}
-          >
-            <i className="tim-icons icon-alert-circle-exc text-primary" />
-            Netswitch Threat Intel
-            <span>
+  return (<>
+    <CardHeader>
+      <CardTitle>
+        <div
+          tag="h3"
+          className="cursor-pointer"
+          onClick={() => navigate("/admin/netswitch-threat-intels")}
+        >
+          <i className="tim-icons icon-alert-circle-exc text-primary" />
+          Threat Intel
+          <span>
+            {link ? (
               <a
                 href={link}
                 target="_blank"
@@ -124,46 +121,58 @@ const NetSwitchThreatIntelChart = () => {
                 className="ml-2"
                 onClick={(event) => event.stopPropagation()}
               >
-                <FaCloudUploadAlt size={20} />
+                <img
+                  alt="Download"
+                  title="Download"
+                  src={downloadIcon}
+                  className="cursor-pointer"
+                />
               </a>
-            </span>
-          </div>
+            ) : null}
+          </span>
+        </div>
 
-          <div>
-            <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-              <DropdownToggle caret>{timeInterval?.label}</DropdownToggle>
-              <DropdownMenu>
-                {OptionsForNetSwitchThreatIntelGraph &&
-                  OptionsForNetSwitchThreatIntelGraph.map((option) => (
-                    <DropdownItem
-                      key={option.value}
-                      onClick={() => handleFilterGraphData(option)}
-                    >
-                      {option.label}
-                    </DropdownItem>
-                  ))}
-              </DropdownMenu>
-            </Dropdown>
+        <div>
+          <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+            <DropdownToggle caret>{timeInterval?.label}</DropdownToggle>
+            <DropdownMenu>
+              {OptionsForNetSwitchThreatIntelGraph &&
+                OptionsForNetSwitchThreatIntelGraph.map((option) => (
+                  <DropdownItem
+                    key={option.value}
+                    onClick={() => handleFilterGraphData(option)}
+                  >
+                    {option.label}
+                  </DropdownItem>
+                ))}
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      </CardTitle>
+    </CardHeader>
+
+    <CardBody>
+      {chartData ? (<>
+        <Chart
+          chartType="PieChart"
+          width="100%"
+          height="300px"
+          data={chartData}
+          options={options}
+        />
+
+        <div className="refresh-buttons mt-3">
+          <div className="cursor-pointer" onClick={() => handleNetSwitchThreatIntelCountData(timeInterval, "threat_intel")}>
+            <i className="tim-icons icon-refresh-01"></i>Refresh
           </div>
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
-        {chartData ? (
-          <Chart
-            chartType="PieChart"
-            width="100%"
-            height="300px"
-            data={chartData}
-            options={options}
-          />
-        ) : (
-          <div className="d-flex justify-content-center align-items-center w-100 h-100">
-            <p>No Data Available</p>
-          </div>
-        )}
-      </CardBody>
-    </>
-  );
-};
+        </div>
+      </>) : (
+        <div className="d-flex justify-content-center align-items-center w-100 h-100">
+          <p>No data available.</p>
+        </div>
+      )}
+    </CardBody>
+  </>)
+}
 
 export default NetSwitchThreatIntelChart;

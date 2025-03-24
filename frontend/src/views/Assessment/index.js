@@ -79,7 +79,7 @@ const AssessmentList = () => {
       dispatch(cleanAssessmentMessage(null));
     }
 
-    if (store?.actionFlag === "ASSESSMENT_DELETED_SUCCSESS") {
+    if (store?.actionFlag === "ASESMNT_DLT_SCS") {
       handleAssesmentLists();
     }
 

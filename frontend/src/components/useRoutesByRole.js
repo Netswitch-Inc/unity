@@ -47,6 +47,10 @@ const useRoutesByRole = () => {
                         flag = toolsPermission.includes(view.toolId) || false;
                     }
 
+                    if (view?.toolId && !permission?.can_read) {
+                        flag = false;
+                    }
+
                     return flag || false;
                 })
 

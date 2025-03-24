@@ -34,8 +34,6 @@ import {
 
 // ** SVG Icons
 import { BiSearch } from "components/SVGIcons";
-
-// ** PNG Icons
 import editIcon from "assets/img/edit.svg";
 import deleteIcon from "assets/img/delete.svg";
 

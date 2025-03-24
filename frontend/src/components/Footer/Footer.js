@@ -3,7 +3,7 @@ import React from "react";
 
 // reactstrap components
 import { Container } from "reactstrap";
-// import { scrolTop } from "utility/Utils";
+// import { scrollTop } from "utility/Utils";
 
 // const company = (process.env.REACT_APP_COM === 'sec' ? 'Securli Limited' : 'Netswitch Inc.')
 const companyUrl = process.env?.REACT_APP_COMPANY_URL || "";

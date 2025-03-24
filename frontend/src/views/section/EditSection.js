@@ -1,235 +1,209 @@
+// ** React Imports
 import React, { useEffect, useState } from "react";
-import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import { updateSection, editSectionRequest } from "./store";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, CardBody } from "reactstrap";
-import ReactSnackBar from "react-js-snackbar";
-import { TiMessages } from "react-icons/ti";
+
+// ** Store & Actions
+import { useDispatch, useSelector } from "react-redux";
+import { updateSection, getSection, cleanSectionMessage } from "./store";
+
+// ** Reactstrap Imports
+import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
+import { Card, CardBody, FormFeedback } from "reactstrap";
+import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
+// ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
+
+// ** Third Party Components
+import ReactSnackBar from "react-js-snackbar";
+import { TiMessages } from "react-icons/ti";
+
 const EditSection = () => {
+  // ** Hooks
   const { id } = useParams();
 
+  // ** Store Vars
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const store = useSelector((state) => state.sections);
+
+  // ** States
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
 
   useEffect(() => {
     const query = { id: id };
-    dispatch(editSectionRequest(query));
+    dispatch(getSection(query));
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (store.actionFlag === "SECTION_UPDATED" && store.success) {
+    if (store.actionFlag || store?.success || store?.error) {
+      dispatch(cleanSectionMessage());
+    }
+
+    if (store.actionFlag === "SCTN_UPDT") {
+      setTimeout(() => {
+        navigate("/admin/sections");
+      }, 2000);
+    }
+
+    if (store?.success) {
       setshowSnackbar(true);
       setSnakbarMessage(store.success);
     }
-    if (store.error) {
+
+    if (store?.error) {
       setshowSnackbar(true);
       setSnakbarMessage(store.error);
     }
-  }, [store.success, store.error, store.actionFlag]);
+  }, [store.success, store.error, store.actionFlag, navigate, dispatch]);
 
   useEffect(() => {
-    if (store.actionFlag === "SECTION_UPDATED" && showSnackBar) {
-      setTimeout(() => {
-        setshowSnackbar(false);
-        setSnakbarMessage("");
-        navigate("/admin/sections");
-      }, 3000);
-    }
-    if (store.error && showSnackBar) {
-      setTimeout(() => {
-        setshowSnackbar(false);
-        setSnakbarMessage("");
-      }, 3000);
-    }
-  }, [showSnackBar, navigate, store.actionFlag, store.error]);
+    setTimeout(() => {
+      setshowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar])
 
   const onSubmit = (values) => {
-    const payload = { ...values };
-    values?.status ? (payload.status = 1) : (payload.status = 0);
-    dispatch(updateSection(payload));
-  };
+    if (values) {
+      const payload = { ...values };
+      values?.status ? (payload.status = 1) : (payload.status = 0);
+      dispatch(updateSection(payload));
+    }
+  }
 
   const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
-    description: Yup.string().required("Description is required"),
-    order: Yup.number()
-      .required("Order is required")
-      .positive("Order must be a positive number")
-      .integer("Order must be an integer"),
-  });
+    name: Yup.string().required("Name is required."),
+    description: Yup.string().required("Description is required."),
+    order: Yup.number().required("Order is required.")
+      .positive("Order must be a positive number.")
+      .integer("Order must be an integer.")
+  })
+
   return (
-    <>
-      <div className="content">
-        {showSnackBar && (
-          <ReactSnackBar
-            Icon={
-              <span>
-                <TiMessages size={25} />
-              </span>
-            }
-            Show={showSnackBar}
-          >
-            {snakebarMessage}
-          </ReactSnackBar>
-        )}
-        <Row>
-          <Col>
-            <Card>
-              <div className="p-0 border-bottom pb-2 card-header row justify-content-between m-0">
-                <h3 className="card-title mb-0 mt-0">Edit Section</h3>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => navigate("/admin/sections")}
-                >
-                  Back
-                  {/* <TiArrowLeft size={25} title="Back" className="ml-2" /> */}
-                </button>
-              </div>
+    <div className="content">
+      {!store?.loading ? (<SimpleSpinner />) : null}
+      <ReactSnackBar Icon={(
+        <span><TiMessages size={25} /></span>
+      )} Show={showSnackBar}>
+        {snakebarMessage}
+      </ReactSnackBar>
 
-              <CardBody className="pl-0 pr-0">
-                <Formik
-                  initialValues={store?.sectionItem}
-                  enableReinitialize={store?.sectionItem}
-                  validationSchema={validationSchema}
-                  onSubmit={onSubmit}
-                >
-                  {({ values, setFieldValue, isSubmitting }) => (
-                    <Form>
-                      <Row className="mb-2">
-                        <Col md={12}>
-                          <BootstrapForm.Group controlId="formGridCompanyName">
-                            <BootstrapForm.Label>Name</BootstrapForm.Label>
-                            <Field
-                              type="text"
-                              name="name"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="name"
-                              component="div"
-                              className="text-danger"
-                            />
-                          </BootstrapForm.Group>
-                        </Col>
-                      </Row>
+      <Row>
+        <Col>
+          <Card>
+            <CardBody className="pl-0 pr-0">
+              <Formik
+                initialValues={store?.sectionItem}
+                enableReinitialize={store?.sectionItem}
+                validationSchema={validationSchema}
+                onSubmit={onSubmit}
+              >
+                {({ values, errors, touched, isSubmitting, setFieldValue }) => (
+                  <Form>
+                    <Row className="mb-2">
+                      <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridFirstName" className="full-width">
+                        <BootstrapForm.Group controlId="formGridCompanyName">
+                          <BootstrapForm.Label className="col-label mt-2">Name</BootstrapForm.Label>
+                          <Field
+                            type="text"
+                            name="name"
+                            className="col-input w-100"
+                          />
+                          {errors.name && touched.name && (
+                            <FormFeedback className="d-block">{errors?.name}</FormFeedback>
+                          )}
+                        </BootstrapForm.Group>
+                      </Col>
 
-                      <Row className="mb-2">
-                        <Col md={12}>
-                          <BootstrapForm.Group controlId="formGridContactNumber">
-                            <BootstrapForm.Label>
-                              Description
-                            </BootstrapForm.Label>
-                            <Field
-                              as="textarea"
-                              name="description"
-                              className="form-control"
-                              rows="3"
-                            />
-                            <ErrorMessage
-                              name="description"
-                              component="div"
-                              className="text-danger"
-                            />
-                          </BootstrapForm.Group>
-                        </Col>
-                      </Row>
+                      <Col xl={12} lg={12} as={BootstrapForm.Group} className="full-width">
+                        <BootstrapForm.Label className="col-label">
+                          Description
+                        </BootstrapForm.Label>
+                        <Field
+                          as="textarea"
+                          name="description"
+                          className="col-input w-100"
+                          rows="3"
+                        />
+                        {errors.description && touched.description && (
+                          <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                        )}
+                      </Col>
 
-                      <Row className="mb-2">
-                        <Col md={6}>
-                          <BootstrapForm.Group controlId="formGridContactNumber">
-                            <BootstrapForm.Label>Order</BootstrapForm.Label>
-                            <Field
-                              type="number"
-                              name="order"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="order"
-                              component="div"
-                              className="text-danger"
-                            />
-                          </BootstrapForm.Group>
-                        </Col>
+                      <Col xl={6} lg={6} as={BootstrapForm.Group} className="full-width">
+                        <BootstrapForm.Label className="col-label">Order</BootstrapForm.Label>
+                        <Field
+                          type="number"
+                          name="order"
+                          className="col-input w-100"
+                        />
+                        {errors.order && touched.order && (
+                          <FormFeedback className="d-block">{errors?.order}</FormFeedback>
+                        )}
+                      </Col>
 
-                        <Col md={6}>
-                          <BootstrapForm.Label>Status</BootstrapForm.Label>
-                          <div className="status-container d-flex row-cols-6">
-                            <div className="form-check">
-                              <input
-                                type="radio"
-                                name="status"
-                                value={1}
-                                checked={values?.status === 1}
-                                id="Active"
-                                onChange={(event) =>
-                                  setFieldValue(
-                                    "status",
-                                    Number(event.target.value)
-                                  )
-                                }
-                                aria-label="Active Status"
-                              />
-                              <label
-                                htmlFor="Active"
-                                className="form-check-label"
-                              >
-                                Active
-                              </label>
-                            </div>
-                            <div className="form-check">
-                              <input
-                                type="radio"
-                                name="status"
-                                value={0}
-                                checked={values?.status === 0}
-                                id="InActive"
-                                onChange={(event) =>
-                                  setFieldValue(
-                                    "status",
-                                    Number(event.target.value)
-                                  )
-                                }
-                                aria-label="Inactive Status"
-                              />
-                              <label
-                                htmlFor="InActive"
-                                className="form-check-label"
-                              >
-                                InActive
-                              </label>
-                            </div>
+                      <Col xl={6} lg={6} as={BootstrapForm.Group} className="full-width">
+                        <BootstrapForm.Label className="col-label">Status</BootstrapForm.Label>
+                        <div className="radio-container d-flex">
+                          <div className="form-check">
+                            <input
+                              value={1}
+                              type="radio"
+                              id="Active"
+                              name="status"
+                              className="mx-2"
+                              aria-label="Active Status"
+                              checked={values?.status === 1}
+                              onChange={(event) => setFieldValue("status", Number(event.target.value))}
+                            />
+                            <label htmlFor="Active" className="form-check-label">Active</label>
                           </div>
-                        </Col>
-                      </Row>
-                      <div className="w-100 PadR0 ItemInfo-right mt-3">
-                        <div className="row justify-content-end m-0">
-                          <button
-                            type="submit"
-                            className="float-end btn btn-primary"
-                            disabled={isSubmitting}
-                          >
-                            Submit
-                          </button>
+
+                          <div className="form-check">
+                            <input
+                              value={0}
+                              type="radio"
+                              name="status"
+                              id="InActive"
+                              className="mx-2"
+                              aria-label="Inactive Status"
+                              checked={values?.status === 0}
+                              onChange={(event) => setFieldValue("status", Number(event.target.value))}
+                            />
+                            <label htmlFor="InActive" className="form-check-label">InActive</label>
+                          </div>
                         </div>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
-  );
-};
+                      </Col>
+                    </Row>
+
+                    <div className="buttons">
+                      <button
+                        type="submit"
+                        className="btnprimary"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btnsecondary ml-3"
+                        onClick={() => navigate("/admin/sections")}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  )
+}
 
 export default EditSection;

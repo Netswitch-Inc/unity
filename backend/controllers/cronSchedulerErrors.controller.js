@@ -19,12 +19,12 @@ exports.getCronSchedulerErrors = async function (req, res, next) {
         var query = { deletedAt: null }
 
         var toolsPermission = await getToolsPermissions() || [];
-        query.tool_id = { $in: toolsPermission }
+        query.tool_slug = { $in: toolsPermission }
 
         if (search) {
             search = search.trim();
             query["$or"] = [
-                { tool_id: { $regex: search, $options: 'i' } },
+                { tool_slug: { $regex: search, $options: 'i' } },
                 { slug: { $regex: search, $options: 'i' } },
                 { cron_style: { $regex: search, $options: 'i' } },
                 { description: { $regex: search, $options: 'i' } }

@@ -96,6 +96,7 @@ async function compressPdfFile(inputPath, outputPath) {
   const buffer = await pdfCompress.compress(inputPath);
   await fs.promises.writeFile(outputPath, buffer);
 }
+
 const generateReport = async (
   assessmentReport,
   file_name,
@@ -157,7 +158,7 @@ const generateReport = async (
     console.error("Error generating report:", error?.message);
     return error?.message;
   }
-};
+}
 
 // Async Controller function to get the To do List
 exports.getAssessmentReports = async function (req, res, next) {
@@ -230,38 +231,32 @@ exports.getAssessmentReports = async function (req, res, next) {
       flag: true,
       data: assessmentReports,
       pagination,
-      message: "Assessment Reports received successfully!",
+      message: "Assessment Reports received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.getAssessmentReport = async function (req, res, next) {
   // Check the existence of the query parameters, If doesn't exists assign a default value
   var id = req.params.id;
   try {
-    var assessmentReport = await AssessmentReportService.getAssessmentReport(
-      id
-    );
+    var assessmentReport = await AssessmentReportService.getAssessmentReport(id)
 
     // Return the Assessment Report with the appropriate HTTP password Code and Message.
     return res.status(200).json({
       status: 200,
       flag: true,
       data: assessmentReport,
-      message: "Assessment Report received successfully!",
+      message: "Assessment Report received successfully."
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.createAssessmentReport = async function (req, res, next) {
   try {
@@ -315,11 +310,9 @@ exports.createAssessmentReport = async function (req, res, next) {
     });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.updateAssessmentReport = async function (req, res, next) {
   // Id is necessary for the update
@@ -370,7 +363,7 @@ exports.updateAssessmentReport = async function (req, res, next) {
     // Return an Error Response Message with Code and the Error Message.
     return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.removeAssessmentReport = async function (req, res, next) {
   var id = req.params.id;
@@ -383,16 +376,12 @@ exports.removeAssessmentReport = async function (req, res, next) {
   try {
     var deleted = await AssessmentReportService.deleteAssessmentReport(id);
 
-    return res
-      .status(200)
-      .send({ status: 200, flag: true, message: "Successfully Deleted... " });
+    return res.status(200).json({ status: 200, flag: true, message: "Successfully Deleted... " });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: e.message });
   }
-};
+}
 
 exports.verifyAssessmentReport = async function (req, res, next) {
   try {
@@ -401,9 +390,7 @@ exports.verifyAssessmentReport = async function (req, res, next) {
     let mobile_verified = false;
     // Validate input
     if (!_id) {
-      return res
-        .status(200)
-        .json({ status: 200, flag: false, message: "Id is required" });
+      return res.status(200).json({ status: 200, flag: false, message: "Id is required." });
     }
     const email_verification = await AssessmentReportService.getDataOfReport({
       _id,
@@ -430,37 +417,34 @@ exports.verifyAssessmentReport = async function (req, res, next) {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "Mobile verification code not matched.",
+        message: "Mobile verification code not matched."
       });
     }
+
     if (!email_verified) {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "Email verification code not matched.",
-      });
+        message: "Email verification code not matched."
+      })
     }
 
     if (mobile_verification && email_verification) {
       const payload = { _id: _id, email_verified: true, mobile_verified: true };
       await AssessmentReportService.updateAssessmentReport(payload);
-      return res
-        .status(200)
-        .json({ status: 200, flag: true, message: "Verification successful!" });
+      return res.status(200).json({ status: 200, flag: true, message: "Verification successful." });
     } else {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "Verification codes do not match.",
-      });
+        message: "Verification codes do not match."
+      })
     }
   } catch (error) {
     console.error("Verification error:", error); // Log the error for debugging
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: "Internal server error." });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.generateAssessmentReport = async function (req, res, next) {
   try {
@@ -494,40 +478,28 @@ exports.generateAssessmentReport = async function (req, res, next) {
       status: 200,
       flag: true,
       // data: generatdPdf,
-      message: "Test report",
+      message: "Test report"
     });
   } catch (error) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: error.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.sentAttachmentReportViaEmail = async function (req, res, next) {
   try {
     const { assessment_id, assessment_report_id } = req.body;
 
     // Step 1: Retrieve the data for the assessment report
-    const assessmentReport = await AssessmentReportService.getAssessmentReport(
-      assessment_report_id
-    );
-    if (
-      !assessmentReport?.pdf_path ||
-      assessmentReport?.pdf_path === "" ||
-      !fs.existsSync(
-        pdfpathexistance +
-        `/files/assessment-report/${assessment_report_id}.pdf`
-      )
+    const assessmentReport = await AssessmentReportService.getAssessmentReport(assessment_report_id)
+    if (!assessmentReport?.pdf_path || assessmentReport?.pdf_path === "" || !fs.existsSync(`${pdfpathexistance}/files/assessment-report/${assessment_report_id}.pdf`)
     ) {
-      const data = await QuestionService.getSectionsWithQuestionsAndAnswers(
-        assessment_id,
-        assessment_report_id
-      );
+      const data = await QuestionService.getSectionsWithQuestionsAndAnswers(assessment_id, assessment_report_id)
       await generateReport(data, assessment_report_id, assessmentReport);
       const payload = {
         _id: assessment_report_id,
-        pdf_path: `files/assessment-report/${assessment_report_id}.pdf`,
-      };
+        pdf_path: `files/assessment-report/${assessment_report_id}.pdf`
+      }
+
       await AssessmentReportService.updateAssessmentReport(payload);
     }
 
@@ -535,13 +507,11 @@ exports.sentAttachmentReportViaEmail = async function (req, res, next) {
       to: assessmentReport?.email || assessmentReport?.name, // Ensure to use the correct email field
       subject: "Assessment Report",
       text: "Assessment Report Details",
-      attachments: [
-        {
-          filename: `${assessment_report_id}.pdf`, // Adjust based on your file type
-          path: `${process.env.BACK_UNITY_URL}/files/assessment-report/${assessment_report_id}.pdf`, // Correct path
-        },
-      ],
-    };
+      attachments: [{
+        filename: `${assessment_report_id}.pdf`, // Adjust based on your file type
+        path: `${process.env?.BACK_UNITY_URL}/files/assessment-report/${assessment_report_id}.pdf`, // Correct path
+      }]
+    }
 
     // Step 5: Send the email with the attachment
     await MailService.sendEmailWithAttachment(emailOptions);
@@ -549,23 +519,19 @@ exports.sentAttachmentReportViaEmail = async function (req, res, next) {
     // Step 6: Respond to the client
     return res.status(200).json({ message: "Email sent successfully." });
   } catch (error) {
-    console.error("Error sending email:", error?.message);
+    console.error("Error sending email:", error?.message)
     // Step 7: Handle errors
-    return res.status(500).json({ error: "Failed to send email." });
+    return res.status(200).json({ message: error.message })
   }
-};
+}
 
 exports.sendSMSPostment = async function (req, res, next) {
   try {
     const response = await sendVerification("+917990905282");
     if (response) {
-      return res
-        .status(200)
-        .json({ status: 200, flag: true, message: "SMS sent successfully!" });
+      return res.status(200).json({ status: 200, flag: true, message: "SMS sent successfully." });
     }
   } catch (error) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: false, message: error.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message })
   }
-};
+}

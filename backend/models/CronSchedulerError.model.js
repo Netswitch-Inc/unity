@@ -4,7 +4,7 @@ var mongoosePaginate = require('mongoose-paginate')
 var CronSchedulerErrorSchema = new mongoose.Schema({
     connection_id: { type: mongoose.Schema.Types.ObjectId, ref: 'connections' },
     cron_scheduler_id: { type: mongoose.Schema.Types.ObjectId, ref: 'cron_schedulers' },
-    tool_id: String,
+    tool_slug: String,
     date: Date,
     slug: String,
     cron_style: String, /* input or editor value */

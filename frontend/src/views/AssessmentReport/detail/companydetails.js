@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
-import { editAssessmentReportRequest } from "views/userAssest/store";
+import { getAssessmentReport } from "views/userAssest/store";
 
 // ** Reactstrap Imports
 import { Col, Row, FormGroup } from "reactstrap"
@@ -21,7 +21,7 @@ const AssessmentReportCompanyDetails = () => {
     const [assessmentReportData, setAssessmentReportData] = useState(null);
 
     useLayoutEffect(() => {
-        dispatch(editAssessmentReportRequest({ id }));
+        dispatch(getAssessmentReport({ id }));
     }, [dispatch]);
 
     useEffect(() => {

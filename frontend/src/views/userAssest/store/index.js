@@ -7,350 +7,305 @@ import instance from "../../../utility/AxiosConfig";
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
 
 async function verifyAssessmentReport(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.AssessmentReport.verify}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.assessmentReports.verify}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const verifyCodeAssessmentReport = createAsyncThunk(
-  "appAssessmentReports/VerifyAssessmentReport",
-  async (payload) => {
-    try {
-      const response = await verifyAssessmentReport(payload);
-      if (response && response.flag) {
-        return {
-          actionFlag: "VARIFIED",
-          success: response?.message,
-          error: "",
-        };
-      } else {
-        return {
-          actionFlag: "VARIFIED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const verifyCodeAssessmentReport = createAsyncThunk("appAssessmentReports/verifyCodeAssessmentReport", async (payload) => {
+  try {
+    const response = await verifyAssessmentReport(payload);
+    if (response && response.flag) {
       return {
-        actionFlag: "VARIFIED_ERROR",
+        actionFlag: "CD_VRFYD_SCS",
+        success: response?.message,
+        error: ""
+      }
+    } else {
+      return {
+        actionFlag: "CD_VRFYD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      actionFlag: "CD_VRFYD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createAssessmentPdf(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.AssessmentReport.pdfcreate}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.assessmentReports.pdfcreate}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const assessmentReportPdf = createAsyncThunk(
-  "appAssessmentReports/AssessmentReportPdf",
-  async (payload) => {
-    try {
-      const response = await createAssessmentPdf(payload);
-      if (response && response.flag) {
-        return {
-          actionFlag: "ASSESSMENT_REPORT_PDF",
-          success: response?.message,
-          error: "",
-        };
-      } else {
-        return {
-          actionFlag: "ASSESSMENT_REPORT_PDF_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const assessmentReportPdf = createAsyncThunk("appAssessmentReports/assessmentReportPdf", async (payload) => {
+  try {
+    const response = await createAssessmentPdf(payload);
+    if (response && response.flag) {
       return {
-        actionFlag: "ASSESSMENT_REPORT_PDF_ERROR",
+        actionFlag: "ASSMT_RPRT_PDF_SCS",
+        success: response?.message,
+        error: ""
+      }
+    } else {
+      return {
+        actionFlag: "ASSMT_RPRT_PDF_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      actionFlag: "ASSMT_RPRT_PDF_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createAssessmentPdfSentemail(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.AssessmentReport.sendpdfemail}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.assessmentReports.sendpdfemail}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const assessmentReportPdfSentEmail = createAsyncThunk(
-  "appAssessmentReports/AssessmentReportPdfSentEmail",
-  async (payload) => {
-    try {
-      const response = await createAssessmentPdfSentemail(payload);
-      if (response && response.flag) {
-        return {
-          actionFlag: "ASSESSMENT_REPORT_PDF_SENT_EMAIL",
-          success: response?.message,
-          error: "",
-        };
-      } else {
-        return {
-          actionFlag: "ASSESSMENT_REPORT_PDF_SENT_EMAIL_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const assessmentReportPdfSentEmail = createAsyncThunk("appAssessmentReports/assessmentReportPdfSentEmail", async (payload) => {
+  try {
+    const response = await createAssessmentPdfSentemail(payload);
+    if (response && response.flag) {
       return {
-        actionFlag: "ASSESSMENT_REPORT_PDF_SENT_EMAIL_ERROR",
+        actionFlag: "ASSMT_RPRT_PDF_SNT_EML_SCS",
+        success: response?.message,
+        error: ""
+      }
+    } else {
+      return {
+        actionFlag: "ASSMT_RPRT_PDF_SNT_EML_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      actionFlag: "ASSMT_RPRT_PDF_SNT_EML_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function getAssessmentReportListRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.AssessmentReport.listing}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.assessmentReports.list}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getAssessmentReportList = createAsyncThunk(
-  "appAssessmentReports/getAssessmentReportList",
-  async (params) => {
-    try {
-      const response = await getAssessmentReportListRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          assessmentReportItems: response?.data || [],
-          pagination: response?.pagination || null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          assessmentReportItems: [],
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const getAssessmentReportList = createAsyncThunk("appAssessmentReports/getAssessmentReportList", async (params) => {
+  try {
+    const response = await getAssessmentReportListRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        assessmentReportItems: response?.data || [],
+        pagination: response?.pagination || null,
+        actionFlag: "ASSMT_RPRT_LST",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         assessmentReportItems: [],
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      assessmentReportItems: [],
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function getAssessmentReportAnswersListRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.AssessmentReport.assessmentAnswers}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.assessmentReports.assessmentAnswers}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getAssessmentReportAnswersList = createAsyncThunk(
-  "appAssessmentReports/getAssessmentAnswerReportList",
-  async (params) => {
-    try {
-      const response = await getAssessmentReportAnswersListRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          asessmentReportAnswers: response?.data || [],
-          // pagination: response?.pagination || null,
-          actionFlag: "ASSESSMENT_REPORT_ANSWER_LISTING",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          asessmentReportAnswers: [],
-          actionFlag: "ASSESSMENT_REPORT_ANSWER_LISTING_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const getAssessmentReportAnswersList = createAsyncThunk("appAssessmentReports/getAssessmentReportAnswersList", async (params) => {
+  try {
+    const response = await getAssessmentReportAnswersListRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        asessmentReportAnswers: response?.data || [],
+        actionFlag: "ASSMT_RPRT_ANSR_LST",
+        success: "",
+        error: "",
+      };
+    } else {
       return {
         params,
         asessmentReportAnswers: [],
-        actionFlag: "ASSESSMENT_REPORT_ANSWER_LISTING_ERROR",
+        actionFlag: "ASSMT_RPRT_ANSR_LST_ERR",
         success: "",
-        error: error,
+        error: response.message,
       };
     }
+  } catch (error) {
+    return {
+      params,
+      asessmentReportAnswers: [],
+      actionFlag: "ASSMT_RPRT_ANSR_LST_ERR",
+      success: "",
+      error: error
+    }
   }
-);
+})
 
-async function editRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.AssessmentReport.edit}/${params?.id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+async function getAssessmentReportRequest(params) {
+  return instance.get(`${API_ENDPOINTS.assessmentReports.get}/${params?.id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const editAssessmentReportRequest = createAsyncThunk(
-  "appAssessmentReports/editAssessmentReports",
-  async (params) => {
-    try {
-      const response = await editRequest(params);
-      if (response && response.flag) {
-        return {
-          assessmentReportItem: response.data,
-          actionFlag: "ASSESSMENT_REPORT_GET",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          assessmentReportItem: null,
-          actionFlag: "ASSESSMENT_REPORT_GET_ERROR",
-          success: "",
-          error: "",
-        };
+export const getAssessmentReport = createAsyncThunk("appAssessmentReports/getAssessmentReport", async (params) => {
+  try {
+    const response = await getAssessmentReportRequest(params);
+    if (response && response.flag) {
+      return {
+        assessmentReportItem: response.data,
+        actionFlag: "ASSMT_RPRT_ITM_SCS",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         assessmentReportItem: null,
-        actionFlag: "ASSESSMENT_REPORT_GET_ERROR",
+        actionFlag: "ASSMT_RPRT_ITM_ERR",
         success: "",
-        error: error,
-      };
+        error: ""
+      }
+    }
+  } catch (error) {
+    return {
+      assessmentReportItem: null,
+      actionFlag: "ASSMT_RPRT_ITM_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createAssessmentReportRequest(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.AssessmentReport.create}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.assessmentReports.create}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const createAssessmentReport = createAsyncThunk(
-  "appAssessmentReports/createAssessmentReport",
-  async (payload) => {
-    try {
-      const response = await createAssessmentReportRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          addAssessmentReportItem: response.data || null,
-          actionFlag: "ASSESSMENT_REPORT_CREATED",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "ASSESSMENT_REPORT_CREATED_ERRROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const createAssessmentReport = createAsyncThunk("appAssessmentReports/createAssessmentReport", async (payload) => {
+  try {
+    const response = await createAssessmentReportRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "ASSESSMENT_REPORT_CREATED_ERRROR",
+        addAssessmentReportItem: response?.data || null,
+        assessmentReportItem: response?.data || null,
+        actionFlag: "ASSMT_RPRT_CRTD_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "ASSMT_RPRT_CRTD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "ASSMT_RPRT_CRTD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function updateAssessmentReportRequest(payload) {
-  return instance
-    .put(`${API_ENDPOINTS.AssessmentReport.update}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.put(`${API_ENDPOINTS.assessmentReports.update}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const updateAssessmentReport = createAsyncThunk(
-  "appAssessmentReports/updateAssessmentReport",
-  async (payload) => {
-    try {
-      const response = await updateAssessmentReportRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          // AssessmentReportItem: response.data || null,
-          actionFlag: "ASSESSMENT_REPORT_UPDATED",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "ASSESSMENT_REPORT_UPDATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const updateAssessmentReport = createAsyncThunk("appAssessmentReports/updateAssessmentReport", async (payload) => {
+  try {
+    const response = await updateAssessmentReportRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "ASSESSMENT_REPORT_UPDATED_ERROR",
+        assessmentReportItem: response?.data || null,
+        actionFlag: "ASSMT_RPRT_UPDT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "ASSMT_RPRT_UPDT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "ASSMT_RPRT_UPDT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function deleteAssessmentReportRequest(id) {
-  return instance
-    .delete(`${API_ENDPOINTS.AssessmentReport.delete}/${id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.delete(`${API_ENDPOINTS.assessmentReports.delete}/${id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const deleteAssessmentReport = createAsyncThunk(
-  "appAssessmentReports/deleteAssessmentReport",
-  async (id) => {
-    try {
-      const response = await deleteAssessmentReportRequest(id);
-      if (response && response.flag) {
-        return {
-          id,
-          actionFlag: "ASSMT_RPRT_DLT_SCS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          id,
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const deleteAssessmentReport = createAsyncThunk("appAssessmentReports/deleteAssessmentReport", async (id) => {
+  try {
+    const response = await deleteAssessmentReportRequest(id);
+    if (response && response.flag) {
+      return {
+        id,
+        actionFlag: "ASSMT_RPRT_DLT_SCS",
+        success: response?.message || "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         id,
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      id,
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 // Create a slice
-const appAuthSlice = createSlice({
+const appAssessmentReportSlice = createSlice({
   name: "appAssessmentReports",
   initialState: {
     assessmentReportItems: [],
@@ -370,7 +325,7 @@ const appAuthSlice = createSlice({
       state.error = "";
       state.addAssessmentReportItem = null;
       state.assessmentReportItem = null;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -381,12 +336,10 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(getAssessmentReportList.fulfilled, (state, action) => {
-        state.assessmentReportItems =
-          action.payload?.assessmentReportItems || [];
+        state.assessmentReportItems = action.payload?.assessmentReportItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
-        state.actionFlag =
-          action.payload?.actionFlag || "ASSESSMENT_REPORT_LISTING";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -402,11 +355,9 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(getAssessmentReportAnswersList.fulfilled, (state, action) => {
-        state.asessmentReportAnswers =
-          action.payload?.asessmentReportAnswers || [];
-        // state.pagination = action.payload?.pagination || null;
+        state.asessmentReportAnswers = action.payload?.asessmentReportAnswers || [];
         state.loading = true;
-        state.actionFlag = "ASSESSMENT_REPORT_ANSWER_LISTING";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -415,10 +366,9 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       })
-      .addCase(editAssessmentReportRequest.fulfilled, (state, action) => {
-        state.type = "EDIT";
-        state.loading = true;
+      .addCase(getAssessmentReport.fulfilled, (state, action) => {
         state.assessmentReportItem = action.payload.assessmentReportItem;
+        state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload.success;
         state.error = action.payload.error;
@@ -429,8 +379,8 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(createAssessmentReport.fulfilled, (state, action) => {
-        state.addAssessmentReportItem =
-          action.payload?.addAssessmentReportItem || null;
+        state.addAssessmentReportItem = action.payload?.assessmentReportItem || null;
+        state.assessmentReportItem = action.payload?.assessmentReportItem || null;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -495,10 +445,9 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(updateAssessmentReport.fulfilled, (state, action) => {
-        // state.AssessmentReportItem = action.payload?.AssessmentReportItem || null;
+        state.assessmentReportItem = action.payload?.assessmentReportItem || null;
         state.loading = true;
-        state.actionFlag =
-          action.payload?.actionFlag || "ASSESSMENT_REPORT_UPDATED";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -514,8 +463,7 @@ const appAuthSlice = createSlice({
       })
       .addCase(deleteAssessmentReport.fulfilled, (state, action) => {
         state.loading = true;
-        state.actionFlag =
-          action.payload?.actionFlag || "ASSESSMENT_REPORT_DELETED";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -524,9 +472,9 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       });
-  },
+  }
 });
 
-export const { cleanAssessmentReportMessage } = appAuthSlice.actions;
+export const { cleanAssessmentReportMessage } = appAssessmentReportSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appAssessmentReportSlice.reducer;

@@ -19,7 +19,7 @@ exports.getConnectiones = async function (req, res, next) {
         var query = { deletedAt: null }
 
         var toolsPermission = await getToolsPermissions() || [];
-        query.tool_id = { $in: toolsPermission }
+        query.tool_slug = { $in: toolsPermission }
 
         if (search) {
             search = search.trim();

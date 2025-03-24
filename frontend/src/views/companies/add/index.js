@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { createComapany, cleanCompanyMessage } from "../store";
+import { createCompany, cleanCompanyMessage } from "../store";
 import { cleanAuthMessage, getEmailExist, getUsernameExist } from "views/login/store";
 
 // ** Reactstrap Imports
@@ -104,8 +104,8 @@ const AddComapny = () => {
     }
 
     if (
-      store?.actionFlag === "CREAT" ||
-      store?.actionFlag === "COMPANY_UPDATED"
+      store?.actionFlag === "COMPANY_CRTD" ||
+      store?.actionFlag === "COMPANY_UPDT"
     ) {
       setTimeout(() => {
         navigate("/admin/companies");
@@ -184,7 +184,7 @@ const AddComapny = () => {
         payload.logo = imagePreviewUrl;
       }
 
-      dispatch(createComapany(payload));
+      dispatch(createCompany(payload));
     }
   };
 

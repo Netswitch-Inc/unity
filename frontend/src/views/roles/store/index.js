@@ -9,9 +9,8 @@ import { API_ENDPOINTS } from "utility/ApiEndPoints";
 import { roleItem } from "utility/reduxConstant";
 
 async function getRoleListRequest(params) {
-    return instance.get(`${API_ENDPOINTS.role.listing}`, { params })
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.get(`${API_ENDPOINTS.roles.list}`, { params })
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const getRoleList = createAsyncThunk("appRoles/getRoleList", async (params) => {
@@ -22,10 +21,10 @@ export const getRoleList = createAsyncThunk("appRoles/getRoleList", async (param
                 params,
                 roleItems: response?.data || [],
                 pagination: response?.pagination || null,
-                actionFlag: "ROLE_LISTING",
+                actionFlag: "ROLE_LST",
                 success: "",
                 error: ""
-            };
+            }
         } else {
             return {
                 params,
@@ -33,7 +32,7 @@ export const getRoleList = createAsyncThunk("appRoles/getRoleList", async (param
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -42,14 +41,13 @@ export const getRoleList = createAsyncThunk("appRoles/getRoleList", async (param
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 
 async function createRoleRequest(payload) {
-    return instance.post(`${API_ENDPOINTS.role.create}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.post(`${API_ENDPOINTS.roles.create}`, payload)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const createRole = createAsyncThunk("appRoles/createRole", async (payload) => {
@@ -79,12 +77,11 @@ export const createRole = createAsyncThunk("appRoles/createRole", async (payload
             error: error
         };
     }
-});
+})
 
 async function updateRoleRequest(payload) {
-    return instance.put(`${API_ENDPOINTS.role.update}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.put(`${API_ENDPOINTS.roles.update}`, payload)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const updateRole = createAsyncThunk("appRoles/updateRole", async (payload) => {
@@ -97,14 +94,14 @@ export const updateRole = createAsyncThunk("appRoles/updateRole", async (payload
                 actionFlag: "ROLE_UPDATED",
                 success: response?.message || "",
                 error: ""
-            };
+            }
         } else {
             return {
                 payload,
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -112,14 +109,13 @@ export const updateRole = createAsyncThunk("appRoles/updateRole", async (payload
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 
 async function deleteRoleRequest(id) {
-    return instance.delete(`${API_ENDPOINTS.role.delete}/${id}`)
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.delete(`${API_ENDPOINTS.roles.delete}/${id}`)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const deleteRole = createAsyncThunk("appRoles/deleteRole", async (id) => {
@@ -131,14 +127,14 @@ export const deleteRole = createAsyncThunk("appRoles/deleteRole", async (id) => 
                 actionFlag: "ROLE_DELETED",
                 success: response?.message || "",
                 error: ""
-            };
+            }
         } else {
             return {
                 id,
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -146,15 +142,14 @@ export const deleteRole = createAsyncThunk("appRoles/deleteRole", async (id) => 
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 
 /* Permission */
 async function createRolePermissionRequest(payload) {
-    return instance.post(`${API_ENDPOINTS.permission.create}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.post(`${API_ENDPOINTS.permissions.create}`, payload)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const createRolePermission = createAsyncThunk("appRoles/createRolePermission", async (payload) => {
@@ -166,14 +161,14 @@ export const createRolePermission = createAsyncThunk("appRoles/createRolePermiss
                 actionFlag: "PERMISSION_CREATED",
                 success: response?.message || "",
                 error: ""
-            };
+            }
         } else {
             return {
                 payload,
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -181,14 +176,13 @@ export const createRolePermission = createAsyncThunk("appRoles/createRolePermiss
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 
 async function updateRolePermissionRequest(payload) {
-    return instance.put(`${API_ENDPOINTS.permission.update}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.put(`${API_ENDPOINTS.permissions.update}`, payload)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const updateRolePermission = createAsyncThunk("appRoles/updateRolePermission", async (payload) => {
@@ -200,14 +194,14 @@ export const updateRolePermission = createAsyncThunk("appRoles/updateRolePermiss
                 actionFlag: "PERMISSION_UPDATED",
                 success: response?.message || "",
                 error: ""
-            };
+            }
         } else {
             return {
                 payload,
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -215,14 +209,13 @@ export const updateRolePermission = createAsyncThunk("appRoles/updateRolePermiss
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 
 async function getRolePermissionsRequest(params) {
-    return instance.get(`${API_ENDPOINTS.permission.rolePermission}`, { params })
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.get(`${API_ENDPOINTS.permissions.rolePermission}`, { params })
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const getRolePermissions = createAsyncThunk("appRoles/getRolePermissions", async (params) => {
@@ -236,7 +229,7 @@ export const getRolePermissions = createAsyncThunk("appRoles/getRolePermissions"
                 actionFlag: "ROLE_PERMISSION",
                 success: "",
                 error: ""
-            };
+            }
         } else {
             return {
                 params,
@@ -244,7 +237,7 @@ export const getRolePermissions = createAsyncThunk("appRoles/getRolePermissions"
                 actionFlag: "",
                 success: "",
                 error: response.message
-            };
+            }
         }
     } catch (error) {
         return {
@@ -253,13 +246,13 @@ export const getRolePermissions = createAsyncThunk("appRoles/getRolePermissions"
             actionFlag: "",
             success: "",
             error: error
-        };
+        }
     }
-});
+})
 /* /Permission */
 
 // Create a slice
-const appAuthSlice = createSlice({
+const appRoleSlice = createSlice({
     name: 'appRoles',
     initialState: {
         roleItems: [],
@@ -403,12 +396,9 @@ const appAuthSlice = createSlice({
                 state.error = "";
             })
         /* /Permission */
-    },
-
+    }
 });
 
-export const {
-    cleanRoleMessage,
-} = appAuthSlice.actions;
+export const { cleanRoleMessage } = appRoleSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appRoleSlice.reducer;

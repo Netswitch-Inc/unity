@@ -5,295 +5,260 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../../utility/AxiosConfig";
 
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
-import { initialQuestion } from "utility/reduxConstant";
+import { initQuestion } from "utility/reduxConstant";
 
 async function getQuestionListRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.question.listing}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.questions.list}`, { params })
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const getQuestionList = createAsyncThunk(
-  "appQuestion/getConnectionList",
-  async (params) => {
-    try {
-      const response = await getQuestionListRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          questionItems: response?.data || [],
-          pagination: response?.pagination || null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          questionItems: [],
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const getQuestionList = createAsyncThunk("appQuestions/getQuestionList", async (params) => {
+  try {
+    const response = await getQuestionListRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        questionItems: response?.data || [],
+        pagination: response?.pagination || null,
+        actionFlag: "QESTN_LST",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         questionItems: [],
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      questionItems: [],
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function getQuestionListFilterRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.question.questionFilter}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.questions.questionFilter}`, { params })
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const getQuestionListFilter = createAsyncThunk(
-  "appQuestion/getQuestionFilterList",
-  async (params) => {
-    try {
-      const response = await getQuestionListFilterRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          questionItemsFilterd: response?.data || [],
-          actionFlag: "QUESTION_LIST_FILTERED_SUCCESS",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          questionItemsFilterd: [],
-          actionFlag: "QUESTION_LIST_FILTERED_ERROR",
-          success: "",
-          error: response.message,
-        };
+export const getQuestionListFilter = createAsyncThunk("appQuestions/getQuestionListFilter", async (params) => {
+  try {
+    const response = await getQuestionListFilterRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        questionItemsFilterd: response?.data || [],
+        actionFlag: "QESTN_LST_FLTRD_SCS",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         questionItemsFilterd: [],
-        actionFlag: "QUESTION_LIST_FILTERED_ERROR",
+        actionFlag: "QESTN_LST_FLTRD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      questionItemsFilterd: [],
+      actionFlag: "QESTN_LST_FLTRD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
-async function editRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.question.edit}/${params?.id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+async function getQuestionRequest(params) {
+  return instance.get(`${API_ENDPOINTS.questions.get}/${params?.id}`)
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const editQuestionRequest = createAsyncThunk(
-  "appQuestion/editConnections",
-  async (params) => {
-    try {
-      const response = await editRequest(params);
-      if (response && response.flag) {
-        return {
-          questionItem: response.data,
-          actionFlag: "GET_QUESTION_DATA_SUCCESS",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          questionItem: null,
-          actionFlag: "GET_QUESTION_DATA_ERROR",
-          success: "",
-          error: "",
-        };
+export const getQuestion = createAsyncThunk("appQuestions/getQuestion", async (params) => {
+  try {
+    const response = await getQuestionRequest(params);
+    if (response && response.flag) {
+      return {
+        questionItem: response?.data || null,
+        actionFlag: "QESTN_ITM_SCS",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         questionItem: null,
-        actionFlag: "GET_QUESTION_DATA_ERROR",
+        actionFlag: "QESTN_ITM_ERR",
         success: "",
-        error: error,
-      };
+        error: ""
+      }
+    }
+  } catch (error) {
+    return {
+      questionItem: null,
+      actionFlag: "QESTN_ITM_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createQuestionRequest(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.question.create}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.questions.create}`, payload)
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const createQuestion = createAsyncThunk(
-  "appQuestion/createQuestion",
-  async (payload) => {
-    try {
-      const response = await createQuestionRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          questionItem: response.data || null,
-          actionFlag: "QUESTION_CREATED_SUCCESS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "QUESTION_CREATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const createQuestion = createAsyncThunk("appQuestions/createQuestion", async (payload) => {
+  try {
+    const response = await createQuestionRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "QUESTION_CREATED_ERROR",
+        questionItem: response.data || null,
+        actionFlag: "QESTN_CRTD_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "QESTN_CRTD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "QESTN_CRTD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function updateBulkOrderQuestionRequest(payload) {
-  return instance
-    .put(`${API_ENDPOINTS.question.bulkorderupdate}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.put(`${API_ENDPOINTS.questions.bulkorderupdate}`, payload)
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const updateBulkOrderQuestion = createAsyncThunk(
-  "appQuestion/updateBulkOrderQuestion",
-  async (payload) => {
-    try {
-      const response = await updateBulkOrderQuestionRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          actionFlag: "QUESTION_BULK_ORDER_UPDATED_SUCCESS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "QUESTION_BULK_ORDER_UPDATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const updateBulkOrderQuestion = createAsyncThunk("appQuestions/updateBulkOrderQuestion", async (payload) => {
+  try {
+    const response = await updateBulkOrderQuestionRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "QUESTION_BULK_ORDER_UPDATED_ERROR",
+        actionFlag: "QESTN_BLK_ODR_UPDT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "QESTN_BLK_ODR_UPDT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "QESTN_BLK_ODR_UPDT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function updateQuestionRequest(payload) {
-  return instance
-    .put(`${API_ENDPOINTS.question.update}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.put(`${API_ENDPOINTS.questions.update}`, payload)
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const updateQuestion = createAsyncThunk(
-  "appQuestion/updateQuestion",
-  async (payload) => {
-    try {
-      const response = await updateQuestionRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          questionItem: response.data || null,
-          actionFlag: "QUESTION_UPDATED_SUCCESS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "QUESTION_UPDATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const updateQuestion = createAsyncThunk("appQuestions/updateQuestion", async (payload) => {
+  try {
+    const response = await updateQuestionRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "QUESTION_UPDATED_ERROR",
+        questionItem: response?.data || null,
+        actionFlag: "QESTN_UPDT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "QESTN_UPDT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "QESTN_UPDT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function deleteQuestionRequest(id) {
-  return instance
-    .delete(`${API_ENDPOINTS.question.delete}/${id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.delete(`${API_ENDPOINTS.questions.delete}/${id}`)
+    .then((items) => items.data).catch((error) => error);
 }
 
-export const deleteQuestion = createAsyncThunk(
-  "appQuestion/deleteQuestion",
-  async (id) => {
-    try {
-      const response = await deleteQuestionRequest(id);
-      if (response && response.flag) {
-        return {
-          id,
-          actionFlag: "SUCCESS_DELETED_QUESTION",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          id,
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const deleteQuestion = createAsyncThunk("appQuestions/deleteQuestion", async (id) => {
+  try {
+    const response = await deleteQuestionRequest(id);
+    if (response && response.flag) {
       return {
         id,
-        actionFlag: "",
+        actionFlag: "QESTN_DLT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        id,
+        actionFlag: "QESTN_DLT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      id,
+      actionFlag: "QESTN_DLT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 // Create a slice
 const appAuthSlice = createSlice({
-  name: "appQuestion",
+  name: "appQuestions",
   initialState: {
     questionItems: [],
     questionItemsFilterd: [],
-    questionItem: initialQuestion,
+    questionItem: initQuestion,
     pagination: null,
     actionFlag: "",
     loading: true,
     success: "",
-    error: "",
+    error: ""
   },
   reducers: {
     cleanQuestionMessage: (state) => {
@@ -301,7 +266,7 @@ const appAuthSlice = createSlice({
       state.success = "";
       state.error = "";
       state.questionItemsFilterd = [];
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -315,7 +280,7 @@ const appAuthSlice = createSlice({
         state.questionItems = action.payload?.questionItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
-        state.actionFlag = action.payload?.actionFlag || "QUESTION_LISTING";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -342,13 +307,23 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       })
-      .addCase(editQuestionRequest.fulfilled, (state, action) => {
-        state.type = "EDIT";
+      .addCase(getQuestion.pending, (state) => {
+        state.questionItem = initQuestion;
+        state.loading = false;
+        state.success = "";
+        state.error = "";
+      })
+      .addCase(getQuestion.fulfilled, (state, action) => {
+        state.questionItem = action.payload?.questionItem || initQuestion;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
-        state.questionItem = action.payload.questionItem;
         state.success = action.payload.success;
         state.error = action.payload.error;
+      })
+      .addCase(getQuestion.rejected, (state) => {
+        state.loading = true;
+        state.success = "";
+        state.error = "";
       })
       .addCase(createQuestion.pending, (state) => {
         state.loading = false;
@@ -356,7 +331,7 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(createQuestion.fulfilled, (state, action) => {
-        state.questionItem = action.payload?.questionItem || null;
+        state.questionItem = action.payload?.questionItem || initQuestion;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -373,7 +348,7 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(updateQuestion.fulfilled, (state, action) => {
-        state.questionItem = action.payload?.questionItem || null;
+        state.questionItem = action.payload?.questionItem || initQuestion;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -416,7 +391,7 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       });
-  },
+  }
 });
 
 export const { cleanQuestionMessage } = appAuthSlice.actions;

@@ -230,9 +230,9 @@ const AsessmentReportList = () => {
                 <Row className="userManagement mt-3">
                   <Col md="12">
                     <DatatablePagination
-                      columns={columns}
-                      pagination={store?.pagination}
                       data={store?.assessmentReportItems || []}
+                      pagination={store?.pagination}
+                      columns={columns}
                       handleSort={handleSort}
                       handlePagination={handlePagination}
                       handleRowPerPage={handlePerPage}

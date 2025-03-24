@@ -18,7 +18,7 @@ exports.getPermissions = async function (req, res, next) {
     try {
         var Permissions = await PermissionService.getPermissions({}, page, limit)
         // Return the Permissions list with the appropriate HTTP password Code and Message.
-        return res.status(200).json({ status: 200, flag: true, data: Permissions, message: "Permissions received successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: Permissions, message: "Permissions received successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -34,9 +34,9 @@ exports.checkPermissions = async function (req, res, next) {
         var Module = await ModuleService.getModuleBySlug(slug);
         if (Module && Module._id) {
             var Permissions = await PermissionService.getPermissionss({ module_id: Module._id, role_id: req.roleId })
-            return res.status(200).json({ status: 200, flag: true, data: Permissions, message: "Permissions received successfully!" });
+            return res.status(200).json({ status: 200, flag: true, data: Permissions, message: "Permissions received successfully." });
         } else {
-            return res.status(200).json({ status: 200, flag: false, message: "Permission not found!" });
+            return res.status(200).json({ status: 200, flag: false, message: "Permission not found." });
         }
     } catch (e) {
         //Return an Error Response Message with Code and the Error Message.
@@ -46,7 +46,7 @@ exports.checkPermissions = async function (req, res, next) {
 
 exports.getGroupModulePermissions = async function (req, res, next) {
     if (!req.query?.role_id) {
-        return res.status(200).json({ status: 200, flag: false, message: "Role Id must be present" })
+        return res.status(200).json({ status: 200, flag: false, message: "Role Id must be present." })
     }
 
     try {
@@ -54,13 +54,14 @@ exports.getGroupModulePermissions = async function (req, res, next) {
         var companyId = req?.companyId;
         var role_id = req.query.role_id;
         var groupPermission = null;
+        var toolsPermission = await getToolsPermissions();
         var requestRole = await RoleService.getRole(role_id);
-        var groups = await ModuleService.getModulesDistinct("group_name", { is_super: 0, status: 1 });
+        var groups = await ModuleService.getModulesDistinct("group_name", { tool_slug: [...toolsPermission, ""], is_super: 0, status: 1 });
         if (groups && groups?.length) {
             groupPermission = {};
             for (let i = 0; i < groups.length; i++) {
                 let group = groups[i];
-                var modules = await ModuleService.getModules({ group_name: group, is_super: 0, status: 1 });
+                var modules = await ModuleService.getModules({ group_name: group, tool_slug: [...toolsPermission, ""], is_super: 0, status: 1 });
                 var modulePermission = [];
                 if (modules && modules?.length) {
                     for (let j = 0; j < modules.length; j++) {
@@ -120,7 +121,7 @@ exports.getGroupModulePermissions = async function (req, res, next) {
             flag: true,
             data: groupPermission,
             role: requestRole || null,
-            message: "Permissions received successfully!"
+            message: "Permissions received successfully."
         });
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -131,13 +132,14 @@ exports.getAllPermissions = async function (req, res, next) {
     try {
         var roleId = req.roleId;
         var companyId = req?.companyId;
-        var groups = await ModuleService.getModulesDistinct("group_name", { status: 1 });
+        var toolsPermission = await getToolsPermissions();
+        var groups = await ModuleService.getModulesDistinct("group_name", { tool_slug: [...toolsPermission, ""], status: 1 });
         if (groups && groups.length) {
             var role = await RoleService.getRole(roleId);
             var groupPermission = {};
             for (let i = 0; i < groups.length; i++) {
                 let group = groups[i];
-                var modules = await ModuleService.getModules({ group_name: group, status: 1 });
+                var modules = await ModuleService.getModules({ group_name: group, tool_slug: [...toolsPermission, ""], status: 1 });
                 var permissions = [];
                 if (superAdminRole != roleId) {
                     var moduleIds = modules.map((t) => t._id);
@@ -196,7 +198,6 @@ exports.getAllPermissions = async function (req, res, next) {
             }
 
             if (groupPermission) {
-                var toolsPermission = await getToolsPermissions();
                 groupPermission.toolsPermission = toolsPermission;
             }
 
@@ -205,7 +206,7 @@ exports.getAllPermissions = async function (req, res, next) {
                 flag: true,
                 role,
                 data: groupPermission,
-                message: "Permissions received successfully!"
+                message: "Permissions received successfully."
             });
         } else {
             return res.status(200).json({ status: 200, flag: false, message: "Permissions not found." })
@@ -222,7 +223,7 @@ exports.getPermission = async function (req, res, next) {
     try {
         var Permission = await PermissionService.getPermission(id)
         // Return the Users list with the appropriate HTTP password Code and Message.
-        return res.status(200).json({ status: 200, flag: true, data: Permission, message: "Permission received successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: Permission, message: "Permission received successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -244,7 +245,7 @@ exports.createPermission = async function (req, res, next) {
         }
 
         var createdPermission = await PermissionService.createPermission(req.body);
-        return res.status(200).json({ status: 200, flag: true, data: createdPermission, message: "Permission created successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: createdPermission, message: "Permission created successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -266,7 +267,7 @@ exports.updatePermission = async function (req, res, next) {
         }
 
         var updatedPermission = await PermissionService.updatePermission(req.body);
-        return res.status(200).json({ status: 200, flag: true, data: updatedPermission, message: "Permission updated successfully!" });
+        return res.status(200).json({ status: 200, flag: true, data: updatedPermission, message: "Permission updated successfully." });
     } catch (e) {
         // Return an Error Response Message with Code and the Error Message.
         return res.status(200).json({ status: 200, flag: false, message: e.message })
@@ -276,7 +277,7 @@ exports.updatePermission = async function (req, res, next) {
 exports.removePermission = async function (req, res, next) {
     var id = req.params.id;
     if (!id) {
-        return res.status(200).json({ status: 200, flag: true, message: "Id must be present!" });
+        return res.status(200).json({ status: 200, flag: true, message: "Id must be present." });
     }
     try {
         var deleted = await PermissionService.deletePermission(id);

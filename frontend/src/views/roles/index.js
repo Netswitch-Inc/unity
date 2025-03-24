@@ -77,7 +77,7 @@ const RoleList = () => {
             dispatch(cleanRoleMessage());
         }
 
-        if (store?.success && store?.actionFlag !== "ROLE_LISTING") {
+        if (store?.success && store?.actionFlag !== "ROLE_LST") {
             setshowSnackbar(true);
             setSnackMessage(store.success);
         }

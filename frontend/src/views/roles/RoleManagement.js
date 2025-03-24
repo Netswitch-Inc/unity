@@ -89,12 +89,12 @@ const RoleManagement = () => {
     }, [handleRoleLists, loadFirst, dispatch])
 
     useEffect(() => {
-        if (store?.actionFlag === "ROLE_LISTING" && store?.roleItems?.length === 0) {
+        if (store?.actionFlag === "ROLE_LST" && store?.roleItems?.length === 0) {
             setSelectedRole("");
             setRolePermission(permissions);
         }
 
-        if (store?.actionFlag === "ROLE_LISTING" && store?.roleItems?.length) {
+        if (store?.actionFlag === "ROLE_LST" && store?.roleItems?.length) {
             let roleId = store.roleItems[0]?._id;
             let rolePermis = store.roleItems[0]?.permission || permissions
             if (selectedRole) {
@@ -133,7 +133,7 @@ const RoleManagement = () => {
             dispatch(cleanRoleMessage());
         }
 
-        if (store?.success && store?.actionFlag !== "ROLE_LISTING") {
+        if (store?.success && store?.actionFlag !== "ROLE_LST") {
             setshowSnackbar(true);
             setSnackMessage(store.success);
         }

@@ -20,7 +20,7 @@ import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
 // ** Constant
-import { initialAssessment } from "utility/reduxConstant";
+import { initAssessmentItem } from "utility/reduxConstant";
 
 const AssessmentForm = () => {
   const dispatch = useDispatch();
@@ -35,13 +35,13 @@ const AssessmentForm = () => {
   });
 
   useEffect(() => {
-    if (store.actionFlag === "ASSESSMENT_CREATED_SUCCESS" && store.success) {
+    if (store.actionFlag === "ASESMNT_CRTD_SCS" && store.success) {
       dispatch(cleanQuestionMessage());
       dispatch(cleanAssessmentMessage());
       navigate(`/admin/assessment-forms/edit/${store?.assessmentItem?._id}`);
     }
 
-    if (store.actionFlag === "ASSESSMENT_CREATED_ERROR" && store.error) {
+    if (store.actionFlag === "ASESMNT_CRTD_ERR" && store.error) {
       setshowSnackbar(true);
       setSnakbarMessage(store.error);
     }
@@ -83,8 +83,8 @@ const AssessmentForm = () => {
           <Card>
             <CardBody className="pl-0 pr-0">
               <Formik
-                initialValues={initialAssessment}
-                enableReinitialize={initialAssessment}
+                initialValues={initAssessmentItem}
+                enableReinitialize={initAssessmentItem}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >

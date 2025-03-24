@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
-import { getCompanyList, deleteComapany } from "./store";
+import { getCompanyList, deleteCompany } from "./store";
 
 // ** Reactstrap Imports
 import { Col, Row, Card, CardBody, InputGroup } from "reactstrap";
@@ -103,9 +103,9 @@ const CompanyList = () => {
 
   useEffect(() => {
     if (
-      store?.actionFlag === "CREAT" ||
-      store?.actionFlag === "COMPANY_UPDATED" ||
-      store?.actionFlag === "COMPANY_DELETED"
+      store?.actionFlag === "COMPANY_CRTD" ||
+      store?.actionFlag === "COMPANY_UPDT" ||
+      store?.actionFlag === "COMPANY_DLT"
     ) {
       handleCompanyLists();
     }
@@ -113,9 +113,9 @@ const CompanyList = () => {
 
   useEffect(() => {
     if (
-      store?.actionFlag === "CREAT" ||
-      store?.actionFlag === "COMPANY_UPDATED" ||
-      store?.actionFlag === "COMPANY_DELETED"
+      store?.actionFlag === "COMPANY_CRTD" ||
+      store?.actionFlag === "COMPANY_UPDT" ||
+      store?.actionFlag === "COMPANY_DLT"
     ) {
       if (store.success) {
         setshowSnackbar(true);
@@ -154,7 +154,7 @@ const CompanyList = () => {
     if (result.isConfirmed) {
       try {
         // Perform delete action here, e.g., call an API to delete the user
-        await dispatch(deleteComapany(id));
+        await dispatch(deleteCompany(id));
         Swal.fire("Deleted!", "Your user has been deleted.", "success");
         // Refresh user list or update UI as needed
       } catch (error) {

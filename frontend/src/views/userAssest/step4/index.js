@@ -46,9 +46,9 @@ const ThankYou = () => {
         const params = {
             assessment_id: id,
             asessment_report_id: assessmentReportId,
-        };
+        }
+
         dispatch(getAssessmentReportAnswersList(params));
-        // handleAssemmentReportAnswerList()
     }, [dispatch, assessmentReportId, id]);
 
     const handleSendEmailPdf = async () => {
@@ -123,6 +123,7 @@ const ThankYou = () => {
                             <img alt="..." src={reactLogo} />
                         </div>
                     </div>
+                    
                     <div className="mb-0">
                         <div className="steps-mains">
                             <div className="steps filled-step">
@@ -135,6 +136,7 @@ const ThankYou = () => {
                                     <h4>Company Info</h4>
                                 </div>
                             </div>
+
                             <div className="steps filled-step">
                                 <div className="borders step-line">
                                     <div className="step-icon ">
@@ -145,6 +147,7 @@ const ThankYou = () => {
                                     <h4>Verification</h4>
                                 </div>
                             </div>
+
                             <div className="steps filled-step">
                                 <div className="borders step-line">
                                     <div className="step-icon ">
@@ -155,6 +158,7 @@ const ThankYou = () => {
                                     <h4>Self Assessment</h4>
                                 </div>
                             </div>
+
                             <div className="steps active-class">
                                 <div className="borders">
                                     <div className="step-icon">
@@ -168,6 +172,7 @@ const ThankYou = () => {
                         </div>
                     </div>
                 </Card>
+
                 <Col className="right-side thank-you">
                     <div className="card-header">
                         <h3 className="m-0">THANK YOU</h3>

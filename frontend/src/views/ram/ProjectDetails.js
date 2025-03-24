@@ -5,8 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Col, Row } from "reactstrap";
 import ProjectDetailsCard from "./ProjectDetailsCard";
 import "../../assets/scss/views-styles.scss";
-import { scrolTop } from "utility/Utils";
-import { editProjectRequest } from "views/Projects/store";
+import { scrollTop } from "utility/Utils";
+import { getProject } from "views/projects/store";
 import { useSelector, useDispatch } from "react-redux";
 import SimpleSpinner from "components/spinner/simple-spinner";
 export default function ProjectDetails() {
@@ -20,7 +20,7 @@ export default function ProjectDetails() {
   useEffect(() => {
     if (displayID) {
       const query = { id: displayID };
-      dispatch(editProjectRequest(query))
+      dispatch(getProject(query))
     }
     if (!displayID) {
       navigate(`/admin/risk-assessment`)
@@ -28,14 +28,14 @@ export default function ProjectDetails() {
   }, [])
 
   useEffect(() => {
-    if (store?.actionFlag === 'PROJECT_UPDATED' && displayID) {
+    if (store?.actionFlag === 'PRJCT_UPDT_SCS' && displayID) {
       const query = { id: displayID };
-      dispatch(editProjectRequest(query))
+      dispatch(getProject(query))
     }
   }, [store?.actionFlag])
 
   function handleBack() {
-    scrolTop()
+    scrollTop()
     navigate(-1);
   }
   return (

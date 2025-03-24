@@ -9,7 +9,7 @@ import { API_ENDPOINTS } from "utility/ApiEndPoints";
 import { initEventLogItem } from "utility/reduxConstant";
 
 async function getEventLogListRequest(params) {
-    return instance.get(`${API_ENDPOINTS.eventLog.list}`, { params })
+    return instance.get(`${API_ENDPOINTS.eventLogs.list}`, { params })
         .then((items) => items.data)
         .catch((error) => error)
 }
@@ -47,7 +47,7 @@ export const getEventLogList = createAsyncThunk("appEventLogs/getEventLogList", 
 })
 
 async function getEventLogRequest(params) {
-    return instance.get(`${API_ENDPOINTS.eventLog.get}/${params?.id}`)
+    return instance.get(`${API_ENDPOINTS.eventLogs.get}/${params?.id}`)
         .then((items) => items.data)
         .catch((error) => error)
 }

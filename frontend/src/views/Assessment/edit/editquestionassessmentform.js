@@ -53,7 +53,7 @@ const EditAssessmentQuestion = ({
   const [snakebarMessage, setSnakbarMessage] = useState("");
 
   const [questionItems, setQuestionsItems] = useState([]);
-  const [initialSectionValues, setInitialSectionValues] = useState(initialValues);
+  const [initSectionValues, setInitialSectionValues] = useState(initialValues);
 
   const closePopup = () => {
     setOpenModel(() => false);
@@ -68,7 +68,7 @@ const EditAssessmentQuestion = ({
       dispatch(cleanSectionMessage(null))
     }
 
-    if (sectionStore?.actionFlag === "SECTION_CREATED" || sectionStore?.actionFlag === "SECTION_UPDATED" || sectionStore?.actionFlag === "SCTN_DLT_SCS") {
+    if (sectionStore?.actionFlag === "SCTN_CRTD" || sectionStore?.actionFlag === "SCTN_UPDT" || sectionStore?.actionFlag === "SCTN_DLT_SCS") {
       handleQuestionsList();
     }
 
@@ -92,11 +92,11 @@ const EditAssessmentQuestion = ({
       dispatch(cleanQuestionMessage(null))
     }
 
-    if (questionStore.actionFlag === "SUCCESS_DELETED_QUESTION") {
+    if (questionStore.actionFlag === "QESTN_DLT_SCS") {
       handleQuestionsList()
     }
 
-    if (questionStore.actionFlag === "QUESTION_LIST_FILTERED_SUCCESS") {
+    if (questionStore.actionFlag === "QESTN_LST_FLTRD_SCS") {
       setQuestionsItems(() => questionStore?.questionItemsFilterd);
     }
 
@@ -308,7 +308,7 @@ const EditAssessmentQuestion = ({
       <AddSectionModel
         show={openModel}
         closePopup={closePopup}
-        initialValues={initialSectionValues}
+        initialValues={initSectionValues}
       />
     </Row>
   )

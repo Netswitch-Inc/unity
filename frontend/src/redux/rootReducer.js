@@ -13,7 +13,7 @@ import globalSetting from "../views/global/store/index.js";
 import sections from "../views/section/store/index.js";
 import questions from "../views/questions/store/index.js";
 import assessment from "../views/Assessment/store/index.js";
-import projects from "../views/Projects/store/index.js";
+import projects from "../views/projects/store/index.js";
 import attachments from "../views/ram/attachmentStore/index.js";
 import comments from "../views/ram/commentStore/index.js";
 import history from "../views/ram/projectHistoryStore/index.js";

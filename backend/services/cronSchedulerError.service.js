@@ -61,7 +61,7 @@ exports.createCronSchedulerError = async function (cronSchedulerError) {
     var newCronSchedulerError = new CronSchedulerError({
         connection_id: cronSchedulerError.connection_id ? cronSchedulerError.connection_id : null,
         cron_scheduler_id: cronSchedulerError.cron_scheduler_id ? cronSchedulerError.cron_scheduler_id : null,
-        tool_id: cronSchedulerError.tool_id ? cronSchedulerError.tool_id : "",
+        tool_slug: cronSchedulerError.tool_slug ? cronSchedulerError.tool_slug : "",
         date: cronSchedulerError.date ? cronSchedulerError.date : null,
         slug: cronSchedulerError.slug ? cronSchedulerError.slug : "",
         cron_style: cronSchedulerError.cron_style ? cronSchedulerError.cron_style : "",
@@ -101,8 +101,8 @@ exports.updateCronSchedulerError = async function (cronSchedulerError) {
         oldCronSchedulerError.cron_scheduler_id = cronSchedulerError.cron_scheduler_id;
     }
 
-    if (cronSchedulerError.tool_id) {
-        oldCronSchedulerError.tool_id = cronSchedulerError.tool_id;
+    if (cronSchedulerError.tool_slug) {
+        oldCronSchedulerError.tool_slug = cronSchedulerError.tool_slug;
     }
 
     if (cronSchedulerError.date) {

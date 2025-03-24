@@ -93,17 +93,17 @@ const initialValues = {
   weightIndex: 1,
   priviledges: [],
 };
-const initialSection = { name: "", description: "", order: "", status: 0 }
+const initSection = { _id: "", name: "", description: "", order: "", status: 1 }
 
 const profileItem = { first_name: "", last_name: "", email: "", phone: "", user_name: "" }
 
-const initialConnectionItem = { _id: "", tool_id: "", name: "", type: "", description: "", ip_address: "", port: "", username: "", password: "" }
+const initialConnectionItem = { _id: "", tool_slug: "", name: "", type: "", description: "", ip_address: "", port: "", username: "", password: "" }
 
-const initialQuestion = { section_id: "", question: "", description: "", option_type: { label: "Note", value: "note" }, options: [{ value: "", points: "" }], value: "", is_mandatory: false, point: 0, order: null, status: 1, deletedAt: null }
+const initQuestion = { section_id: "", question: "", description: "", option_type: { label: "Note", value: "note" }, options: [{ value: "", points: "" }], value: "", is_mandatory: false, point: 0, order: null, status: 1, deletedAt: null }
 
 const initialProject = { company_id: "", user_id: "", framework_id: [], involved_parties: [], submitted_by: "", name: "", description: "", cost_of_risk: 0, fix_cost_risk_ratio: 0, affected_scope: "", priority: "", fix_projected_cost: 0, likelyhood: 1, impact_assessment: 1, affected_risk: 0, status: "" }
 
-const initialAssessment = { name: "", description: "", order: "", status: 1, show_score_calculation: false }
+const initAssessmentItem = { _id: "", name: "", description: "", order: "", status: 1, show_score_calculation: false }
 
 const priority = [
   { label: "Low", value: "low" },
@@ -189,7 +189,7 @@ const OptionsForVulnerGraph = [
 ]
 
 const defaultCronStyle = '0 0 * * *';
-const initCronSchedulerItem = { _id: "", tool_id: "", name: "", type: "", slug: "", cron_style: defaultCronStyle, cron_style_disabled: false, description: "", is_default: false, status: true }
+const initCronSchedulerItem = { _id: "", tool_slug: "", name: "", type: "", slug: "", cron_style: defaultCronStyle, cron_style_disabled: false, description: "", is_default: false, status: true }
 
 const initAgentItem = { _id: "", ref_id: "", os: null, group: null, name: "", ip: "", registerIP: "", version: "", node_name: "", manager: "", mergedSum: "", configSum: "", dateAdd: "", lastKeepAlive: "", disconnection_time: "", group_config_status: "", status: "", status_code: 0 }
 
@@ -249,10 +249,10 @@ export {
   initialValues,
   profileItem,
   initialConnectionItem,
-  initialSection,
+  initSection,
   questionTypeOptions,
-  initialQuestion,
-  initialAssessment,
+  initQuestion,
+  initAssessmentItem,
   initialProject,
   projectStatus,
   priority,

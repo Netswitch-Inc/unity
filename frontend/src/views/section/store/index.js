@@ -6,264 +6,234 @@ import instance from "../../../utility/AxiosConfig";
 
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
 
-import { initialSection } from "utility/reduxConstant";
+import { initSection } from "utility/reduxConstant";
 
 async function getSectionListRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.Section.listing}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.sections.list}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getSectionList = createAsyncThunk(
-  "appSection/getConnectionList",
-  async (params) => {
-    try {
-      const response = await getSectionListRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          sectionItems: response?.data || [],
-          pagination: response?.pagination || null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          sectionItems: [],
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const getSectionList = createAsyncThunk("appSections/getSectionList", async (params) => {
+  try {
+    const response = await getSectionListRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        sectionItems: response?.data || [],
+        pagination: response?.pagination || null,
+        actionFlag: "SCTN_LST",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         sectionItems: [],
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      sectionItems: [],
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function getSectionListByAssessmentRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.Section.byAssessment}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.sections.byAssessment}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getSectionListByAssessment = createAsyncThunk(
-  "appSection/getSectionListByAssessment",
-  async (params) => {
-    try {
-      const response = await getSectionListByAssessmentRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          sectionItemsByAssessment: response?.data || [],
-          actionFlag: "SECTION_LIST_BY_ASSESSMENT_SUCCESS",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          sectionItemsByAssessment: [],
-          actionFlag: "SECTION_LIST_BY_ASSESSMENT_SUCCESS",
-          success: "",
-          error: response.message,
-        };
+export const getSectionListByAssessment = createAsyncThunk("appSections/getSectionListByAssessment", async (params) => {
+  try {
+    const response = await getSectionListByAssessmentRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        sectionItemsByAssessment: response?.data || [],
+        actionFlag: "SCTN_LST_BY_ASSMNT_SCS",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         sectionItemsByAssessment: [],
-        actionFlag: "SECTION_LIST_BY_ASSESSMENT_SUCCESS",
+        actionFlag: "SCTN_LST_BY_ASSMNT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      sectionItemsByAssessment: [],
+      actionFlag: "SCTN_LST_BY_ASSMNT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
-async function editRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.Section.edit}/${params?.id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+async function getSectionRequest(params) {
+  return instance.get(`${API_ENDPOINTS.sections.get}/${params?.id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const editSectionRequest = createAsyncThunk(
-  "appSection/editConnections",
-  async (params) => {
-    try {
-      const response = await editRequest(params);
-      if (response && response.flag) {
-        return {
-          sectionItem: response.data,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          sectionItem: null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
+export const getSection = createAsyncThunk("appSections/getSection", async (params) => {
+  try {
+    const response = await getSectionRequest(params);
+    if (response && response.flag) {
+      return {
+        sectionItem: response?.data || null,
+        actionFlag: "SCTN_ITM",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         sectionItem: null,
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: ""
+      }
+    }
+  } catch (error) {
+    return {
+      sectionItem: null,
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createSectionRequest(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.Section.create}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.sections.create}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const createSection = createAsyncThunk(
-  "appSection/createSection",
-  async (payload) => {
-    try {
-      const response = await createSectionRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          sectionItem: response.data || null,
-          actionFlag: "SECTION_CREATED",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "SECTION_CREATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const createSection = createAsyncThunk("appSections/createSection", async (payload) => {
+  try {
+    const response = await createSectionRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "SECTION_CREATED_ERROR",
+        sectionItem: response.data || null,
+        actionFlag: "SCTN_CRTD",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "SCTN_CRTD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "SCTN_CRTD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function updateSectionRequest(payload) {
-  return instance
-    .put(`${API_ENDPOINTS.Section.update}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.put(`${API_ENDPOINTS.sections.update}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const updateSection = createAsyncThunk(
-  "appSection/updateSection",
-  async (payload) => {
-    try {
-      const response = await updateSectionRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          sectionItem: response.data || null,
-          actionFlag: "SECTION_UPDATED",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "SECTION_UPDATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const updateSection = createAsyncThunk("appSections/updateSection", async (payload) => {
+  try {
+    const response = await updateSectionRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "SECTION_UPDATED_ERROR",
+        sectionItem: response.data || null,
+        actionFlag: "SCTN_UPDT",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "SCTN_UPDT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "SCTN_UPDT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function deleteSectionRequest(id) {
-  return instance
-    .delete(`${API_ENDPOINTS.Section.delete}/${id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.delete(`${API_ENDPOINTS.sections.delete}/${id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const deleteSection = createAsyncThunk(
-  "appSection/deleteSection",
-  async (id) => {
-    try {
-      const response = await deleteSectionRequest(id);
-      if (response && response.flag) {
-        return {
-          id,
-          actionFlag: "SCTN_DLT_SCS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          id,
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const deleteSection = createAsyncThunk("appSections/deleteSection", async (id) => {
+  try {
+    const response = await deleteSectionRequest(id);
+    if (response && response.flag) {
+      return {
+        id,
+        actionFlag: "SCTN_DLT_SCS",
+        success: response?.message || "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         id,
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      id,
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 // Create a slice
-const appAuthSlice = createSlice({
-  name: "appSection",
+const appSectionSlice = createSlice({
+  name: "appSections",
   initialState: {
     sectionItems: [],
     sectionItemsByAssessment: [],
-    sectionItem: initialSection,
+    sectionItem: initSection,
     pagination: null,
     actionFlag: "",
     loading: true,
     success: "",
-    error: "",
+    error: ""
   },
   reducers: {
     cleanSectionMessage: (state) => {
       state.actionFlag = "";
       state.success = "";
       state.error = "";
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -277,7 +247,7 @@ const appAuthSlice = createSlice({
         state.sectionItems = action.payload?.sectionItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
-        state.actionFlag = action.payload?.actionFlag || "SECTION_LISTING";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -293,8 +263,7 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(getSectionListByAssessment.fulfilled, (state, action) => {
-        state.sectionItemsByAssessment =
-          action.payload?.sectionItemsByAssessment || [];
+        state.sectionItemsByAssessment = action.payload?.sectionItemsByAssessment || [];
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -305,12 +274,22 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       })
-      .addCase(editSectionRequest.fulfilled, (state, action) => {
-        state.type = "EDIT";
+      .addCase(getSection.pending, (state) => {
+        state.sectionItem = initSection;
+        state.loading = false;
+        state.success = "";
+        state.error = "";
+      })
+      .addCase(getSection.fulfilled, (state, action) => {
         state.loading = true;
-        state.sectionItem = action.payload.sectionItem;
+        state.sectionItem = action.payload?.sectionItem || initSection;
         state.success = action.payload.success;
         state.error = action.payload.error;
+      })
+      .addCase(getSection.rejected, (state) => {
+        state.loading = true;
+        state.success = "";
+        state.error = "";
       })
       .addCase(createSection.pending, (state) => {
         state.loading = false;
@@ -318,7 +297,7 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(createSection.fulfilled, (state, action) => {
-        state.sectionItem = action.payload?.sectionItem || null;
+        state.sectionItem = action.payload?.sectionItem || initSection;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -335,7 +314,7 @@ const appAuthSlice = createSlice({
         state.error = "";
       })
       .addCase(updateSection.fulfilled, (state, action) => {
-        state.sectionItem = action.payload?.sectionItem || null;
+        state.sectionItem = action.payload?.sectionItem || initSection;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
@@ -353,7 +332,7 @@ const appAuthSlice = createSlice({
       })
       .addCase(deleteSection.fulfilled, (state, action) => {
         state.loading = true;
-        state.actionFlag = action.payload?.actionFlag || "SECTION_DELETED";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -362,9 +341,9 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       });
-  },
+  }
 });
 
-export const { cleanSectionMessage } = appAuthSlice.actions;
+export const { cleanSectionMessage } = appSectionSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appSectionSlice.reducer;

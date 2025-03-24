@@ -1984,6 +1984,35 @@ nav {
 
 /* Compliance builder */
 .compliance-head{
+  .framework-icon{
+    display: flex;
+    gap: 6px;
+  }
+  .cis-icon{
+    display: flex;
+    gap: 5px;
+    img{
+      margin-top: 2px;
+    }
+    p{
+      margin: 0;
+      font-weight: 400;
+      color: $white-color;
+      font-size: 14px;
+      @media (max-width:991px) {
+        font-size: 12px;
+      }
+    }
+  }
+  .i-icon-img{
+    height: 17px;
+    width: 17px;
+    @media (max-width:576px) {
+      height: 15px;
+      width: 15px;
+      margin-top: 2px;
+    }
+  }
   .card-title{
     font-size: 16px!important;
     font-weight: 600!important;
@@ -2092,7 +2121,9 @@ nav {
             // padding-bottom: 44px;
             // padding-bottom: 54px;
             line-height: 20px;
-
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 10px;
             @media (max-width: 1440px) {
               padding-bottom:25px;
               font-size: 18px;
@@ -2121,6 +2152,7 @@ nav {
             padding-right: 0px;
             flex-direction: unset;
             color: $text-color;
+            align-items: center;
             font-weight: 400;
             span {
               font-size: 14px;
@@ -2387,6 +2419,7 @@ nav {
             @media (max-width: 767px) {
               // padding: 4px 0;
               padding: 0 0px 4px;
+              flex-wrap: wrap;
             }
           }
         }
@@ -2410,35 +2443,35 @@ nav {
         }
       }
 
-      table {
+      .control-box {
         border-spacing: 0 7px;
         border-collapse: separate;
-
-        tr {
+        align-items: center;
+        display: flex;
+        .main-table-row{
           // background-color: #042464;
           text-align: center;
           color: $white-color;
-          border: 1px solid $white-color;
+          // border: 1px solid $white-color;
           cursor: pointer;
         }
 
-        td {
+        .rows-td {
           border: 0;
 
           &.tabletdstyle {
             // padding: 7px 7px;
             padding: 0px 7px 0 0;
             width: 58%;
-
+            
             span {
               color: $white-color;
               // font-size: small;
               font-size:14px;
               line-height: 21px;
               width: 100%;
-              display: block;
+              display: flex;
               word-break: break-word;
-
               @media (max-width: 991px) {
                 // font-size: 0.795rem !important;
                 font-size: 12px;
@@ -2463,6 +2496,12 @@ nav {
             justify-content:flex-end;
             height: 100%;
             align-items: center;
+            margin-left: 10px;
+            @media (max-width: 767px) {
+              // flex-wrap: wrap;
+              margin-left: 10px;
+              margin-top: 10px;
+            }
             span {
               // background-color: #4672c4;
               background: linear-gradient(171.79deg, $blue-bg-color 0%, $blue-btn-color 100%);
@@ -2487,6 +2526,11 @@ nav {
       }
 
       .cis-complinance-control-content {
+        .content-wrap{
+          .text-content{
+            flex-wrap: nowrap!important;
+          }
+        }
         .row {
           .cis-text{
             @media (max-width:767px) {
@@ -2500,6 +2544,7 @@ nav {
               border-radius: 5px;
               margin-bottom: 3px;
             }
+            
           }
 
           &:first-child {
@@ -2529,22 +2574,6 @@ nav {
           flex-wrap: wrap;
           background: $hover-bg-color;
           justify-content: center;
-        }
-        .cis-icon{
-          display: flex;
-          gap: 5px;
-          img{
-            margin-top: 2px;
-          }
-          p{
-            margin: 0;
-            font-weight: 400;
-            color: $white-color;
-            font-size: 14px;
-            @media (max-width:991px) {
-              font-size: 12px;
-            }
-          }
         }
         .icon-number-img {
           // width: calc(100% - 60px);
@@ -2987,7 +3016,14 @@ nav {
 
     .edit2-icons {
       padding-top: 0;
-      top: 7px;
+      top: 15px;
+      right: 15px;
+      @media (max-width:1440px) {
+        top: 12px;
+      }
+      @media (max-width:991px) {
+        top: 10px!important;
+      }
     }
 
     @media (max-width: 991px) {
@@ -4339,11 +4375,11 @@ nav {
   }
   .main-logo-img{
     border-bottom: 2px solid $grey-opacity-border-color;
-    padding-bottom: 40px;
-    margin-bottom: 10px;
-    padding-top: 20px;
+    padding-bottom: 30px;
+    margin-bottom: 0px;
+    padding-top: 10px;
     @media (max-width:991px) {
-      padding-bottom: 30px;
+      padding-bottom: 25px;
     }
     @media (max-width:767px) {
       display: none;

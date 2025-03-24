@@ -1,7 +1,7 @@
 var moment = require('moment');
 var path = require("path");
 
-var backendNodeUrl = process.env?.NODE_BACKEND_URL || "";
+var backendNodeUrl = process.env?.BACK_UNITY_URL || "";
 
 var MailService = require("../services/mail.service");
 var EventLogService = require("../services/eventLog.service");

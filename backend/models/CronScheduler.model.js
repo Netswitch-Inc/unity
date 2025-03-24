@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 
 var CronSchedulerSchema = new mongoose.Schema({
-    tool_id: String,
+    tool_slug: String,
     name: String,
     type: String,
     slug: { type: String, unique: true },

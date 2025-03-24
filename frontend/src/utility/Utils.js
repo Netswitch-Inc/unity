@@ -172,11 +172,11 @@ const getModulePermissionData = (permissions = null, moduleKey = "", groupModule
 }
 /* /Permission helper */
 
-// const scrolTop = () => {
+// const scrollTop = () => {
 //   window.scrollTo({ top: 0, behavior: "smooth" });
 // };
 
-const scrolTop = () => {
+const scrollTop = () => {
   window.requestAnimationFrame(() => {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -294,7 +294,7 @@ export {
   setAccessToken,
   onImageSrcError,
   getModulePermissionData,
-  scrolTop,
+  scrollTop,
   splitWithPipe,
   getExtension,
   timeAgo,

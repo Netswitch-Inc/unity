@@ -6,222 +6,197 @@ import instance from "../../../utility/AxiosConfig";
 
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
 
-// import { initialComment } from "utility/reduxConstant";
+// import { initComment } from "utility/reduxConstant";
 
 async function getCommentListRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.Comment.listing}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.comments.list}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getCommentList = createAsyncThunk(
-  "appComment/getCommentList",
-  async (params) => {
-    try {
-      const response = await getCommentListRequest(params);
-      if (response && response.flag) {
-        return {
-          params,
-          commentItems: response?.data || [],
-          pagination: response?.pagination || null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          params,
-          commentItems: [],
-          actionFlag: "",
-          success: "",
-          error: response.message,
-        };
+export const getCommentList = createAsyncThunk("appComments/getCommentList", async (params) => {
+  try {
+    const response = await getCommentListRequest(params);
+    if (response && response.flag) {
+      return {
+        params,
+        commentItems: response?.data || [],
+        pagination: response?.pagination || null,
+        actionFlag: "COMMENT_LST",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         params,
         commentItems: [],
         actionFlag: "",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      commentItems: [],
+      actionFlag: "",
+      success: "",
+      error: error
     }
   }
-);
+})
 
-async function editRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.Comment.edit}/${params?.id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+async function getCommentRequest(params) {
+  return instance.get(`${API_ENDPOINTS.comments.get}/${params?.id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const editCommentRequest = createAsyncThunk(
-  "appComment/editComments",
-  async (params) => {
-    try {
-      const response = await editRequest(params);
-      if (response && response.flag) {
-        return {
-          commentItem: response.data,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          commentItem: null,
-          actionFlag: "",
-          success: "",
-          error: "",
-        };
+export const getComment = createAsyncThunk("appComments/getComment", async (params) => {
+  try {
+    const response = await getCommentRequest(params);
+    if (response && response.flag) {
+      return {
+        commentItem: response?.data || "",
+        actionFlag: "COMMENT_ITM",
+        success: "",
+        error: ""
       }
-    } catch (error) {
+    } else {
       return {
         commentItem: null,
-        actionFlag: "",
+        actionFlag: "COMMENT_ERR",
         success: "",
-        error: error,
-      };
+        error: ""
+      }
+    }
+  } catch (error) {
+    return {
+      commentItem: null,
+      actionFlag: "COMMENT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function createCommentRequest(payload) {
-  return instance
-    .post(`${API_ENDPOINTS.Comment.create}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.post(`${API_ENDPOINTS.comments.create}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const createComment = createAsyncThunk(
-  "appComment/createComment",
-  async (payload) => {
-    try {
-      const response = await createCommentRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          commentItem: response.data || null,
-          actionFlag: "COMMENT_CREATED_SUCCESS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "COMMENT_CREATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const createComment = createAsyncThunk("appComments/createComment", async (payload) => {
+  try {
+    const response = await createCommentRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "COMMENT_CREATED_ERROR",
+        commentItem: response.data || null,
+        actionFlag: "COMMENT_CRTD_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "COMMENT_CRTD_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "COMMENT_CRTD_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function updateCommentRequest(payload) {
-  return instance
-    .put(`${API_ENDPOINTS.Comment.update}`, payload)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.put(`${API_ENDPOINTS.comments.update}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const updateComment = createAsyncThunk(
-  "appComment/updateComment",
-  async (payload) => {
-    try {
-      const response = await updateCommentRequest(payload);
-      if (response && response.flag) {
-        return {
-          payload,
-          commentItem: response.data || null,
-          actionFlag: "COMMENT_UPDATED",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          payload,
-          actionFlag: "COMMENT_UPDATED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const updateComment = createAsyncThunk("appComments/updateComment", async (payload) => {
+  try {
+    const response = await updateCommentRequest(payload);
+    if (response && response.flag) {
       return {
         payload,
-        actionFlag: "COMMENT_UPDATED_ERROR",
+        commentItem: response.data || null,
+        actionFlag: "COMMENT_UPDT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        payload,
+        actionFlag: "COMMENT_UPDT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      payload,
+      actionFlag: "COMMENT_UPDT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function deleteCommentRequest(id) {
-  return instance
-    .delete(`${API_ENDPOINTS.Comment.delete}/${id}`)
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.delete(`${API_ENDPOINTS.comments.delete}/${id}`)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const deleteComment = createAsyncThunk(
-  "appComment/deleteComment",
-  async (id) => {
-    try {
-      const response = await deleteCommentRequest(id);
-      if (response && response.flag) {
-        return {
-          id,
-          actionFlag: "COMMENT_DELETED_SUCCSESS",
-          success: response?.message || "",
-          error: "",
-        };
-      } else {
-        return {
-          id,
-          actionFlag: "COMMENT_DELETED_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const deleteComment = createAsyncThunk("appComments/deleteComment", async (id) => {
+  try {
+    const response = await deleteCommentRequest(id);
+    if (response && response.flag) {
       return {
         id,
-        actionFlag: "COMMENT_DELETED_ERROR",
+        actionFlag: "COMMENT_DLT_SCS",
+        success: response?.message || "",
+        error: ""
+      }
+    } else {
+      return {
+        id,
+        actionFlag: "COMMENT_DLT_ERR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      id,
+      actionFlag: "COMMENT_DLT_ERR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 // Create a slice
-const appAuthSlice = createSlice({
-  name: "appComment",
+const appCommentSlice = createSlice({
+  name: "appComments",
   initialState: {
     commentItems: [],
-    commentItem: '',
+    commentItem: null,
     pagination: null,
     actionFlag: "",
     loading: true,
     success: "",
-    error: "",
+    error: ""
   },
   reducers: {
     cleanCommentMessage: (state) => {
       state.actionFlag = "";
       state.success = "";
       state.error = "";
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -235,7 +210,7 @@ const appAuthSlice = createSlice({
         state.commentItems = action.payload?.commentItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
-        state.actionFlag = action.payload?.actionFlag || "COMMENT_LISTING";
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
@@ -244,15 +219,27 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       })
-      .addCase(editCommentRequest.fulfilled, (state, action) => {
-        state.type = "EDIT";
+      .addCase(getComment.pending, (state) => {
+        state.commentItem = null;
+        state.loading = false;
+        state.success = "";
+        state.error = "";
+      })
+      .addCase(getComment.fulfilled, (state, action) => {
+        state.commentItem = action.payload?.commentItem || null;
         state.loading = true;
-        state.commentItem = action.payload.commentItem;
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload.success;
         state.error = action.payload.error;
       })
+      .addCase(getComment.rejected, (state) => {
+        state.loading = true;
+        state.success = "";
+        state.error = "";
+      })
       .addCase(createComment.pending, (state) => {
         state.loading = false;
+        state.actionFlag = "";
         state.success = "";
         state.error = "";
       })
@@ -301,9 +288,9 @@ const appAuthSlice = createSlice({
         state.success = "";
         state.error = "";
       });
-  },
+  }
 });
 
-export const { cleanCommentMessage } = appAuthSlice.actions;
+export const { cleanCommentMessage } = appCommentSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appCommentSlice.reducer;

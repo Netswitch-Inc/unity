@@ -1,20 +1,35 @@
+// ** React Imports
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import { Row, Col,Form as BootstrapForm } from "react-bootstrap";
-import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
-import { updateQuestion, editQuestionRequest } from "./store";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { Card, CardBody, FormGroup } from "reactstrap";
-import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiTrash } from "react-icons/ti";
-import { getSectionList } from "views/section/store";
-import { questionTypeOptions, initialQuestion } from "utility/reduxConstant";
+
+// ** Store & Actions
+import { useDispatch, useSelector } from "react-redux";
+import { getSectionList, cleanSectionMessage } from "views/section/store";
+import { updateQuestion, getQuestion, cleanQuestionMessage } from "./store";
+
+// ** Reactstrap Imports
+import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
+import { Card, CardBody, FormFeedback, FormGroup, Label } from "reactstrap";
+import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";
+
 import Select from "react-select";
 
+// ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
+
+// ** Third Party Components
+import ReactSnackBar from "react-js-snackbar";
+import { TiMessages, TiTrash } from "react-icons/ti";
+
+// ** Constants
+import { questionTypeOptions, initQuestion } from "utility/reduxConstant";
+
 const EditQuestion = () => {
+  // ** Hooks
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Create a URLSearchParams object from the query string
   const queryParams = new URLSearchParams(location.search);
@@ -22,131 +37,134 @@ const EditQuestion = () => {
   // Extract parameters from the query string
   const assessmentId = queryParams.get("assessmentId");
 
+  // ** Store Vars
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const store = useSelector((state) => state.questions);
   const sectionStore = useSelector((state) => state.sections);
+
+  // ** States
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
 
   const [sectionList, setSectionList] = useState([]);
-  const [initialState, setInitialState] = useState(initialQuestion);
+  const [initialState, setInitialState] = useState(initQuestion);
 
   const validationSchema = Yup.object().shape({
-    section_id: Yup.object().required("Section is required"),
-    question: Yup.string().required("Question is required"),
-    description: Yup.string(),
-    option_type: Yup.object()
-      .shape({
-        value: Yup.string().required("Option type is required"),
-      })
-      .required("Option type is required!")
-      .nullable(),
-    // order: Yup.number().required("Order number is required"),
+    section_id: Yup.object().required("Section is required."),
+    question: Yup.string().required("Question is required."),
+    option_type: Yup.object().shape({
+      value: Yup.string().required("Option type is required"),
+    }).required("Option type is required!").nullable(),
     options: Yup.array().when("option_type", {
       is: (optionType) => ["checkbox", "radio"].includes(optionType?.value),
-      then: () =>
-        Yup.array().of(
-          Yup.object().shape({
-            value: Yup.string().required("Value is required"),
-            points: Yup.string().required("Points is required"),
-          })
-        ),
+      then: () => Yup.array().of(
+        Yup.object().shape({
+          value: Yup.string().required("Value is required."),
+          points: Yup.string().required("Points is required.")
+        })
+      )
     }),
     point: Yup.number().when("option_type", {
-      is: (optionType) =>
-        ["note", "textarea", "text"].includes(optionType?.value),
-      then: () => Yup.number().required("Points is required"),
-    }),
+      is: (optionType) => ["note", "textarea", "text"].includes(optionType?.value),
+      then: () => Yup.number().required("Points is required.")
+    })
   });
 
   useLayoutEffect(() => {
     dispatch(getSectionList());
-  }, [dispatch]);
+
+    dispatch(getQuestion({ id: id }));
+  }, [dispatch, id])
 
   const getQuestionTypeOption = (typeValue) => {
     return (
       questionTypeOptions.find((option) => option.value === typeValue) || {
         label: "",
-        value: "",
+        value: ""
       }
-    );
-  };
+    )
+  }
 
   useEffect(() => {
-    if (
-      sectionStore?.sectionItems &&
-      sectionStore.actionFlag === "SECTION_LISTING"
-    ) {
+    if (sectionStore.actionFlag) {
+      dispatch(cleanSectionMessage(null))
+    }
+
+    if (sectionStore?.sectionItems && sectionStore.actionFlag === "SCTN_LST") {
+      let sectionList = [];
       if (sectionStore?.sectionItems?.length > 0) {
-        let sectionList = [];
         sectionList = sectionStore?.sectionItems?.map((item) => {
           return {
             value: item?._id,
             label: item?.name,
-          };
-        });
-        setSectionList(sectionList);
+          }
+        })
       }
+
+      setSectionList(sectionList)
     }
-  }, [sectionStore?.sectionItems, sectionStore.actionFlag]);
+  }, [sectionStore.sectionItems, sectionStore.actionFlag, dispatch]);
 
   const handleChangeOptionType = (values, setFieldValue) => {
     let optionValues = [{ value: "", points: "" }];
     if (["note", "textarea", "text"].includes(values?.option_type?.value)) {
       setFieldValue("options", optionValues);
     }
-  };
+  }
 
   useEffect(() => {
-    const query = { id: id };
-    dispatch(editQuestionRequest(query));
-  }, [dispatch, id]);
+    if (store.actionFlag || store?.success || store?.error) {
+      dispatch(cleanQuestionMessage(null));
+    }
 
-  useEffect(() => {
-    if (store.actionFlag === "QUESTION_UPDATED_SUCCESS" && store.success) {
-      setshowSnackbar(true);
-      setSnakbarMessage(store.success);
-    }
-    if (store.actionFlag === "QUESTION_UPDATED_SUCCESS" && store.error) {
-      setshowSnackbar(true);
-      setSnakbarMessage(store.error);
-    }
-    if (store.actionFlag === "GET_QUESTION_DATA_SUCCESS") {
+    if (store.actionFlag === "QESTN_ITM_SCS") {
       const transformedQuestionItem = {
         ...store?.questionItem,
         section_id: {
-          label: store?.questionItem?.section_id?.name || "", // Fallback to empty string if undefined
-          value: store?.questionItem?.section_id?._id || "", // Fallback to empty string if undefined
+          label: store?.questionItem?.section_id?.name || "",
+          value: store?.questionItem?.section_id?._id || ""
         },
+
         option_type: getQuestionTypeOption(store?.questionItem?.option_type),
-      };
+      }
+
       setInitialState(() => transformedQuestionItem);
     }
-  }, [store.success, store.error, store.actionFlag, store?.questionItem]);
 
-  useEffect(() => {
-    if (store.actionFlag === "QUESTION_UPDATED_SUCCESS" && showSnackBar) {
+    if (store.actionFlag === "QESTN_UPDT_SCS") {
       setTimeout(() => {
-        setshowSnackbar(false);
-        setSnakbarMessage("");
         if (assessmentId) {
           navigate(`/admin/assessment-forms/edit/${assessmentId}?active_tab=2`);
         } else {
           navigate("/admin/questions");
         }
-      }, 3000);
+      }, 2000);
     }
-  }, [showSnackBar, navigate, store.actionFlag, assessmentId]);
+
+    if (store?.success) {
+      setshowSnackbar(true);
+      setSnakbarMessage(store.success);
+    }
+
+    if (store?.error) {
+      setshowSnackbar(true);
+      setSnakbarMessage(store.error);
+    }
+  }, [store.success, store.error, store.actionFlag, store?.questionItem, assessmentId, navigate, dispatch]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setshowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar])
 
   const onSubmit = (values) => {
     const payload = { ...values };
-    // payload?.status ? payload.status = 1 : payload.status = 0
     payload.option_type = payload.option_type?.value || payload.option_type;
     payload.section_id = payload.section_id?.value || payload.section_id;
 
     dispatch(updateQuestion(payload));
-  };
+  }
 
   const goBack = () => {
     if (assessmentId) {
@@ -154,188 +172,164 @@ const EditQuestion = () => {
     } else {
       navigate("/admin/questions");
     }
-  };
+  }
 
   return (
-    <>
-      <div className="content">
-        {showSnackBar && (
-          <ReactSnackBar
-            Icon={
-              <span>
-                <TiMessages size={25} />
-              </span>
-            }
-            Show={showSnackBar}
-          >
-            {snakebarMessage}
-          </ReactSnackBar>
-        )}
-        <Row>
-          <Col>
-            <Card>
-              <CardBody className="pl-0 pr-0">
-                <Formik
-                  initialValues={initialState}
-                  enableReinitialize={initialState}
-                  validationSchema={validationSchema}
-                  onSubmit={onSubmit}
-                >
-                  {({ setFieldValue, values, isSubmitting }) => (
-                    <Form>
-                      <Row className="mb-2">
-                        <Col
-                          xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width"
-                        >
-                          <BootstrapForm.Label className="col-label">Section</BootstrapForm.Label>
-                          {sectionList && (
-                            <Select
-                              name="section_id"
-                              className="react-select col-select w-100"
-                              classNamePrefix="react-select"
-                              placeholder="Select Section..."
-                              options={sectionList}
-                              value={values?.section_id}
-                              onChange={(secVal) => {
-                                setFieldValue("section_id", secVal);
-                              }}
-                            />
-                          )}
-                          <ErrorMessage
-                            name="section_id"
-                            component="div"
-                            style={{ color: "red" }}
-                          />
-                        </Col>
-                      </Row>
+    <div className="content">
+      {!store?.loading ? (<SimpleSpinner />) : null}
+      
+      <ReactSnackBar Icon={(
+        <span><TiMessages size={25} /></span>
+      )} Show={showSnackBar}>
+        {snakebarMessage}
+      </ReactSnackBar>
 
-                      <Row className="mb-2">
-                        <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
-                            <BootstrapForm.Label className="col-label">Question</BootstrapForm.Label>
-                            <Field
-                              as="textarea"
-                              name="question"
-                              className="col-input w-100"
-                            />
-                            <ErrorMessage
-                              name="question"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                        </Col>
-                      </Row>
-                      <Row className="mb-2">
-                        <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
-                            <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
-                            <Field
-                              as="textarea"
-                              name="description"
-                              className="col-input w-100"
-                            />
-                            <ErrorMessage
-                              name="description"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                        </Col>
-                      </Row>
-                      <Row className="mb-2">
-                        <Col
-                          xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width"
-                        >
-                          <BootstrapForm.Label className="col-label">Option Type</BootstrapForm.Label>
+      <Row>
+        <Col>
+          <Card>
+            <CardBody className="pl-0 pr-0">
+              <Formik
+                initialValues={initialState}
+                enableReinitialize={initialState}
+                validationSchema={validationSchema}
+                onSubmit={onSubmit}
+              >
+                {({ values, errors, touched, isSubmitting, setFieldValue }) => (
+                  <Form>
+                    <Row className="mb-2">
+                      <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width">
+                        <BootstrapForm.Label className="col-label">Section</BootstrapForm.Label>
+                        {sectionList && (
                           <Select
-                            name="option_type"
-                            className="react-select col-select w-100"
+                            name="section_id"
+                            options={sectionList}
+                            value={values?.section_id}
                             classNamePrefix="react-select"
                             placeholder="Select Section..."
-                            options={questionTypeOptions}
-                            value={values?.option_type}
-                            onChange={(question) => {
-                              setFieldValue("option_type", question);
-                              handleChangeOptionType(values, setFieldValue);
-                            }}
+                            className="react-select col-select w-100"
+                            onChange={(secVal) => setFieldValue("section_id", secVal)}
                           />
-                          <ErrorMessage
-                            name="option_type"
-                            component="div"
-                            style={{ color: "red" }}
+                        )}
+                        {errors.section_id && touched.section_id && (
+                          <FormFeedback className="d-block">{errors?.section_id}</FormFeedback>
+                        )}
+                      </Col>
+                    </Row>
+
+                    <Row className="mb-2">
+                      <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
+                        <BootstrapForm.Label className="col-label">Question</BootstrapForm.Label>
+                        <Field
+                          as="textarea"
+                          name="question"
+                          className="col-input w-100"
+                        />
+                        {errors.question && touched.question && (
+                          <FormFeedback className="d-block">{errors?.question}</FormFeedback>
+                        )}
+                      </Col>
+                    </Row>
+
+                    <Row className="mb-2">
+                      <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridContactNumber" className="full-width">
+                        <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
+                        <Field
+                          as="textarea"
+                          name="description"
+                          className="col-input w-100"
+                        />
+                        {errors.description && touched.description && (
+                          <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                        )}
+                      </Col>
+                    </Row>
+
+                    <Row className="mb-2">
+                      <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width">
+                        <BootstrapForm.Label className="col-label">Option Type</BootstrapForm.Label>
+                        <Select
+                          name="option_type"
+                          value={values?.option_type}
+                          options={questionTypeOptions}
+                          classNamePrefix="react-select"
+                          placeholder="Select Section..."
+                          className="react-select col-select w-100"
+                          onChange={(question) => {
+                            setFieldValue("option_type", question);
+                            handleChangeOptionType(values, setFieldValue);
+                          }}
+                        />
+                        {errors.option_type && touched.option_type && (
+                          <FormFeedback className="d-block">{errors?.option_type}</FormFeedback>
+                        )}
+                      </Col>
+                    </Row>
+
+                    {["note", "textarea", "text"]?.includes(values?.option_type?.value) ? (
+                      <Row className="mb-2">
+                        <Col
+                          xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width">
+                          <BootstrapForm.Label className="col-label">Point</BootstrapForm.Label>
+                          <Field
+                            name="point"
+                            type="number"
+                            className="col-input w-100"
+                            placeholder="Enter Points"
                           />
+                          {errors.point && touched.point && (
+                            <FormFeedback className="d-block">{errors?.point}</FormFeedback>
+                          )}
                         </Col>
                       </Row>
-                      {["note", "textarea", "text"]?.includes(
-                        values?.option_type?.value
-                      ) && (
-                        <Row className="mb-2">
-                          <Col xl={12} lg={6} as={BootstrapForm.Group} controlId="formGridRole" className="full-width">
-                            <BootstrapForm.Label className="col-label">Point</BootstrapForm.Label>
-                            <Field
-                              name={`point`}
-                              type="number"
-                              className="col-input w-100"
-                              placeholder="Enter Points"
-                            />
-                            <ErrorMessage
-                              name={`point`}
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </Col>
-                        </Row>
-                      )}
-                      {!["note", "textarea", "text"].includes(
-                        values?.option_type?.value
-                      ) &&  <BootstrapForm.Label className="col-label">Options</BootstrapForm.Label>}
-                      {!["note", "textarea", "text"].includes(
-                        values?.option_type?.value
-                      ) && (
+                    ) : null}
+
+                    {!["note", "textarea", "text"].includes(values?.option_type?.value) ? (
+                      <div className="d-block">
+                        <BootstrapForm.Label className="col-label">Options</BootstrapForm.Label>
                         <FieldArray name="options">
                           {({ remove, push }) => (
-                            <div>
+                            <div className="mb-3">
                               {values.options.map((option, index) => (
                                 <Row key={index} className="mb-2">
                                   <Col md={5} className="mb-2 mb-md-0">
                                     <Field
-                                      name={`options.${index}.value`}
                                       type="text"
-                                      className="col-input w-100"
                                       placeholder="Option Value"
-                                    />
-                                    <ErrorMessage
+                                      className="col-input w-100"
                                       name={`options.${index}.value`}
-                                      component="div"
-                                      style={{ color: "red" }}
                                     />
+                                    {touched?.options && errors?.options && errors?.options[index]?.value && touched?.options[index]?.value && (
+                                      <FormFeedback className="d-block">{errors.options[index]?.value}</FormFeedback>
+                                    )}
                                   </Col>
+
                                   <Col md={5} className="mb-2 mb-md-0">
                                     <Field
-                                      name={`options.${index}.points`}
                                       type="number"
-                                      className="col-input w-100"
                                       placeholder="Points"
-                                    />
-                                    <ErrorMessage
+                                      className="col-input w-100"
                                       name={`options.${index}.points`}
-                                      component="div"
-                                      style={{ color: "red" }}
                                     />
-                                  </Col>
-                                  {!["note", "textarea", "text"].includes(
-                                    values?.option_type?.value
-                                  ) &&
-                                    values.options?.length > 1 && (
-                                      <Col md={2}>
-                                        <TiTrash
-                                          size={20}
-                                          color="#fff"
-                                          cursor="pointer"
-                                          onClick={() => remove(index)}
-                                          className="mt-3"
-                                        />
-                                      </Col>
+                                    {touched?.options && errors?.options && errors?.options[index]?.points && touched?.options[index]?.points && (
+                                      <FormFeedback className="d-block">{errors.options[index]?.points}</FormFeedback>
                                     )}
+                                  </Col>
+
+                                  {!["note", "textarea", "text"].includes(values?.option_type?.value) &&
+                                    values.options?.length > 1 ? (
+                                    <Col md={2}>
+                                      <TiTrash
+                                        size={20}
+                                        color="#fff"
+                                        cursor="pointer"
+                                        onClick={() => remove(index)}
+                                        className="mt-3"
+                                      />
+                                    </Col>
+                                  ) : null}
                                 </Row>
                               ))}
+
                               <div className="buttons">
                                 <button
                                   type="button"
@@ -344,143 +338,109 @@ const EditQuestion = () => {
                                 >
                                   Add Option
                                 </button>
-                                </div>
+                              </div>
                             </div>
                           )}
                         </FieldArray>
-                      )}
+                      </div>
+                    ) : null}
 
-                      <Row className="mb-2">
-                        <Col md={6} className="d-none">
-                          <FormGroup
-                            controlId="formGridContactNumber"
-                            className="mb-0"
-                          >
-                            <label>Order Number</label>
-                            <Field
-                              type="number"
-                              name="order"
-                              className="form-control"
-                            />
-                            <ErrorMessage
-                              name="order"
-                              component="div"
-                              style={{ color: "red" }}
-                            />
-                          </FormGroup>
-                        </Col>
-                        {!["note", "textarea", "text"].includes(
-                          values?.option_type?.value
-                        ) && (
-                          <Col md={3} className="mb-2 mb-md-0">
-                            <BootstrapForm.Label className="col-label">Is Mandatory ?</BootstrapForm.Label>
-                            <div className="is-active-container col">
-                              <div className="is-active-checked form-check">
-                                <input
-                                  type="checkbox"
-                                  name="is_mandatory"
-                                  className="is-active-checked form-check-input mt-0"
-                                  checked={values?.is_mandatory}
-                                  id="Yes"
-                                  onChange={(event) =>
-                                    setFieldValue(
-                                      event?.target?.name,
-                                      event?.target?.checked
-                                    )
-                                  }
-                                />
-                                <BootstrapForm.Label 
-                                  title="Yes"
-                                  htmlFor="Yes"
-                                  className="pl-3 mb-0"
-                                >
-                                  Yes
-                                </BootstrapForm.Label >
-                                {/* {errors?.isActive && <div style={{ color: 'red' }}>{errors.isActive}</div>} */}
-                              </div>
-                            </div>
-                          </Col>
-                        )}
+                    <Row className="mb-2">
+                      <Col md={6} className="d-none">
+                        <FormGroup controlId="formGridContactNumber" className="mb-0">
+                          <label>Order Number</label>
+                          <Field
+                            type="number"
+                            name="order"
+                            className="form-control"
+                          />
+                          {errors.order && touched.order && (
+                            <FormFeedback className="d-block">{errors?.order}</FormFeedback>
+                          )}
+                        </FormGroup>
+                      </Col>
 
-                        <Col xl={4} lg={6} as={BootstrapForm.Group} controlId="formGridFirstName" className="full-width">
-                          <BootstrapForm.Label className="col-label">Status</BootstrapForm.Label >
-                          <div className="radio-container d-flex">
-                            <div className="form-check">
+                      {!["note", "textarea", "text"].includes(values?.option_type?.value) ? (
+                        <Col md={3} className="mb-2 mb-md-0">
+                          <BootstrapForm.Label className="col-label">Is Mandatory ?</BootstrapForm.Label>
+                          <div className="d-flex align-items-center checkbox-container">
+                            <label className="checkbox-box text-center">
                               <input
-                                type="radio"
-                                name="status" // Ensure the name is the same for both radio buttons
-                                value={1}
-                                className="mx-2"
-                                checked={values?.status === 1}
-                                id="Active"
-                                onChange={(event) =>
-                                  setFieldValue(
-                                    "status",
-                                    Number(event.target.value)
-                                  )
-                                }
-                                aria-label="Active Status"
+                                type="checkbox"
+                                id="is_mandatory"
+                                name="is_mandatory"
+                                className="pointer mr-1 align-middle"
+                                checked={values?.is_mandatory}
+                                onChange={(event) => setFieldValue(event?.target?.name, event?.target?.checked)}
                               />
-                              <label
-                                htmlFor="Active" // Ensure htmlFor matches the id
-                                className="form-check-label"
-                              >
-                                Active
-                              </label>
-                            </div>
-                            <div className="form-check">
-                              <input
-                                type="radio"
-                                name="status" // Ensure the name is the same for both radio buttons
-                                value={0}
-                                checked={values?.status === 0}
-                                id="InActive"
-                                onChange={(event) =>
-                                  setFieldValue(
-                                    "status",
-                                    Number(event.target.value)
-                                  )
-                                }
-                                aria-label="Inactive Status" // Corrected aria-label
-                              />
-                              <label
-                                htmlFor="InActive" // Ensure htmlFor matches the id
-                                className="form-check-label"
-                              >
-                                InActive
-                              </label>
-                            </div>
+                              <span className="checkmark" for="is_mandatory"></span>
+                            </label>
+
+                            <Label for="is_mandatory" className="form-check-label user-select-none pointer mb-0 ml-2">Yes</Label>
                           </div>
                         </Col>
-                      </Row>
+                      ) : null}
 
-                      <div className="buttons">
-                        <button
-                          type="submit"
-                          className="btnprimary"
-                          disabled={isSubmitting}
-                        >
-                          Submit
-                        </button>
+                      <Col xl={4} lg={6} as={BootstrapForm.Group} className="full-width">
+                        <BootstrapForm.Label className="col-label">Status</BootstrapForm.Label>
+                        <div className="radio-container d-flex">
+                          <div className="form-check">
+                            <input
+                              value={1}
+                              id="Active"
+                              type="radio"
+                              name="status"
+                              className="mx-2"
+                              aria-label="Active Status"
+                              checked={values?.status === 1}
+                              onChange={(event) => setFieldValue("status", Number(event.target.value))}
+                            />
+                            <label htmlFor="Active" className="form-check-label">Active</label>
+                          </div>
 
-                        <button
-                          type="button"
-                          className="btnsecondary ml-3"
-                          onClick={() => goBack()}
-                        >
-                          Back
-                        </button>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
-  );
-};
+                          <div className="form-check">
+                            <input
+                              value={0}
+                              type="radio"
+                              id="InActive"
+                              name="status"
+                              className="mx-2"
+                              aria-label="Inactive Status"
+                              checked={values?.status === 0}
+                              onChange={(event) => setFieldValue("status", Number(event.target.value))}
+                            />
+                            <label htmlFor="InActive" className="form-check-label">InActive</label>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+
+                    <div className="buttons">
+                      <button
+                        type="submit"
+                        className="btnprimary"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btnsecondary ml-3"
+                        onClick={() => goBack()}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  )
+}
 
 export default EditQuestion;

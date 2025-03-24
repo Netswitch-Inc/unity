@@ -22,7 +22,7 @@ const QuestionModel = ({
   show,
   closePopup,
   title,
-  initialQuestion,
+  initQuestion,
   isEditing,
 }) => {
   const validationSchema = Yup.object().shape({
@@ -62,7 +62,7 @@ const QuestionModel = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (store?.sectionItems && store.actionFlag === "SECTION_LISTING") {
+    if (store?.sectionItems && store.actionFlag === "SCTN_LST") {
       if (store?.sectionItems?.length > 0) {
         let sectionList = [];
         sectionList = store?.sectionItems?.map((item) => {
@@ -78,16 +78,16 @@ const QuestionModel = ({
 
   useEffect(() => {
     if (
-      (questionStore.actionFlag === "QUESTION_CREATED_SUCCESS" ||
-        questionStore.actionFlag === "QUESTION_UPDATED_SUCCESS") &&
+      (questionStore.actionFlag === "QESTN_CRTD_SCS" ||
+        questionStore.actionFlag === "QESTN_UPDT_SCS") &&
       questionStore.success
     ) {
       setshowSnackbar(true);
       setSnakbarMessage(questionStore.success);
     }
     if (
-      (questionStore.actionFlag === "QUESTION_CREATED_ERROR" ||
-        questionStore.actionFlag === "QUESTION_UPDATED_ERROR") &&
+      (questionStore.actionFlag === "QESTN_CRTD_ERR" ||
+        questionStore.actionFlag === "QESTN_UPDT_ERR") &&
       questionStore.error
     ) {
       setshowSnackbar(true);
@@ -97,8 +97,8 @@ const QuestionModel = ({
 
   useEffect(() => {
     if (
-      (questionStore.actionFlag === "QUESTION_CREATED_SUCCESS" ||
-        questionStore.actionFlag === "QUESTION_UPDATED_SUCCESS") &&
+      (questionStore.actionFlag === "QESTN_CRTD_SCS" ||
+        questionStore.actionFlag === "QESTN_UPDT_SCS") &&
       showSnackBar
     ) {
       setTimeout(() => {
@@ -108,8 +108,8 @@ const QuestionModel = ({
       }, 2000);
     }
     if (
-      (questionStore.actionFlag === "QUESTION_CREATED_ERROR" ||
-        questionStore.actionFlag === "QUESTION_UPDATED_ERROR") &&
+      (questionStore.actionFlag === "QESTN_CRTD_ERR" ||
+        questionStore.actionFlag === "QESTN_UPDT_ERR") &&
       showSnackBar
     ) {
       setTimeout(() => {
@@ -181,8 +181,8 @@ const QuestionModel = ({
             <Row>
               <Col>
                 <Formik
-                  initialValues={initialQuestion}
-                  enableReinitialize={initialQuestion}
+                  initialValues={initQuestion}
+                  enableReinitialize={initQuestion}
                   validationSchema={validationSchema}
                   onSubmit={onSubmit}
                 >

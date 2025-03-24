@@ -264,13 +264,13 @@ router.get("/wazuh-indexer-graph/filter", Authorization, DashboardController.fil
 router.get("/incident-trend-wazuh-stats-graph/filter", Authorization, DashboardController.incidentTrendingWazuhIndexerStatsGraphData);
 router.get("/configuration-assessment-stats-graph/filter", Authorization, DashboardController.configurationAssessmentStatsGraphData);
 router.get("/openvas-scan-report-stats-graph/filter", Authorization, DashboardController.openVASScanReportStatsGraphData);
-router.get("/netswitch-threat-intels-stats-count/filter",Authorization, DashboardController.getCountBasedOnStatsCountry);
+router.get("/netswitch-threat-intels-stats-count/filter", Authorization, DashboardController.getNetswitchThreatIntelsStatsCount);
 
 // ** Test
-    
+
 // ** wazuh-indexer
-router.post("/wazuh-indexer-statistic",Authorization, WazuhIndexerController.createWazuhIndexer);
-router.get("/wazuh-indexer-statistic",Authorization, WazuhIndexerController.getWazuhIndexers);
+router.post("/wazuh-indexer-statistic", Authorization, WazuhIndexerController.createWazuhIndexer);
+router.get("/wazuh-indexer-statistic", Authorization, WazuhIndexerController.getWazuhIndexers);
 router.put("/wazuh-indexer-statistic", Authorization, WazuhIndexerController.updateWazuhIndexer);
 router.get("/wazuh-indexer-statistic/:id", Authorization, WazuhIndexerController.getWazuhIndexer);
 router.delete("/wazuh-indexer-statistic/:id", Authorization, WazuhIndexerController.removeWazuhIndexer);
@@ -296,7 +296,7 @@ router.delete("/agents/:id", Authorization, AgentController.softDeleteAgent);
 
 // ** Helpdesk Supports
 // router.get("/helpdesk-supports-filter/last-20-days",Authorization, HelpdeskSupportController.getLast20DaysData);
-router.get("/helpdesk-graph-data",Authorization,HelpdeskSupportController.getHelpdeskSupportGraphData);
+router.get("/helpdesk-graph-data", Authorization, HelpdeskSupportController.getHelpdeskSupportGraphData);
 router.get("/helpdesk-supports", Authorization, HelpdeskSupportController.getHelpdeskSupports);
 router.post("/helpdesk-supports", Authorization, HelpdeskSupportController.createHelpdeskSupport);
 router.put("/helpdesk-supports", Authorization, HelpdeskSupportController.updateHelpdeskSupport);
@@ -319,21 +319,21 @@ router.get("/cron-scheduler-errors/:id", Authorization, CronSchedulerErrorContro
 router.delete("/cron-scheduler-errors/:id", Authorization, CronSchedulerErrorController.softDeleteCronSchedulerError);
 
 // ** NetSwitch Threat Intels
-router.get("/netswitch-threat-intels", NetSwitchThreatIntelController.getNetswitchThreatIntels);
-router.post("/netswitch-threat-intels", NetSwitchThreatIntelController.createNetswitchThreatIntel);
-router.put("/netswitch-threat-intels", NetSwitchThreatIntelController.updateNetSwitchThreatIntel);
-router.get("/netswitch-threat-intels/:id", NetSwitchThreatIntelController.getNetswitchThreatIntel);
-router.post("/netswitch-threat-intels-createBulk", NetSwitchThreatIntelController.createNetswitchThreatIntelBulk);
-router.delete("/netswitch-threat-intels/:id", NetSwitchThreatIntelController.softDeleteNetSwitchThreatIntel);
-router.delete("/netswitch-threat-intels-deleteAll", NetSwitchThreatIntelController.deleteManyNetSwitchThreatIntel);
+router.get("/netswitch-threat-intels",Authorization, NetSwitchThreatIntelController.getNetswitchThreatIntels);
+router.post("/netswitch-threat-intels",Authorization, NetSwitchThreatIntelController.createNetswitchThreatIntel);
+router.put("/netswitch-threat-intels",Authorization, NetSwitchThreatIntelController.updateNetSwitchThreatIntel);
+router.get("/netswitch-threat-intels/:id",Authorization, NetSwitchThreatIntelController.getNetswitchThreatIntel);
+router.post("/netswitch-threat-intels-createBulk",Authorization, NetSwitchThreatIntelController.createNetswitchThreatIntelBulk);
+router.delete("/netswitch-threat-intels/:id",Authorization, NetSwitchThreatIntelController.softDeleteNetSwitchThreatIntel);
+router.delete("/netswitch-threat-intels-deleteAll",Authorization, NetSwitchThreatIntelController.deleteManyNetSwitchThreatIntel);
 
-router.get("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelsStats);
-router.post("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelStats);
-router.put("/netswitch-threat-intels-stats",Authorization, NetswitchThreatIntelStatsController.updateNetSwitchThreatIntelStats);
-router.get("/netswitch-threat-intels-stats/:id",Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelStats);
-router.post("/netswitch-threat-intels-createBulk-stats",Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelBulkStats);
-router.delete("/netswitch-threat-intels-stats/:id",Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
-router.delete("/netswitch-threat-intels-deleteAll-stats",Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
-router.delete("/netswitch-threat-intels-country-stats/filter",Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
+router.get("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelsStats);
+router.post("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelStats);
+router.put("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.updateNetSwitchThreatIntelStats);
+router.get("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelStats);
+router.post("/netswitch-threat-intels-createBulk-stats", Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelBulkStats);
+router.delete("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
+router.delete("/netswitch-threat-intels-deleteAll-stats", Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
+router.delete("/netswitch-threat-intels-country-stats/filter", Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
 
 module.exports = router;

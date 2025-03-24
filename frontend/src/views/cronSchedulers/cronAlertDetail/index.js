@@ -28,9 +28,9 @@ import classnames from 'classnames';
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
-// PNG Icons
-import openedIcon from "../../../assets/img/openpolygon.png"
-import closedIcon from "../../../assets/img/closedpolygon.png"
+// ** SVG Icons
+import openedIcon from "../../../assets/img/openedPolygon.svg"
+import closedIcon from "../../../assets/img/closedPolygon.svg"
 
 const CronAlertDetail = () => {
   // ** Hooks
@@ -144,9 +144,8 @@ const CronAlertDetail = () => {
               <Card className="m-0">
                 <CardBody className='m-0 p-0'>
                   {store.cronSchedulerErrorItems.map((item, ind) => (
-                    <div key={`${item?._id}-${ind}`} className={classnames({
-                      'accrodion-permi mt-2': true,
-                      'accordion-border-left': selectedAccordion === ind
+                    <div key={`${item?._id}-${ind}`} className={classnames("accrodion-permi mt-2", {
+                      "accordion-border-left": selectedAccordion === ind
                     })}>
                       <Button
                         color="link"
@@ -159,11 +158,17 @@ const CronAlertDetail = () => {
                         }}
                         aria-expanded={selectedAccordion === ind}
                       >
+                        <div className="d-flex justify-content-between w-100 pr-4">
+                          <span className="pr-2 w-75">{item?.description}</span>
+
+                          {item?.date ? (<span className="h4 text-white mb-0 w-25 text-right">{getFormatDate(item.date, "DD-MM-YYYY HH:mm:ss")} </span>) : null}
+                        </div>
+
                         {selectedAccordion === ind ? (
                           <span className="check-box-permission"><img alt="Open" src={openedIcon} /></span>
                         ) : (
                           <span className="check-box-permission"><img alt="Close" src={closedIcon} /></span>
-                        )} <span>{item?.description || ""} </span> {item?.date ? (<span>{getFormatDate(item.date, "DD-MM-YYYY HH:mm:ss")} </span>) : null}
+                        )}
                       </Button>
 
                       <Collapse isOpen={selectedAccordion === ind} className='gobal-input border-top-0'>

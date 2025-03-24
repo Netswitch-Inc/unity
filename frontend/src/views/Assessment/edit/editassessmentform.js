@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { cleanQuestionMessage } from "views/questions/store";
 import {
   updateAssessment,
-  editAssessmentRequest,
+  getAssessment,
   cleanAssessmentMessage
 } from "../store";
 
@@ -51,18 +51,18 @@ const EditAssessmentForm = () => {
 
   useLayoutEffect(() => {
     const query = { id: id };
-    dispatch(editAssessmentRequest(query));
+    dispatch(getAssessment(query));
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (store.actionFlag === "ASSESSMENT_UPDATED" && store.success) {
+    if (store.actionFlag === "ASESMNT_UPDT_SCS" && store.success) {
       setshowSnackbar(true);
       setSnakbarMessage(store.success);
       dispatch(cleanQuestionMessage());
       dispatch(cleanAssessmentMessage());
     }
 
-    if (store.actionFlag === "ASSESSMENT_UPDATED_ERROR" && store.error) {
+    if (store.actionFlag === "ASESMNT_UPDT_ERR" && store.error) {
       setshowSnackbar(true);
       setSnakbarMessage(store.error);
     }

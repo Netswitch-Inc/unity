@@ -175,7 +175,7 @@ const EditUser = () => {
       dispatch(cleanCompanyMessage(null));
     }
 
-    if (companyStore?.actionFlag === "COMPANY_LISTING") {
+    if (companyStore?.actionFlag === "COMPANY_LST") {
       let cmpList = [];
       if (companyStore?.companyItems?.length) {
         cmpList = companyStore.companyItems.map((item) => {
@@ -198,7 +198,7 @@ const EditUser = () => {
       dispatch(cleanRoleMessage(null));
     }
 
-    if (roleStore?.actionFlag === "ROLE_LISTING") {
+    if (roleStore?.actionFlag === "ROLE_LST") {
       let roleList = [];
       if (roleStore?.roleItems?.length) {
         roleList = roleStore.roleItems.map((item) => {

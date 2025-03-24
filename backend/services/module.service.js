@@ -57,6 +57,7 @@ exports.getModule = async function (id) {
 exports.createModule = async function (module) {
     var newModule = new Module({
         group_name: module.group_name ? module.group_name : "",
+        tool_slug: module.tool_slug ? module.tool_slug : "",
         name: module.name ? module.name : "",
         slug: module.slug ? module.slug : "",
         is_super: module.is_super ? module.is_super : 0,
@@ -88,6 +89,10 @@ exports.updateModule = async function (module) {
     // Edit the Module Object
     if (module.group_name) {
         oldModule.group_name = module.group_name;
+    }
+
+    if (module.tool_slug) {
+        oldModule.tool_slug = module.tool_slug;
     }
 
     if (module.name) {

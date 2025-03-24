@@ -80,8 +80,8 @@ const EditCompany = () => {
       dispatch(cleanCompanyMessage());
     }
     if (
-      store?.actionFlag === "GET_COMPANY" ||
-      store?.actionFlag === "GET_NOT_COMPANY"
+      store?.actionFlag === "COMPANY_ITM" ||
+      store?.actionFlag === "COMPANY_ITM_ERR"
     ) {
       let companyItem = { ...initCompanyItem };
       if (store.companyItem?._id) {
@@ -90,8 +90,8 @@ const EditCompany = () => {
       setNewCompanyItem(companyItem);
     }
     if (
-      store?.actionFlag === "CREAT" ||
-      store?.actionFlag === "COMPANY_UPDATED"
+      store?.actionFlag === "COMPANY_CRTD" ||
+      store?.actionFlag === "COMPANY_UPDT"
     ) {
       setTimeout(() => {
         navigate("/admin/companies");

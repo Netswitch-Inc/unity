@@ -6,29 +6,29 @@ import instance from "../../../utility/AxiosConfig";
 
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
 
-// import { initAttachmentItem } from "utility/reduxConstant";
+import { initialProject } from "utility/reduxConstant";
 
-async function getAttachmentListRequest(params) {
-  return instance.get(`${API_ENDPOINTS.attachments.list}`, { params })
+async function getProjectListRequest(params) {
+  return instance.get(`${API_ENDPOINTS.projects.list}`, { params })
     .then((items) => items.data).catch((error) => error)
 }
 
-export const getAttachmentList = createAsyncThunk("appAttachments/getAttachmentList", async (params) => {
+export const getProjectList = createAsyncThunk("appProjects/getProjectList", async (params) => {
   try {
-    const response = await getAttachmentListRequest(params);
+    const response = await getProjectListRequest(params);
     if (response && response.flag) {
       return {
         params,
-        attachmentItems: response?.data || [],
+        projectItems: response?.data || [],
         pagination: response?.pagination || null,
-        actionFlag: "ATACHMNT_LST",
+        actionFlag: "PRJCT_LST",
         success: "",
         error: ""
       }
     } else {
       return {
         params,
-        attachmentItems: [],
+        projectItems: [],
         actionFlag: "",
         success: "",
         error: response.message
@@ -37,7 +37,7 @@ export const getAttachmentList = createAsyncThunk("appAttachments/getAttachmentL
   } catch (error) {
     return {
       params,
-      attachmentItems: [],
+      projectItems: [],
       actionFlag: "",
       success: "",
       error: error
@@ -45,59 +45,59 @@ export const getAttachmentList = createAsyncThunk("appAttachments/getAttachmentL
   }
 })
 
-async function getAttachmentRequest(params) {
-  return instance.get(`${API_ENDPOINTS.attachments.get}/${params?.id}`)
+async function getProjectRequest(params) {
+  return instance.get(`${API_ENDPOINTS.projects.get}/${params?.id}`)
     .then((items) => items.data).catch((error) => error)
 }
 
-export const getAttachment = createAsyncThunk("appAttachments/getAttachment", async (params) => {
+export const getProject = createAsyncThunk("appProjects/getProject", async (params) => {
   try {
-    const response = await getAttachmentRequest(params);
+    const response = await getProjectRequest(params);
     if (response && response.flag) {
       return {
-        attachmentItem: response.data,
-        actionFlag: "ATACHMNT_ITM",
+        projectItem: response.data,
+        actionFlag: "PRJCT_ITM_SCS",
         success: "",
         error: ""
       }
     } else {
       return {
-        attachmentItem: null,
-        actionFlag: "ATACHMNT_ITM_RR",
+        projectItem: null,
+        actionFlag: "PRJCT_ITM_ERR",
         success: "",
         error: ""
       }
     }
   } catch (error) {
     return {
-      attachmentItem: null,
-      actionFlag: "ATACHMNT_ITM_ERR",
+      projectItem: null,
+      actionFlag: "PRJCT_ITM_ERR",
       success: "",
       error: error
     }
   }
 })
 
-async function createAttachmentRequest(payload) {
-  return instance.post(`${API_ENDPOINTS.attachments.create}`, payload)
+async function createProjectRequest(payload) {
+  return instance.post(`${API_ENDPOINTS.projects.create}`, payload)
     .then((items) => items.data).catch((error) => error)
 }
 
-export const createAttachment = createAsyncThunk("appAttachments/createAttachment", async (payload) => {
+export const createProject = createAsyncThunk("appProjects/createProject", async (payload) => {
   try {
-    const response = await createAttachmentRequest(payload);
+    const response = await createProjectRequest(payload);
     if (response && response.flag) {
       return {
         payload,
-        attachmentItem: response.data || null,
-        actionFlag: "ATACHMNT_CRTD_SCS",
+        projectItem: response?.data || null,
+        actionFlag: "PRJCT_CRTD_SCS",
         success: response?.message || "",
         error: ""
       }
     } else {
       return {
         payload,
-        actionFlag: "ATACHMNT_CRTD_ERR",
+        actionFlag: "PRJCT_CRTD_ERR",
         success: "",
         error: response.message
       }
@@ -105,33 +105,33 @@ export const createAttachment = createAsyncThunk("appAttachments/createAttachmen
   } catch (error) {
     return {
       payload,
-      actionFlag: "ATACHMNT_CRTD_ERR",
+      actionFlag: "PRJCT_CRTD_ERR",
       success: "",
       error: error
     }
   }
 })
 
-async function updateAttachmentRequest(payload) {
-  return instance.put(`${API_ENDPOINTS.attachments.update}`, payload)
-    .then((items) => items.data).catch((error) => error);
+async function updateProjectRequest(payload) {
+  return instance.put(`${API_ENDPOINTS.projects.update}`, payload)
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const updateAttachment = createAsyncThunk("appAttachments/updateAttachment", async (payload) => {
+export const updateProject = createAsyncThunk("appProjects/updateProject", async (payload) => {
   try {
-    const response = await updateAttachmentRequest(payload);
+    const response = await updateProjectRequest(payload);
     if (response && response.flag) {
       return {
         payload,
-        attachmentItem: response.data || null,
-        actionFlag: "ATACHMNT_UPDT_SCS",
+        projectItem: response.data || null,
+        actionFlag: "PRJCT_UPDT_SCS",
         success: response?.message || "",
         error: ""
       }
     } else {
       return {
         payload,
-        actionFlag: "ATACHMNT_UPDT_ERR",
+        actionFlag: "PRJCT_UPDT_ERR",
         success: "",
         error: response.message
       }
@@ -139,32 +139,32 @@ export const updateAttachment = createAsyncThunk("appAttachments/updateAttachmen
   } catch (error) {
     return {
       payload,
-      actionFlag: "ATACHMNT_UPDT_ERR",
+      actionFlag: "PRJCT_UPDT_ERR",
       success: "",
       error: error
     }
   }
 })
 
-async function deleteAttachmentRequest(id) {
-  return instance.delete(`${API_ENDPOINTS.attachments.delete}/${id}`)
+async function deleteProjectRequest(id) {
+  return instance.delete(`${API_ENDPOINTS.projects.delete}/${id}`)
     .then((items) => items.data).catch((error) => error)
 }
 
-export const deleteAttachment = createAsyncThunk("appAttachments/deleteAttachment", async (id) => {
+export const deleteProject = createAsyncThunk("appProjects/deleteProject", async (id) => {
   try {
-    const response = await deleteAttachmentRequest(id);
+    const response = await deleteProjectRequest(id);
     if (response && response.flag) {
       return {
         id,
-        actionFlag: "ATACHMNT_DLT_SCS",
+        actionFlag: "PRJCT_DLT_SCS",
         success: response?.message || "",
         error: ""
       }
     } else {
       return {
         id,
-        actionFlag: "ATACHMNT_DLT_ERR",
+        actionFlag: "PRJCT_DLT_ERR",
         success: "",
         error: response.message
       }
@@ -172,7 +172,7 @@ export const deleteAttachment = createAsyncThunk("appAttachments/deleteAttachmen
   } catch (error) {
     return {
       id,
-      actionFlag: "ATACHMNT_DLT_ERR",
+      actionFlag: "PRJCT_DLT_ERR",
       success: "",
       error: error
     }
@@ -180,11 +180,11 @@ export const deleteAttachment = createAsyncThunk("appAttachments/deleteAttachmen
 })
 
 // Create a slice
-const appAttachmentSlice = createSlice({
-  name: "appAttachments",
+const appProjectSlice = createSlice({
+  name: "appProjects",
   initialState: {
-    attachmentItems: [],
-    attachmentItem: null,
+    projectItems: [],
+    projectItem: initialProject,
     pagination: null,
     actionFlag: "",
     loading: true,
@@ -192,7 +192,7 @@ const appAttachmentSlice = createSlice({
     error: ""
   },
   reducers: {
-    cleanAttachmentMessage: (state) => {
+    cleanProjectMessage: (state) => {
       state.actionFlag = "";
       state.success = "";
       state.error = "";
@@ -200,95 +200,96 @@ const appAttachmentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAttachmentList.pending, (state) => {
-        state.attachmentItems = [];
+      .addCase(getProjectList.pending, (state) => {
+        state.projectItems = [];
         state.loading = false;
         state.success = "";
         state.error = "";
       })
-      .addCase(getAttachmentList.fulfilled, (state, action) => {
-        state.attachmentItems = action.payload?.attachmentItems || [];
+      .addCase(getProjectList.fulfilled, (state, action) => {
+        state.projectItems = action.payload?.projectItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
-      .addCase(getAttachmentList.rejected, (state) => {
+      .addCase(getProjectList.rejected, (state) => {
         state.loading = true;
         state.success = "";
         state.error = "";
       })
-      .addCase(getAttachment.pending, (state) => {
-        state.attachmentItem = null;
+      .addCase(getProject.pending, (state) => {
+        state.projectItem = initialProject;
         state.loading = false;
         state.success = "";
         state.error = "";
       })
-      .addCase(getAttachment.fulfilled, (state, action) => {
-        state.attachmentItem = action.payload?.attachmentItem || null;
+      .addCase(getProject.fulfilled, (state, action) => {
         state.loading = true;
+        state.projectItem = action.payload?.projectItem || initialProject;
+        state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload.success;
         state.error = action.payload.error;
       })
-      .addCase(getAttachment.rejected, (state) => {
+      .addCase(getProject.rejected, (state) => {
         state.loading = true;
         state.success = "";
         state.error = "";
       })
-      .addCase(createAttachment.pending, (state) => {
+      .addCase(createProject.pending, (state) => {
         state.loading = false;
         state.success = "";
         state.error = "";
       })
-      .addCase(createAttachment.fulfilled, (state, action) => {
-        state.attachmentItem = action.payload?.attachmentItem || null;
+      .addCase(createProject.fulfilled, (state, action) => {
+        state.projectItem = action.payload?.projectItem || initialProject;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
-      .addCase(createAttachment.rejected, (state) => {
+      .addCase(createProject.rejected, (state) => {
         state.loading = true;
         state.success = "";
         state.error = "";
       })
-      .addCase(updateAttachment.pending, (state) => {
+      .addCase(updateProject.pending, (state) => {
         state.loading = false;
         state.success = "";
         state.error = "";
       })
-      .addCase(updateAttachment.fulfilled, (state, action) => {
-        state.attachmentItem = action.payload?.attachmentItem || null;
+      .addCase(updateProject.fulfilled, (state, action) => {
+        state.projectItem = action.payload?.projectItem || initialProject;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
-      .addCase(updateAttachment.rejected, (state) => {
+      .addCase(updateProject.rejected, (state) => {
         state.loading = true;
         state.success = "";
         state.error = "";
       })
-      .addCase(deleteAttachment.pending, (state) => {
+      .addCase(deleteProject.pending, (state) => {
         state.loading = false;
         state.success = "";
         state.error = "";
       })
-      .addCase(deleteAttachment.fulfilled, (state, action) => {
+      .addCase(deleteProject.fulfilled, (state, action) => {
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       })
-      .addCase(deleteAttachment.rejected, (state) => {
+      .addCase(deleteProject.rejected, (state) => {
         state.loading = true;
         state.success = "";
         state.error = "";
-      });
-  },
+      })
+  }
 });
 
-export const { cleanAttachmentMessage } = appAttachmentSlice.actions;
+export const { cleanProjectMessage } = appProjectSlice.actions;
 
-export default appAttachmentSlice.reducer;
+export default appProjectSlice.reducer;

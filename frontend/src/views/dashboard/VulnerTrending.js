@@ -22,7 +22,7 @@ const VulnerTrending = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.dashboard);
 
-  const [timeInterval, setTimeInterval] = useState({ label: "Week", value: "week" });
+  const [timeInterval, setTimeInterval] = useState({ label: "Year", value: "year" });
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggleDropdown = useCallback(() => setDropdownOpen((prevState) => !prevState), [])

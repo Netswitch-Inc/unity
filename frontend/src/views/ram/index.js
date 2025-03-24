@@ -14,7 +14,7 @@ import {
 import OuterCard from "./OuterCard";
 import GeneralCard from "./GeneralCard";
 import { useNavigate } from "react-router-dom";
-import { getProjectList } from "views/Projects/store";
+import { getProjectList } from "views/projects/store";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import { defaultPerPageRow } from "utility/reduxConstant";

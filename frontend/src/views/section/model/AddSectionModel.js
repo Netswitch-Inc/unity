@@ -26,7 +26,7 @@ const AddSectionModel = ({
   });
 
   useEffect(() => {
-    if (store.actionFlag === "SECTION_CREATED" || store.actionFlag === "SECTION_UPDATED") {
+    if (store.actionFlag === "SCTN_CRTD" || store.actionFlag === "SCTN_UPDT") {
       closePopup();
     }
   }, [store.actionFlag, closePopup]);

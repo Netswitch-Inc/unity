@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     updateAssessmentReport,
     createAssessmentReport,
-    editAssessmentReportRequest,
+    getAssessmentReport,
     cleanAssessmentReportMessage
 } from "../store";
 
@@ -35,13 +35,13 @@ const CompanyInfoStep = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
-    
+
     const assessmentReport = useSelector((state) => state.assessmentReport);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const assessmentId = queryParams.get("id");
-    
+
     const [asessmentReportValue, setAsessmentReportValue] = useState(AssessmentReport);
 
     // Define the validation schema
@@ -61,24 +61,16 @@ const CompanyInfoStep = () => {
     }
 
     useEffect(() => {
-        if (
-            assessmentReport?.actionFlag === "ASSESSMENT_REPORT_CREATED" &&
-            assessmentReport?.addAssessmentReportItem?._id
-        ) {
-            navigate(
-                `/code-verification/${id}?id=${assessmentReport?.addAssessmentReportItem?._id}`
-            );
+        if (assessmentReport?.actionFlag === "ASSMT_RPRT_CRTD_SCS" && assessmentReport?.addAssessmentReportItem?._id) {
+            navigate(`/code-verification/${id}?id=${assessmentReport?.addAssessmentReportItem?._id}`)
             dispatch(cleanAssessmentReportMessage());
         }
-        if (
-            assessmentReport?.actionFlag === "ASSESSMENT_REPORT_UPDATED" &&
-            assessmentReport?.assessmentReportItem?._id
-        ) {
-            navigate(
-                `/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`
-            );
+
+        if (assessmentReport?.actionFlag === "ASSMT_RPRT_UPDT_SCS" && assessmentReport?.assessmentReportItem?._id) {
+            navigate(`/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
             dispatch(cleanAssessmentReportMessage());
         }
+
         if (assessmentReport?.actionFlag === "ASSESSMENT_REPORT_GET") {
             setAsessmentReportValue({
                 ...assessmentReport?.assessmentReportItem,
@@ -93,7 +85,7 @@ const CompanyInfoStep = () => {
         if (assessmentId) {
             // setAsessmentReportValue()
             const query = { id: assessmentId };
-            dispatch(editAssessmentReportRequest(query));
+            dispatch(getAssessmentReport(query));
         }
     }, [assessmentId, dispatch]);
 
@@ -107,10 +99,12 @@ const CompanyInfoStep = () => {
             ...values,
             business_type: values.business_type.value,
             assessment_id: id,
-        };
+        }
+
         if (assessmentId) {
             dispatch(updateAssessmentReport(payload));
         }
+
         if (!assessmentId) {
             payload.assessment_id = id;
             dispatch(createAssessmentReport(payload));
@@ -120,57 +114,62 @@ const CompanyInfoStep = () => {
     return (
         <div className="step-wise-content">
             <Row className="sticky--- m-0">
-                <Card className="main-progress col-md-3 mb-0"> 
-                    <div className="main-logo-img">                     
+                <Card className="main-progress col-md-3 mb-0">
+                    <div className="main-logo-img">
                         <div className="logo">
                             <img alt="..." src={reactLogo} />
                         </div>
-                    </div>  
+                    </div>
+
                     <div className="mb-0">
                         <div className="steps-mains">
-                        <div className="steps active-class">
-                            <div className="borders step-line second-step">
-                            <div className="step-icon">
-                                <p>1</p>
+                            <div className="steps active-class">
+                                <div className="borders step-line second-step">
+                                    <div className="step-icon">
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Company Info</h4>
+                                </div>
                             </div>
+
+                            <div className="steps">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>2</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Verification</h4>
+                                </div>
                             </div>
-                            <div className="step-name">
-                            <h4>Company Info</h4>
+
+                            <div className="steps">
+                                <div className="borders step-line">
+                                    <div className="step-icon ">
+                                        <p>3</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Self Assessment</h4>
+                                </div>
                             </div>
-                        </div>
-                        <div className="steps">
-                            <div className="borders step-line">
-                            <div className="step-icon ">
-                            <p>2</p>
+                            
+                            <div className="steps">
+                                <div className="borders">
+                                    <div className="step-icon">
+                                        <p>4</p>
+                                    </div>
+                                </div>
+                                <div className="step-name">
+                                    <h4>Thank You</h4>
+                                </div>
                             </div>
-                            </div>
-                            <div className="step-name">
-                            <h4>Verification</h4>
-                            </div>
-                        </div>
-                        <div className="steps">
-                            <div className="borders step-line">
-                            <div className="step-icon ">
-                            <p>3</p>
-                            </div>
-                            </div>
-                            <div className="step-name">
-                            <h4>Self Assessment</h4>
-                            </div>
-                        </div>
-                        <div className="steps">
-                            <div className="borders">
-                            <div className="step-icon">
-                            <p>4</p>
-                            </div>
-                            </div>
-                            <div className="step-name">
-                            <h4>Thank You</h4>
-                            </div>
-                        </div>
                         </div>
                     </div>
                 </Card>
+
                 <Col className="right-side col-md-9">
                     <div className="card-header">
                         <h3 className="m-0">Company Information</h3>
@@ -206,6 +205,7 @@ const CompanyInfoStep = () => {
                                                     )}
                                                 </FormGroup>
                                             </Col>
+
                                             <Col xl={6}>
                                                 <FormGroup
                                                     controlId="formGridCompanyName"
@@ -227,6 +227,7 @@ const CompanyInfoStep = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
                                         <Row className="mb-3">
                                             <Col xl={6} className="mb-3 mb-xl-0">
                                                 <FormGroup
@@ -248,6 +249,7 @@ const CompanyInfoStep = () => {
                                                     )}
                                                 </FormGroup>
                                             </Col>
+
                                             <Col xl={6}>
                                                 <FormGroup
                                                     controlId="formGridContactNumber"
@@ -269,8 +271,7 @@ const CompanyInfoStep = () => {
                                                                 "mobile",
                                                                 val,
                                                                 data,
-                                                                setFieldValue,
-                                                               
+                                                                setFieldValue
                                                             )
                                                         }
                                                     // onBlur={() => setFieldTouched('mobile', true)}
@@ -283,6 +284,7 @@ const CompanyInfoStep = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
                                         <Row className="mb-3">
                                             <Col xl={6}>
                                                 {/* <BootstrapForm.Label>Business Type</BootstrapForm.Label> */}
@@ -306,8 +308,7 @@ const CompanyInfoStep = () => {
                                                     </div>
                                                 )}
                                             </Col>
-                                        </Row>
-                                        <Row className="mb-3">
+
                                             <Col xl={6} className="mb-3 mb-xl-0">
                                                 <FormGroup
                                                     controlId="formGridContactNumber"
@@ -328,7 +329,10 @@ const CompanyInfoStep = () => {
                                                     )}
                                                 </FormGroup>
                                             </Col>
-                                            <Col xl={6}>
+                                        </Row>
+
+                                        <Row className="mb-3">
+                                            <Col xl={12}>
                                                 <FormGroup
                                                     controlId="formGridContactNumber"
                                                     className="mb-0"
@@ -336,7 +340,7 @@ const CompanyInfoStep = () => {
                                                     {/* <BootstrapForm.Label> Description of Operations</BootstrapForm.Label> */}
                                                     <label className="col-label form-label">Description of Operations</label>
                                                     <Field
-                                                        type="text"
+                                                        type="textarea"
                                                         name="operation_description"
                                                         className="col-input w-100"
                                                         placeholder="Enter Description of Operations"
@@ -350,6 +354,7 @@ const CompanyInfoStep = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
                                         <Row className="mb-3">
                                             <Col xl={6} className="mb-3 mb-xl-0">
                                                 <FormGroup
