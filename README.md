@@ -31,12 +31,10 @@ Follow these steps for a manual installation:
    git clone https://github.com/Netswitch-Inc/unity
 
 6. **Download the manually setup script:**
-- Navigate to the root directory of the cloned repository.
    ```bash
    wget https://raw.githubusercontent.com/Netswitch-Inc/unity/refs/heads/master/manuallysetup.sh
    ```
 7. **Run the Setup Script:**
-   - Navigate to the root directory of the cloned repository.
    ```bash
    sudo sh manuallysetup.sh
    ```
