@@ -5,7 +5,7 @@
 Please refer to the following link for the automatic installation guide:
 [Unity Risk Indicator Setup Guide](https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf)
 
-Option 2: [Unity Unity Risk Indicator Setup Guide](https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit)
+Option 2: [Unity Unity Risk Indicator Setup Guide Option 2](https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit)
 
 ---
 
