@@ -166,7 +166,7 @@ exports.deleteManyNetSwitchThreatIntelStats = async function (filter = {}) {
 exports.getTotalCountBasedOnCountryStats = async function (pipeline) {
   try {
     const countryData = await NetswitchThreatIntelStats.aggregate(pipeline);
-
+    console.log("----------",countryData)
     return countryData;
   } catch (error) {
     throw new Error(error.message);

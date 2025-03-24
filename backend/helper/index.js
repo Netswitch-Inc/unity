@@ -36,6 +36,7 @@ const moduleSlugs = {
   "cron-schedulers": "cron-schedulers",
   "openvas-scan-reports": "openvas-scan-reports",
   "helpdesk-support-ticket": "helpdesk-support-ticket",
+  "zendesk-support-ticket": "zendesk-support-ticket",
   "vulnerability-scanner": "vulnerability-scanner",
   "siem": "siem",
   "log-collector": "log-collector"
@@ -143,6 +144,12 @@ const modulesData = [
     group_name: "governance",
     name: "Helpdesk Ticket",
     slug: "helpdesk-support-ticket"
+  },
+  {
+    _id: "67e10953c5b8b9945e4e245a",
+    group_name: "governance",
+    name: "Zendesk Ticket",
+    slug: "zendesk-support-ticket"
   },
   {
     _id: "67ada4ecf70f67bf5d59a4d6",

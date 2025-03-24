@@ -25,6 +25,7 @@ import cronScheduler from "../views/cronSchedulers/store";
 import agent from "../views/agents/store";
 import configurationAssessment from "../views/configurationAssessments/store";
 import openVASScanReport from "../views/openVASScanReports/store";
+import zendesk from "../views/zendesks/store";
 import netswitchThreatIntel from "views/netswitchThreatIntels/store";
 
 const rootReducer = {
@@ -54,6 +55,7 @@ const rootReducer = {
   agent,
   configurationAssessment,
   openVASScanReport,
+  zendesk,
   netswitchThreatIntel
 };
 

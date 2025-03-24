@@ -20,12 +20,18 @@ var ConfigurationAssessmentService = require("../services/configurationAssessmen
 var HelpdeskSupportService = require("../services/helpdeskSupport.service")
 var CronSchedulerErrorService = require('../services/cronSchedulerError.service')
 var NetSwitchThreatIntelService = require('../services/netSwitchThreatIntel.service')
+var FrameworkService = require('../services/framework.service')
+var ControlService = require("../services/control.service")
+var CISControlService = require("../services/CISControl.service")
+var EventLogService = require('../services/eventLog.service')
+var ZendeskSupportService = require("../services/zendeskSupport.service")
 var NetswitchThreatIntelStatsService = require("../services/netswitchThreatIntelStats.service");
 
 
 const {
     wazuhKey,
     netswitchThreatIntelKey,
+    zendeskSupportTicketKey,
     isObjEmpty,
     formatDate,
     getToolsPermissions,
@@ -48,7 +54,8 @@ const cronTaskFuntions = {
     'wazuh-tool-agents': () => wazuhToolAgentsData(),
     'wazuh-tool-configuration-assessment': () => wazuhToolAgentsConfigurationAssessmentData(),
     'helpdesk-support-ticket': () => helpdeskSupportTicketData(),
-    'netswitch-threat-intel-txt-file': () => netswitchThreatIntelTxtData()
+    'netswitch-threat-intel-txt-file': () => netswitchThreatIntelTxtData(),
+    'zendesk-support-ticket': () => zendeskSupportTicketData()
 }
 
 const getCronNextPrevTime = (expression = "") => {
@@ -1074,7 +1081,6 @@ const helpdeskSupportTicketData = async () => {
             var endDate = new Date(startDate);
             endDate.setUTCDate(endDate.getUTCDate()); // Move to the next day
             endDate.setUTCHours(23, 59, 59, 999);
-
             var helpdeskSupport = await HelpdeskSupportService.getHelpdeskSupportOne({ date_in_string: todayDate })
 
             var queries = {
@@ -1458,6 +1464,244 @@ const netswitchThreatIntelTxtData = async () => {
             }
 
             await createCronSchedulerErrorData(payload)
+        }
+
+        return { flag: false, message: error.message }
+    }
+}
+
+const zendeskSupportTicketData = async () => {
+    var connectionType = "zendesk-support-ticket";
+    var cronSchdlSlug = "zendesk-support-ticket";
+    let createCronErrorLog = false;
+    let errorLogType = "";
+    let errorLogMessage = "";
+    let errorLogDescription = "";
+    let apiErrorLog = null;
+    var currentDate = new Date();
+
+    try {
+        updateScheduleCronLogTime(cronSchdlSlug);
+
+        const cronScheduler = await CronSchedulerService.getCronSchedulerOne({
+            slug: cronSchdlSlug,
+            status: true,
+            deletedAt: null
+        })
+
+        manageCronRunningLog({
+            connection_type: connectionType,
+            cron_slug: cronSchdlSlug,
+            cron_id: cronScheduler?._id || "",
+            date_time: currentDate.toString(),
+            utc_date_time: currentDate.toUTCString(),
+            status: "running"
+        })
+
+        const connection = await ConnetionService.getConnectionOne({
+            type: connectionType,
+            status: true,
+            deletedAt: null
+        })
+
+        if (connection?._id && connection?.password && connection?.ip_address) {
+            const userName = connection.username;
+            const password = connection?.password || "";
+
+            const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+
+            let baseUrl = `${connection?.ip_address}`;
+            if (connection?.port) {
+                baseUrl = `${baseUrl}:${connection.port}`;
+            }
+
+            let apiUrl = `${baseUrl}/v2/search.json`;
+
+            const currentTimeHour = formatDate(null, "HH:mm");
+            let dateTime = moment();
+            let todayDate = formatDate(null, "YYYY-MM-DD");
+
+            if (currentTimeHour === "00:00") {
+                const previousDate = new Date(todayDate);
+                previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+                previousDate.setUTCHours(0, 0, 0, 0);
+
+                todayDate = formatDate(previousDate, "YYYY-MM-DD");
+                dateTime = moment(todayDate);
+            }
+
+            var startDate = new Date(todayDate);
+            startDate.setUTCHours(0, 0, 0, 0);
+
+            var endDate = new Date(startDate);
+            endDate.setUTCDate(endDate.getUTCDate());
+            endDate.setUTCHours(23, 59, 59, 999);
+
+            var startDateISO = startDate.toISOString();
+            var endDateISO = endDate.toISOString();
+
+            var zendeskSupport = await ZendeskSupportService.getZendeskSupportOne({
+                date_in_string: todayDate,
+                deletedAt: null
+            })
+
+            var closedQuery = `status:closed created>${startDateISO} created<${endDateISO}`;
+            var openQuery = `status:open created>${startDateISO} created<${endDateISO}`;
+            var receivedQuery = `status:open assignee_id:none, created>${startDateISO} created<${endDateISO}`;
+
+            var apiResponseData = {
+                closed_request_content: zendeskSupport?.closed_request_content || null,
+                open_request_content: zendeskSupport?.open_request_content || null,
+                received_request_content: zendeskSupport?.received_request_content || null
+            }
+
+            var headers = {
+                Authorization: `Basic ${Buffer.from(`${userName}/token:${password}`).toString("base64")}`,
+                "Content-Type": "application/json"
+            }
+
+            // Make the API calls with properly encoded queries
+            var apiClosedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(closedQuery)}`, { headers, httpsAgent })
+                .then((res) => res.data).catch((error) => error);
+            if (!apiClosedResponse?.results?.length) {
+                createCronErrorLog = true;
+                errorLogType = "connection_cron_error";
+                errorLogMessage = "Please check your connection and cron details.";
+                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                apiErrorLog = {
+                    status: apiClosedResponse.response?.status,
+                    statusText: apiClosedResponse.response?.statusText,
+                    data: apiClosedResponse.response?.data || null
+                }
+            } else if (apiClosedResponse?.results) {
+                apiResponseData.closed_request_content = {
+                    count: apiClosedResponse?.results?.length || 0,
+                    results: apiClosedResponse?.results
+                }
+            }
+
+            var apiOpenResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(openQuery)}`, { headers, httpsAgent })
+                .then((res) => res.data).catch((error) => error);
+            if (!apiOpenResponse?.results?.length) {
+                createCronErrorLog = true;
+                errorLogType = "connection_cron_error";
+                errorLogMessage = "Please check your connection and cron details.";
+                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                apiErrorLog = {
+                    status: apiOpenResponse.response?.status,
+                    statusText: apiOpenResponse.response?.statusText,
+                    data: apiOpenResponse.response?.data || null
+                }
+            } else if (apiOpenResponse?.results) {
+                apiResponseData.open_request_content = {
+                    count: apiOpenResponse?.results?.length || 0,
+                    results: apiOpenResponse?.results
+                }
+            }
+
+            var apiReceivedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(receivedQuery)}`, { headers, httpsAgent })
+                .then((res) => res.data).catch((error) => error);
+            if (!apiReceivedResponse?.results?.length) {
+                createCronErrorLog = true;
+                errorLogType = "connection_cron_error";
+                errorLogMessage = "Please check your connection and cron details.";
+                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                apiErrorLog = {
+                    status: apiReceivedResponse.response?.status,
+                    statusText: apiReceivedResponse.response?.statusText,
+                    data: apiReceivedResponse.response?.data || null
+                }
+            } else if (apiReceivedResponse?.results) {
+                apiResponseData.received_request_content = {
+                    count: apiReceivedResponse?.results?.length || 0,
+                    results: apiReceivedResponse?.results
+                }
+            }
+
+            // Save or update the data
+            if (zendeskSupport?._id) {
+                await ZendeskSupportService.updateZendeskSupport({
+                    ...apiResponseData,
+                    date: todayDate,
+                    date_time: dateTime,
+                    time: currentTimeHour,
+                    date_in_string: todayDate,
+                    _id: zendeskSupport._id
+
+                });
+            } else {
+                await ZendeskSupportService.createZendeskSupport({
+                    ...apiResponseData,
+                    date: todayDate,
+                    date_time: dateTime,
+                    time: currentTimeHour,
+                    date_in_string: todayDate
+                });
+            }
+            console.log("zendeskSupportTicketData >>> ", currentTimeHour, todayDate);
+        } else {
+            createCronErrorLog = true;
+            errorLogType = "connection_setup";
+            errorLogMessage = "Please setup connection data.";
+            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
+        }
+
+        if (createCronErrorLog) {
+            const payload = {
+                connection_id: connection?._id || null,
+                cron_scheduler_id: cronScheduler?._id || null,
+                tool_slug: cronScheduler?.tool_slug || zendeskSupportTicketKey,
+                date: currentDate,
+                slug: cronSchdlSlug,
+                cron_style: cronScheduler?.cron_style || "",
+                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                description: errorLogDescription,
+                error_logs: {
+                    type: errorLogType,
+                    cron_slug: cronSchdlSlug,
+                    connection_slug: connectionType,
+                    message: errorLogMessage,
+                    api_errors: apiErrorLog,
+                },
+                status: true,
+            };
+
+            await createCronSchedulerErrorData(payload);
+        }
+
+        return { flag: true, message: "Zendesk Support Ticket data fetched." }
+    } catch (error) {
+        console.log("zendeskSupportTicketData catch >>> ", error);
+        updateScheduleCronLogTime(cronSchdlSlug);
+
+        createCronErrorLog = true;
+        errorLogType = "cron_error";
+        errorLogMessage = "Internal cron function error.";
+        errorLogDescription = `Cron (${cronSchdlSlug}): Internal cron function error.`;
+        apiErrorLog = {
+            status: 400,
+            statusText: error.message,
+            data: null
+        }
+
+        if (createCronErrorLog) {
+            const payload = {
+                tool_slug: zendeskSupportTicketKey,
+                date: currentDate,
+                slug: cronSchdlSlug,
+                connection_type: connectionType,
+                description: errorLogDescription,
+                error_logs: {
+                    type: errorLogType,
+                    cron_slug: cronSchdlSlug,
+                    connection_slug: connectionType,
+                    message: errorLogMessage,
+                    api_errors: apiErrorLog,
+                },
+                status: true,
+            };
+
+            await createCronSchedulerErrorData(payload);
         }
 
         return { flag: false, message: error.message }

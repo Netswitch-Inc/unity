@@ -38,6 +38,7 @@ var OpenVASScanReportController = require("../controllers/openVASScanReports.con
 var CronSchedulerErrorController = require("../controllers/cronSchedulerErrors.controller");
 var NetSwitchThreatIntelController = require("../controllers/netSwitchThreatIntels.controller");
 var NetswitchThreatIntelStatsController = require("../controllers/netswitchThreatIntelsStats.controller");
+var ZendeskSupportController = require("../controllers/zendeskSupports.controller");
 
 
 // ** Auth
@@ -327,6 +328,7 @@ router.post("/netswitch-threat-intels-createBulk",Authorization, NetSwitchThreat
 router.delete("/netswitch-threat-intels/:id",Authorization, NetSwitchThreatIntelController.softDeleteNetSwitchThreatIntel);
 router.delete("/netswitch-threat-intels-deleteAll",Authorization, NetSwitchThreatIntelController.deleteManyNetSwitchThreatIntel);
 
+// ** NetSwitch Threat Intels Stats
 router.get("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelsStats);
 router.post("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelStats);
 router.put("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.updateNetSwitchThreatIntelStats);
@@ -335,5 +337,13 @@ router.post("/netswitch-threat-intels-createBulk-stats", Authorization, Netswitc
 router.delete("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-deleteAll-stats", Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-country-stats/filter", Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
+
+// ** Zendesk Supports
+router.get("/zendesk-graph-data", Authorization, ZendeskSupportController.getZendeskSupportGraphData);
+router.get("/zendesk-supports", Authorization, ZendeskSupportController.getZendeskSupports);
+router.post("/zendesk-supports", Authorization, ZendeskSupportController.createZendeskSupport);
+router.put("/zendesk-supports", Authorization, ZendeskSupportController.updateZendeskSupport);
+router.get("/zendesk-supports/:id", Authorization, ZendeskSupportController.getZendeskSupport);
+router.delete("/zendesk-supports/:id", Authorization, ZendeskSupportController.softDeleteZendeskSupport);
 
 module.exports = router;

@@ -21,6 +21,7 @@ const complianceBuilderPermissionId = "compliance-builder";
 const resilienceIndexPermissionId = "resilience-index";
 const projectsPermissionId = "projects";
 const helpdeskTicketPermissionId = "helpdesk-support-ticket";
+const zendeskTicketPermissionId = "zendesk-support-ticket";
 
 const toolsGroupPermissionId = "tools";
 const cveLookupPermissionId = "cve-lookup";
@@ -226,6 +227,7 @@ export {
   resilienceIndexPermissionId,
   projectsPermissionId,
   helpdeskTicketPermissionId,
+  zendeskTicketPermissionId,
 
   toolsGroupPermissionId,
   cveLookupPermissionId,
