@@ -5,6 +5,8 @@
 Please refer to the following link for the automatic installation guide:
 [Unity Risk Indicator Setup Guide](https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf)
 
+Option 2: [Unity Unity Risk Indicator Setup Guide Option 2](https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit)
+
 ---
 
 ## Option 2: Manual Installation
@@ -38,7 +40,6 @@ Follow these steps for a manual installation:
    ```bash
    sudo sh manuallysetup.sh
    ```
-   - When prompted, enter domain1 for the backend and domain2 for the frontend.
    - Ensure ports 3006 and 8081 are open for public access.
 
 8. **Configure the Frontend .env File**
