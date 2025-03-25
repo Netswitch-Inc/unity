@@ -19,7 +19,6 @@ else
 fi
 
 if ! [ -x "$(command -v docker-compose)" ]; then
-then
     # Fetch the latest version dynamically
     LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -o '"tag_name": "v[0-9.]*"' | grep -o 'v[0-9.]*')
     
