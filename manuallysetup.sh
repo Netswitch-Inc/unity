@@ -1,13 +1,5 @@
 #!/bin/bash
 
-FRONTEND_PORT=8081
-BACKEND_PORT=3006
-MONGO_DB_PORT=27017
-
-export FRONTEND_PORT=$FRONTEND_PORT
-export BACKEND_PORT=$BACKEND_PORT
-export MONGO_DB_PORT=$MONGO_DB_PORT
-
 # Install Docker and Docker Compose if not already installed
 if ! [ -x "$(command -v docker)" ]; then
     echo "Docker not found. Installing Docker..."
