@@ -57,7 +57,7 @@ Follow these steps for a manual installation:
    - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
    - Ensure port 3006 is open on your server.
 
-10. **Run the Setup Script:**
+10. **Run the Database import script:**
    ```bash
    sudo sh mongoImport.sh
    ```
