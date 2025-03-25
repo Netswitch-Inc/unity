@@ -53,45 +53,41 @@ Follow these steps for a manual installation:
    - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
    - Ensure port 3006 is open on your server.
 
-9. **Download the manually setup script:**
-   ```bash
-   wget https://raw.githubusercontent.com/Netswitch-Inc/unity/refs/heads/master/manuallysetup.sh
-   ```
-10. **Run the Setup Script:**
+9. **Run the Setup Script:**
    ```bash
    sudo sh manuallysetup.sh
    ```
    - Ensure ports 3006 and 8081 are open for public access.
   
-11. **Verify Docker Containers**
+10. **Verify Docker Containers**
    - Check if containers are running:
    ```bash
    sudo docker ps -a
    ```
 
-12. **Start the Application**
+11. **Start the Application**
    ```bash
    sudo docker-compose up --build -d
    ```
 
-13. **Stop the Application**
+12. **Stop the Application**
    ```bash
    sudo docker-compose down
    ```
 
-14. **View Container Logs**
+13. **View Container Logs**
    ```bash
    sudo docker logs --follow <container_id>
    ```
 
-15. **Update for Code Changes**
+14. **Update for Code Changes**
    - Pull the latest code from the repository.
    ```bash
    docker-compose up -d --no-recreate --build <service-name>
    ```
    - Use backend or frontend as <service-name> depending on where changes were made.
 
-16. **Replace IP**
+15. **Replace IP**
    - Browse http://<your_server_ip>:8081
    - Replace <your_server_ip> with your actual server IP address.
    - Ensure that your firewall settings allow access to the necessary ports (3006 and 8081).
