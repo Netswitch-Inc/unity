@@ -1,5 +1,13 @@
 #!/bin/bash
 
+FRONTEND_PORT=8081
+BACKEND_PORT=3006
+MONGO_DB_PORT=27017
+
+export FRONTEND_PORT=$FRONTEND_PORT
+export BACKEND_PORT=$BACKEND_PORT
+export MONGO_DB_PORT=$MONGO_DB_PORT
+
 # Install Docker and Docker Compose if not already installed
 if ! [ -x "$(command -v docker)" ]; then
     echo "Docker not found. Installing Docker..."
@@ -11,7 +19,6 @@ else
 fi
 
 if ! [ -x "$(command -v docker-compose)" ]; then
-then
     # Fetch the latest version dynamically
     LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -o '"tag_name": "v[0-9.]*"' | grep -o 'v[0-9.]*')
     
