@@ -32,28 +32,19 @@ Follow these steps for a manual installation:
    ```bash
    git clone https://github.com/Netswitch-Inc/unity
 
-6. **Download the manually setup script:**
-   ```bash
-   wget https://raw.githubusercontent.com/Netswitch-Inc/unity/refs/heads/master/manuallysetup.sh
-   ```
-7. **Run the Setup Script:**
-   ```bash
-   sudo sh manuallysetup.sh
-   ```
-   - Ensure ports 3006 and 8081 are open for public access.
-
-8. **Go inside the unity folder**
+6. **Go inside the unity folder**
    ```bash
    cd unity
    ```
-9. **Configure the Frontend .env File**    
+
+7. **Configure the Frontend .env File**    
    - Inside the unity directory, edit the frontend .env file
    ```bash
    vi frontend/.env
    ```
    - Update the REACT_APP_BACKEND_REST_API_URL in the .env file from http://localhost:3006 to http://<your_server_ip>:3006.
 
-10. **Configure the Backend .env File**
+8. **Configure the Backend .env File**
    - Inside the unity directory, edit the backend .env file
    ```bash
    vi backend/.env
@@ -61,6 +52,16 @@ Follow these steps for a manual installation:
    - FRONT_WEB_URL from http://localhost:8081 to http://<your_server_ip>:8081
    - BACK_UNITY_URL from http://localhost:3006 to http://<your_server_ip>:3006
    - Ensure port 3006 is open on your server.
+
+9. **Download the manually setup script:**
+   ```bash
+   wget https://raw.githubusercontent.com/Netswitch-Inc/unity/refs/heads/master/manuallysetup.sh
+   ```
+10. **Run the Setup Script:**
+   ```bash
+   sudo sh manuallysetup.sh
+   ```
+   - Ensure ports 3006 and 8081 are open for public access.
   
 11. **Verify Docker Containers**
    - Check if containers are running:
