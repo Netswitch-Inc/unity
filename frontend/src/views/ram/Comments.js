@@ -81,7 +81,7 @@ const Comments = () => {
             );
           })}
         </div>
-        {allowed && <div className={"input-container"}>
+        {allowed && <div className={"input-container mb-2"}>
           <textarea className={"input-text"} placeholder={"Your comment..."} value={inputVal} onChange={(e) => setInputVal(e.target.value)} />
           <div className={"input-menu"}>
             <div className={"option-items-container"}>
@@ -89,11 +89,13 @@ const Comments = () => {
               <div className={"option-button"} />
               <div className={"option-button"} />
             </div>
-            <div className={"add-comment-button btn btn-primary"} onClick={addCommentHandler}>
-              Add comment
-            </div>
           </div>
         </div>}
+        <div className="buttons w-100">
+              <button className={"btnprimary w-100"} onClick={addCommentHandler}>
+                Add comment
+              </button>
+            </div>
       </div>
     </>
   );

@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"bdea780269bc4f338d8bec1e0f4081f2","collectionName":"openvas_scan_reports","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"b8ed0be18b3c47e18af2164655ba3c5c","collectionName":"openvas_scan_reports","type":"collection"}

@@ -193,8 +193,8 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
     <>
       <Row className="add-edit-form">
         <Col>
-          <Card>
-            <CardBody className="pl-0 pr-0">
+          {/* <Card> */}
+            <CardBody className="pl-0 pr-0 pt-0">
               {questionItems?.length === 0 && (
                 <div className="buttons">
                   <button
@@ -217,7 +217,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
                 
               )}
             </CardBody>
-          </Card>
+          {/* </Card> */}
         </Col>
       </Row>
       {openModel && (

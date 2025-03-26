@@ -117,15 +117,14 @@ const AssessmentReportPreview = () => {
     <div className="content global-management">
       <div className="container-fluid">
         <Row>
-          <Col xl={12} lg={12} md={12} className="mb-4">
+          <Col xl={12} lg={12} md={12} className="mb-4 p-0">
             <Card className="m-0">
               <div className="role-name d-flex justify-content-between border-bottom mb-3 p-0">
                 <h3 className="card-title mb-0 mt-0 pr-1">{store.asessmentReportAnswers?.assessment_name}</h3>
-
                 <h4 className="card-title mb-0 mt-0 text-right">{store?.asessmentReportAnswers?.assessment_show_score_calculation ? `Overall score: ${totalPercentage}` : null}</h4>
               </div>
 
-              <CardBody className="m-0 p-0">
+              <CardBody className="m-0 p-0 assesment-detail">
                 {store.asessmentReportAnswers?.sections?.length ? (
                   store.asessmentReportAnswers?.sections.map((section, sInd) => (
                     section?.questions?.length ? (
@@ -147,7 +146,7 @@ const AssessmentReportPreview = () => {
                             <span className="pr-2 w-75">{section?.name}</span>
 
                             {store?.asessmentReportAnswers?.assessment_show_score_calculation ? (
-                              <span className="h4 text-white mb-0 w-25 text-right">
+                              <span className="text-white mb-0 w-25 text-right">
                                 {totalMaxPoints[sInd] > 0 ? `${((totalPoints[sInd] * 100) / totalMaxPoints[sInd]).toFixed(2)}%` : "0%"}
                                 {`(${totalPoints[sInd]} / ${totalMaxPoints[sInd]})`}
                               </span>
@@ -170,7 +169,7 @@ const AssessmentReportPreview = () => {
                                     <Label className="col-label w-100">{`Q${qInd + 1}`}: {question.question}</Label>
                                   </Col>
 
-                                  <Col xl={2} lg={2} md={4}>
+                                  <Col xl={2} lg={2} md={4} className="text-right">
                                     <Label className="col-label w-100">{question.option_type}</Label>
                                   </Col>
 

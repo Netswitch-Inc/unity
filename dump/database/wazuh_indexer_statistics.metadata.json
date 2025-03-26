@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"77ff8211a6c44bc6a321d44036c14214","collectionName":"wazuh_indexer_statistics","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"a16234af0f604662a8666b11f1b3c9b6","collectionName":"wazuh_indexer_statistics","type":"collection"}

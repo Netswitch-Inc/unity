@@ -192,14 +192,15 @@ const AsessmentReportList = () => {
           <Col className="col-md-12 col-xxl-10 mx-auto">
             <div className="p-0 role-name d-flex justify-content-between mb-3">
               <h3 className="card-title mb-0 mt-0">{location?.state?.name ? `${location?.state?.name} Submissions` : `Asessment Reports`}</h3>
-
+              <div className="buttons black-btn">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btnprimary"
                 onClick={() => navigate("/admin/assessment-forms")}
               >
                 Back
               </button>
+              </div>
             </div>
 
             <Card className="card-content p-0">
@@ -227,7 +228,7 @@ const AsessmentReportList = () => {
                   </Col>
                 </Row>
 
-                <Row className="userManagement mt-3">
+                <Row className="mt-3 assesment-share-table">
                   <Col md="12">
                     <DatatablePagination
                       data={store?.assessmentReportItems || []}

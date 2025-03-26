@@ -62,7 +62,7 @@ const AddNewRoleModal = ({
         >
             <Modal.Header>
                 <span className='modal-title col-sm-12' id="example-modal-sizes-title-lg">
-                    <h3 className='border-bottom mb-0 mt-0'>{roleItemData?._id ? "Edit" : "Add"} Role</h3>
+                    <h3 className='mb-0 mt-0'>{roleItemData?._id ? "Edit" : "Add"} Role</h3>
                 </span>
 
                 <button type="button" className='Close-button' onClick={handleModalClose}>×</button>

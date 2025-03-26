@@ -259,8 +259,8 @@ const EditAssessmentQuestion = ({
       </ReactSnackBar>
 
       <Col>
-        <Card>
-          <CardBody className="pl-0 pr-0">
+        {/* <Card> */}
+          <CardBody className="pl-0 pr-0 pt-0">
             {questionItems?.length === 0 && (
               <div className="buttons">
                 <button
@@ -284,7 +284,7 @@ const EditAssessmentQuestion = ({
               />
             )}
 
-            <div className="buttons">
+            <div className="buttons black-btn">
               <button
                 type="button"
                 className="btnprimary"
@@ -302,7 +302,7 @@ const EditAssessmentQuestion = ({
               </button>
             </div>
           </CardBody>
-        </Card>
+        {/* </Card> */}
       </Col>
 
       <AddSectionModel

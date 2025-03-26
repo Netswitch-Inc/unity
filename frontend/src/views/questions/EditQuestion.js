@@ -20,10 +20,13 @@ import SimpleSpinner from "components/spinner/simple-spinner";
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
-import { TiMessages, TiTrash } from "react-icons/ti";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constants
 import { questionTypeOptions, initQuestion } from "utility/reduxConstant";
+
+// ** SVG Icons
+import deleteIcon from "assets/img/delete.svg";
 
 const EditQuestion = () => {
   // ** Hooks
@@ -318,10 +321,12 @@ const EditQuestion = () => {
                                   {!["note", "textarea", "text"].includes(values?.option_type?.value) &&
                                     values.options?.length > 1 ? (
                                     <Col md={2}>
-                                      <TiTrash
-                                        size={20}
-                                        color="#fff"
+                                      <img
+                                        height={19}
+                                        alt="Delete"
+                                        title="Delete"
                                         cursor="pointer"
+                                        src={deleteIcon}
                                         onClick={() => remove(index)}
                                         className="mt-3"
                                       />

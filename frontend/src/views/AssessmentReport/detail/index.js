@@ -45,13 +45,15 @@ const AssessmentReportFront = () => {
           </NavItem>
         </Nav>
 
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
+        <div className="buttons black-btn">
+          <button
+            type="button"
+            className="btnprimary"
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </button>
+        </div>
       </div>
 
       <TabContent activeTab={activeTab}>
