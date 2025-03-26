@@ -61,11 +61,25 @@ sudo systemctl restart mongod
 sudo systemctl status mongod --no-pager
 
 
-echo "⏳ Waiting for MongoDB to start... ${MONGO_DB_DUMP_DIR}"
+echo "⏳ Waiting for MongoDB to start..."
 until mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.runCommand({ ping: 1 })" --quiet; do
   sleep 2
 done
 echo "✅ MongoDB is up and running."
+
+MONGO_DB_COLLECTION=modules
+
+# Check and drop the collection if it exists before import
+if [ -n "$MONGO_DB_COLLECTION" ]; then
+  COLLECTION_EXISTS=$(mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.getSiblingDB('$MONGO_DB_NAME').getCollectionNames().includes('$MONGO_DB_COLLECTION')" --quiet)
+  
+  if [ "$COLLECTION_EXISTS" = "true" ]; then
+    echo "⚠️ Dropping existing collection: $MONGO_DB_COLLECTION"
+    mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.getSiblingDB('$MONGO_DB_NAME').$MONGO_DB_COLLECTION.drop()"
+  else
+    echo "✅ Collection $MONGO_DB_COLLECTION does not exist, skipping drop step."
+  fi
+fi
 
 # Import the database dump
 if [ -d "$MONGO_DB_DUMP_DIR" ]; then
