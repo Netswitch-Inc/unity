@@ -38,7 +38,7 @@ const Editassessment = () => {
 
   return (
     <div className="content asssessment-forms">
-      <div className="tab-buttons row align-items-center m-0 mb-4 justify-content-between">
+      <div className="tab-buttons row align-items-center m-0 mb-3 justify-content-between">
         <Nav tabs className="">
           <NavItem>
             <NavLink
@@ -60,7 +60,7 @@ const Editassessment = () => {
         </Nav>
 
         {activeTab === '2' ? (
-          <div className="buttons">
+          <div className="buttons black-btn">
             <button
               type="button"
               className="btnprimary mt-0"

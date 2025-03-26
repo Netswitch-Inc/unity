@@ -32,7 +32,7 @@ function Footer() {
         <ul className="nav">
           <li className="nav-item">
             <a className="nav-link" href={companyUrl}>
-              Securli
+              {company}
             </a>
           </li>{" "}
           <li className="nav-item">

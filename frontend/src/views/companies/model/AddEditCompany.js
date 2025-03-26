@@ -191,7 +191,7 @@ const CompanyProfileForm = ({ show, closePopup, initialValues, title }) => {
           className="modal-title col-sm-12 "
           id="example-modal-sizes-title-lg"
         >
-          <h3 className="border-bottom pb-2 mb-0 mt-0">{title}</h3>
+          <h3 className="pb-2 mb-0 mt-0">{title}</h3>
         </span>
         <button type="button" className="Close-button" onClick={closePopup}>
           ×

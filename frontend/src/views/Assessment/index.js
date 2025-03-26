@@ -266,7 +266,7 @@ const AssessmentList = () => {
                   </Col>
                 </Row>
 
-                <Row className="userManagement mt-3">
+                <Row className=" mt-3 assesment-table">
                   <Col className="pb-2" md="12">
                     <DatatablePagination
                       data={store.assessmentItems}

@@ -1562,6 +1562,7 @@ module.exports = {
     wazuhToolAgentsData,
     wazuhToolAgentsConfigurationAssessmentData,
     manageCronNextAutorunErrorLogs,
+    helpdeskSupportTicketData,
     netswitchThreatIntelTxtData,
     testScriptData
 }

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, useLayoutEffect } from "re
 import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
+import { getHistoryList } from "./projectHistoryStore";
 import { updateProject, cleanProjectMessage } from "../projects/store/index";
 
 import {
@@ -11,11 +12,8 @@ import {
   Row,
   Card,
   Badge,
-  Button,
   CardBody,
-  FormGroup,
-  CardTitle,
-  CardHeader,
+  FormGroup
 } from "reactstrap";
 
 // ** Utils
@@ -23,15 +21,22 @@ import { getModulePermissionData } from "utility/Utils";
 
 // ** Third Party Components
 import Slider from "nouislider";
-// import TagsInput from "components/TagsInput/TagsInput";
+import Swal from "sweetalert2";
+import { TiArrowLeft } from "react-icons/ti";
 
-import { currencySign, defaultPerPageRow, superAdminRole, companyAdminRole, projectsPermissionId, governanceGroupPermissionId } from "utility/reduxConstant";
+// ** Constant
+import {
+  currencySign,
+  superAdminRole,
+  companyAdminRole,
+  defaultPerPageRow,
+  projectsPermissionId,
+  governanceGroupPermissionId
+} from "utility/reduxConstant";
 
 import Gauge from "./Gauge";
 import Comments from "./Comments";
 import Attachments from "./Attachments";
-import { getHistoryList } from "./projectHistoryStore";
-import Swal from "sweetalert2";
 
 
 const ProjectDetailsCard = (props) => {
@@ -43,7 +48,6 @@ const ProjectDetailsCard = (props) => {
 
   const historyStore = useSelector((state) => state.history);
   const loginStore = useSelector((state) => state.login)
-  // const projectStore = useSelector((state) => state.projects)
   const store = useSelector((state) => state.comments);
 
   // ** Const
@@ -57,25 +61,18 @@ const ProjectDetailsCard = (props) => {
   const [page] = useState(1);
   const [complianceTags] = useState(frameworks);
   const [partiesTags] = useState(InvolvedParties);
-  const [submitTagsinput] = useState([
-    riskData.submitted_by.user_name,
-  ]);
-  // const handleTagsinput = (complianceTags) => setComplianceTags(complianceTags);
-  // const handlePartiesTagsinput = (partiesTags) => setPartiesTags(partiesTags);
-
-  // const handleSubmitTagsinput = (submitTagsinput) =>
-  //   setSubmitTagsinput(submitTagsinput);
+  const [submitTagsinput] = useState([riskData.submitted_by.user_name])
 
   const slider1Ref = useRef(null);
   const slider2Ref = useRef(null);
 
   const callApies = async (payload) => {
-    await dispatch(updateProject(payload))
-    await dispatch(getHistoryList({
+    dispatch(updateProject(payload))
+    dispatch(getHistoryList({
       project_id: id, page,
       limit: defaultPerPageRow,
     }))
-    await dispatch(cleanProjectMessage())
+    dispatch(cleanProjectMessage())
   }
 
   useLayoutEffect(() => {
@@ -89,7 +86,7 @@ const ProjectDetailsCard = (props) => {
     if (!historyStore?.historyItems?.length) return null;
 
     return (
-      <ul className="timeline timeline-simple">
+      <ul className="timeline timeline-simple main-time-line">
         {historyStore.historyItems.map((history) => (
           <li key={history?._id} className="timeline-inverted">
             <div className="timeline-badge info">
@@ -121,16 +118,16 @@ const ProjectDetailsCard = (props) => {
     "Foreseeable,but unexpected",
     "Expected,but not common",
     "Common",
-    "Current",
-  ];
+    "Current"
+  ]
 
   let pipFormats2 = [
     "Negligible",
     "Acceptable",
     "Unacceptable",
     "High",
-    "Catastrophic",
-  ];
+    "Catastrophic"
+  ]
 
   useEffect(() => {
     const createSlider = (sliderRef, startValue, onChange) => {
@@ -211,15 +208,6 @@ const ProjectDetailsCard = (props) => {
     };
   }, [dispatch, likelihood, impactAssessment, riskData, id, loginStore, setLikelihood, setImpactAssessment]);
 
-  // Handle key up events for both sliders
-  // const handleKeyUp = (event, sliderRef) => {
-  //   if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
-  //     sliderRef.current.noUiSlider.set(sliderRef.current.noUiSlider.get()[0] + 1);
-  //   } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
-  //     sliderRef.current.noUiSlider.set(sliderRef.current.noUiSlider.get()[0] - 1);
-  //   }
-  // };
-
   const updateProjectStatus = async (payload, action) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -250,327 +238,283 @@ const ProjectDetailsCard = (props) => {
   };
 
   const updateStatus = async (payload, status, action) => {
-    // setStatusval(() => status);
     await updateProjectStatus(payload, action);
-  };
+  }
 
   return (
-    <Row>
-      <Col lg="8">
-        <Card>
-          <Row className="align-items-center border-bottom mb-2 pb-2">
-            <Col>
-              <div className="d-flex align-items-center">
-                <Button
-                  className="btn btn-primary mb-0 mt-0"
-                  onClick={(e) => props.onToggleDisplay(false)}
-                >
-                  <i className="tim-icons icon-minimal-left top-0" />
-                </Button>
-                <div className="card-header p-0">
-                  <h3 className="card-title mb-0 mt-0 ml-2">{riskData?.name}</h3>
-                </div>
-              </div>
-            </Col>
+    <div className="main-risk-edit">
+      <Row className="align-items-center mb-2">
+        <Col lg={7} className="mb-2">
+          <div className="d-flex align-items-center heading">
+            <TiArrowLeft
+              size={30}
+              className="arrow-left"
+              onClick={(e) => props.onToggleDisplay(false)}
+            />
+            <div className="p-0">
+              <h3 className="card-title mb-0 mt-0 ml-1">{riskData?.name}</h3>
+            </div>
+          </div>
+        </Col>
 
-            <Col className="text-right">
-              {allowed ? (<>
-                <Button
-                  className="btn btn-primary mb-0 mt-0"
-                  onClick={() => navigate(`/admin/project/edit/${id}`)}
+        <Col lg={5} className="text-sm-right text-center mb-2 buttons black-btn">
+          {allowed ? (<>
+            <button
+              className="btnprimary mb-0 mt-0 ml-2"
+              onClick={() => navigate(`/admin/project/edit/${id}`)}
+            >
+              Revise
+            </button>
+          </>) : null}
+
+          {(loginStore?.authUserItem?.role_id?._id === superAdminRole ||
+            loginStore?.authUserItem?.role_id?._id === companyAdminRole) || permission?.update ? (<>
+              {riskData?.status === 'created' ? (<>
+                <button
+                  className="btnprimary mb-0 mt-0 ml-2"
+                  onClick={() => updateStatus({ _id: id, status: "approved" }, "created", "Approve")}
                 >
-                  Revise
-                </Button>
+                  Approve
+                </button>
               </>) : null}
 
-              {(loginStore?.authUserItem?.role_id?._id === superAdminRole ||
-                loginStore?.authUserItem?.role_id?._id === companyAdminRole) || permission?.update ? (<>
-                  {riskData?.status === 'created' ? (<>
-                    <Button
-                      className="btn btn-primary mb-0 mt-0"
-                      onClick={() => updateStatus({ _id: id, status: "approved" }, "created", "Approve")}
-                    >
-                      Approve
-                    </Button>
-                  </>
-                  ) : null}
+              {riskData?.status === 'approved' ? (<>
+                <button
+                  className="btnprimary mb-0 mt-0 ml-2"
+                  onClick={() => updateStatus({ _id: id, status: "completed" }, "approved", "Complete")}
+                >
+                  Complete
+                </button>
+              </>) : null}
 
-                  {riskData?.status === 'approved' ? (<>
-                    <Button
-                      className="btn btn-primary mb-0 mt-0"
-                      onClick={() => updateStatus({ _id: id, status: "completed" }, "approved", "Complete")}
-                    >
-                      Complete
-                    </Button>
-                  </>) : null}
+              {riskData?.status === 'created' || riskData?.status === 'approved' ? (<>
+                <button
+                  className="btnprimary mb-0 mt-0 ml-2"
+                  onClick={() => updateStatus({ _id: id, status: "cancelled" }, "created", "Cancel")}
+                >
+                  Decline
+                </button>
+              </>) : null}
+            </>) : null}
+        </Col>
+      </Row>
 
-                  {riskData?.status === 'created' || riskData?.status === 'approved' ? (<>
-                    <Button
-                      className="btn btn-primary mb-0 mt-0"
-                      onClick={() => updateStatus({ _id: id, status: "cancelled" }, "created", "Cancel")}
-                    >
-                      Decline
-                    </Button>
-                  </>) : null}
-                </>) : null}
+      <Row>
+        <Col lg={8}>
+          <Row className="mb-3">
+            <Col md={6}>
+              <Card role="description" className="h-100 pb-0">
+                <FormGroup>
+                  <label className="description">Description</label>
+                  <p className="description-text"> {riskData?.description}</p>
+                </FormGroup>
+              </Card>
+            </Col>
+
+            <Col md={6} className="pl-md-0">
+              {/* Column for gauge */}
+              <Card className=" main-graph-dot h-100 mt-md-0 mt-2 p-0">
+                <Gauge val={((likelihood * impactAssessment) / 25) * 100} />
+              </Card>
             </Col>
           </Row>
 
-          <CardBody>
-            <Row>
-              <Col lg="8">
-                <Row role="description">
-                  <Col lg="12">
-                    <FormGroup>
-                      <label className="text-info">Description</label>
-                      <p> {riskData?.description}</p>
-                    </FormGroup>
-                  </Col>
-                </Row>
-              </Col>
-
-              <Col lg="4">
-                {/* Column for gauge */}
-                <Gauge val={((likelihood * impactAssessment) / 25) * 100} />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>
-                <Card className="card-plain">
-                  {/* Risk Assessment */}
-                  <CardHeader>Risk Assessment</CardHeader>
-                  <CardBody>
-                    <Row>
-                      <Col lg="12">
-                        {/* Column for Details */}
-                        <Row role="displayName">
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">Compliance</label>
-                              <div className="react-tagsinput">
-                                {/* <TagsInput
-                                  onChange={handleTagsinput}
-                                  tagProps={{
-                                    className: "react-tagsinput-tag warning",
-                                  }}
-                                  value={complianceTags}
-                                /> */}
-                                <p className="react-tagsinput-tag warning">{complianceTags}</p>
-                              </div>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">
-                                Involved Parties
-                              </label>
-                              <div className="react-tagsinput">
-                                <p className="react-tagsinput-tag info">{partiesTags}</p>
-                                {/* <TagsInput
-                                  onChange={handlePartiesTagsinput}
-                                  tagProps={{
-                                    className: "react-tagsinput-tag info",
-                                  }}
-                                  value={partiesTags}
-                                /> */}
-
-                              </div>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">
-                                Cost of The Risk
-                              </label>
-                              <p>{currencySign}{riskData.cost_of_risk}</p>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">
-                                Cost of Fix Risk Ratio
-                              </label>
-                              <p>{currencySign}{riskData.fix_cost_risk_ratio}</p>
-                            </FormGroup>
-                          </Col>
-                        </Row>
-
-                        <Row>
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">Submitted By</label>
-                              <div className="react-tagsinput">
-                                {/* <TagsInput
-                                  onChange={handleSubmitTagsinput}
-                                  tagProps={{
-                                    className: "react-tagsinput-tag info",
-                                  }}
-                                  value={submitTagsinput}
-                                /> */}
-                                <p className="react-tagsinput-tag info">{submitTagsinput}</p>
-                              </div>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">
-                                Affected Scope
-                              </label>
-                              <p>{riskData.affected_scope}</p>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">Priority</label>
-                              <p>{riskData.priority}</p>
-                            </FormGroup>
-                          </Col>
-
-                          <Col>
-                            <FormGroup>
-                              <label className="text-info">
-                                Projected Cost to Fix
-                              </label>
-                              <p>{currencySign}{riskData.fix_projected_cost}</p>
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-
-                    <Row>
-                      <Col xs={"4"}>
-                        <h6>Likelihood</h6>
-                        <h2 className="text-center">
-                          <u>{likelihood}</u>
-                        </h2>
-                      </Col>
-
-                      <Col xs={"7"}>
-                        <div className="box lg">
-                          <div className="slider" ref={slider1Ref}
-                          />
-                        </div>
-
-                        <div className="hidden-mobile">
-                          <div className="dropdown">
-                            <select
-                              aria-label="select"
-                              value={likelihood}
-                              onChange={(e) => setLikelihood(e?.target?.value || 0)}
-                              className="form-select dropbtn w-100 dropdown-toggle btn"
-                            >
-                              <option value={1}>Not Foreseeable</option>
-                              <option value={2}>
-                                Foreseeable,but unexpected
-                              </option>
-                              <option value={3}>
-                                Expected,but not common!
-                              </option>
-                              <option value={4}>Common</option>
-                              <option value={5}>Current</option>
-                            </select>
-                          </div>
-                        </div>
-                      </Col>
-                    </Row>
-
-                    <Row>
-                      <Col xs={"4"}>
-                        <h6>Impact</h6>
-                        <h2 className="text-center">
-                          <u>{impactAssessment}</u>
-                        </h2>
-                      </Col>
-
-                      <Col xs={"7"}>
-                        <div className="box lg">
-                          <div className="slider" ref={slider2Ref} />
-                        </div>
-
-                        <div className="hidden-mobile">
-                          <div className="dropdown">
-                            <select
-                              aria-label="select"
-                              value={impactAssessment}
-                              onChange={(e) => {
-                                setImpactAssessment(e?.target?.value || 0);
-                              }
-                              }
-                              className="form-select dropbtn w-100 dropdown-toggle btn"
-                            >
-                              <option value={1}>Negligible</option>
-                              <option value={2}>Acceptable</option>
-                              <option value={3}>Unacceptable</option>
-                              <option value={4}>High</option>
-                              <option value={5}>Catastrophic</option>
-                            </select>
-                            <button className="dropbtn w-100 dropdown-toggle btn">
-                              Impact
-                            </button>
-                            <div className="dropdown-content">
-                              <span>Negligible</span>
-                              <span>Acceptable</span>
-                              <span>Unacceptable</span>
-                              <span>High</span>
-                              <span>Catastrophic</span>
+          <Row>
+            <Col>
+              <div>
+                <Card className="mb-3 asses-card">
+                  <Row>
+                    <Col lg={12}>
+                      <div className="description mb-2">Risk Assessment</div>
+                      {/* Column for Details */}
+                      <Row role="displayName">
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup className="text-lg-left">
+                            <label className="text-info">Compliance</label>
+                            <div className="react-tagsinput">
+                              <p className="react-tagsinput-tag warning">{complianceTags}</p>
                             </div>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">
+                              Involved Parties
+                            </label>
+                            <div className="react-tagsinput">
+                              <p className="react-tagsinput-tag info">{partiesTags}</p>
+                            </div>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">
+                              Cost of The Risk
+                            </label>
+                            <p>{currencySign}{riskData.cost_of_risk}</p>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">
+                              Cost of Fix Risk Ratio
+                            </label>
+                            <p>{currencySign}{riskData.fix_cost_risk_ratio}</p>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup className="text-lg-left">
+                            <label className="text-info">Submitted By</label>
+                            <div className="react-tagsinput">
+                              <p className="react-tagsinput-tag info">{submitTagsinput}</p>
+                            </div>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">
+                              Affected Scope
+                            </label>
+                            <p>{riskData.affected_scope}</p>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">Priority</label>
+                            <p>{riskData.priority}</p>
+                          </FormGroup>
+                        </Col>
+
+                        <Col className="col-6 col-md-4 col-lg-3">
+                          <FormGroup>
+                            <label className="text-info">
+                              Projected Cost to Fix
+                            </label>
+                            <p>{currencySign}{riskData.fix_projected_cost}</p>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Card>
+
+                <Card className="mb-3 like-impact-main">
+                  <Row>
+                    <Col xs={12}>
+                      <h6 className="description">Likelihood</h6>
+                      <div className="box lg">
+                        <div className="slider" ref={slider1Ref} />
+                      </div>
+
+                      <div className="hidden-mobile">
+                        <div className="dropdown">
+                          <select
+                            aria-label="select"
+                            value={likelihood}
+                            onChange={(e) => setLikelihood(e?.target?.value || 0)}
+                            className="form-select dropbtn w-100 dropdown-toggle btn"
+                          >
+                            <option value={1}>Not Foreseeable</option>
+                            <option value={2}>
+                              Foreseeable,but unexpected
+                            </option>
+                            <option value={3}>
+                              Expected,but not common!
+                            </option>
+                            <option value={4}>Common</option>
+                            <option value={5}>Current</option>
+                          </select>
+                        </div>
+                      </div>
+                      <h2 className="text-center impact-number">
+                        <u className="impact-text">{likelihood}</u>
+                      </h2>
+                    </Col>
+                  </Row>
+                </Card>
+
+                <Card className="mb-3 like-impact-main">
+                  <Row>
+                    <Col xs={"12"}>
+                      <h6 className="description">Impact</h6>
+                      <div className="box lg">
+                        <div className="slider" ref={slider2Ref} />
+                      </div>
+
+                      <div className="hidden-mobile">
+                        <div className="dropdown">
+                          <select
+                            aria-label="select"
+                            value={impactAssessment}
+                            className="form-select dropbtn w-100 dropdown-toggle btn"
+                            onChange={(e) => setImpactAssessment(e?.target?.value || 0)}
+                          >
+                            <option value={1}>Negligible</option>
+                            <option value={2}>Acceptable</option>
+                            <option value={3}>Unacceptable</option>
+                            <option value={4}>High</option>
+                            <option value={5}>Catastrophic</option>
+                          </select>
+                          <button className="dropbtn w-100 dropdown-toggle btn">
+                            Impact
+                          </button>
+                          <div className="dropdown-content">
+                            <span>Negligible</span>
+                            <span>Acceptable</span>
+                            <span>Unacceptable</span>
+                            <span>High</span>
+                            <span>Catastrophic</span>
                           </div>
                         </div>
-                      </Col>
-                    </Row>
-                  </CardBody>
+                      </div>
+                      <h2 className="text-center impact-number">
+                        <u className="impact-text">{impactAssessment}</u>
+                      </h2>
+                    </Col>
+                  </Row>
                 </Card>
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
+              </div>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col lg="7">
-            {/* Comments */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Comments ({store.commentItems?.length ? store.commentItems?.length : 0})</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <Comments />
-              </CardBody>
-            </Card>
-          </Col>
+          <Row>
+            <Col md={6}>
+              {/* Comments */}
+              <Card className="main-comment-card common-comment-attach">
+                <div className="description mb-2">Comments ({store.commentItems?.length ? store.commentItems?.length : 0})</div>
+                <CardBody>
+                  <Comments />
+                </CardBody>
+              </Card>
+            </Col>
 
-          <Col lg="5">
-            <Card>
-              <CardHeader>
-                <CardTitle>Attachments</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <Attachments />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Col>
+            <Col md={6} className="pl-md-0">
+              <Card className="common-comment-attach">
+                <div className="description mb-2">Attachments</div>
+                <CardBody>
+                  <Attachments />
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Col>
 
-      <Col lg="4">
-        <Card className="card-timeline card-plain">
-          <CardHeader>
-            <CardTitle>Project History</CardTitle>
-          </CardHeader>
+        <Col lg={4} className="pl-lg-0">
+          <Card className="card-timeline">
+            <div className="description time-history">Project History</div>
 
-          <CardBody>
-            {timelineItems}
-          </CardBody>
-        </Card>
-      </Col>
-    </Row>
-  );
-};
+            <CardBody>{timelineItems}</CardBody>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  )
+}
 
 export default ProjectDetailsCard;

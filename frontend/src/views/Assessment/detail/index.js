@@ -94,17 +94,19 @@ const AssessmentFormDetail = () => {
             <div className="p-0 role-name d-flex justify-content-between mb-3">
               <h3 className="card-title mb-0 mt-0">{""}</h3>
               {/* <h3 className="card-title mb-0 mt-0">Assessment Form Detail</h3> */}
+              <div className="buttons black-btn">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btnprimary"
                 onClick={() => navigate("/admin/assessment-forms")}
               >
                 Back
               </button>
+              </div>
             </div>
 
             <Card className="m-0">
-              <CardBody className="m-0 p-0">
+              <CardBody className="m-0 p-0 assesment-detail">
                 {questionItems?.length ? (
                   questionItems.map((item, index) => (
                     item.questions?.length ? (
@@ -138,7 +140,7 @@ const AssessmentFormDetail = () => {
                                     <Label className="col-label w-100">{`Q${qInd + 1}`}: {question.question}</Label>
                                   </Col>
 
-                                  <Col xl={2} lg={2} md={4}>
+                                  <Col xl={2} lg={2} md={4} className="text-right">
                                     <Label className="col-label w-100">{question.option_type}</Label>
                                   </Col>
 
