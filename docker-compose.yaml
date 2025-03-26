@@ -21,8 +21,6 @@ services:
       context: backend
       target: development
     network_mode: "host"
-    ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
     env_file:
       - backend/.env
     environment:
