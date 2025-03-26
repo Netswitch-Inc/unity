@@ -161,6 +161,8 @@ update_environment_file "$BACKEND_ENV_FILE" "FRONT_WEB_URL" "$FRONTEND_WEB_URL"
 update_environment_file "$BACKEND_ENV_FILE" "PORT" "$BACKEND_PORT"
 if [ "$MONGO_DB_SECURED" = true ]; then
     update_environment_file "$BACKEND_ENV_FILE" "APP_MODE" "production"
+else
+    update_environment_file "$BACKEND_ENV_FILE" "APP_MODE" "development"
 fi
 update_environment_file "$BACKEND_ENV_FILE" "DATABASE_NAME" "$MONGO_DB_NAME"
 update_environment_file "$BACKEND_ENV_FILE" "DB_PORT" "$MONGO_DB_PORT"
