@@ -6,14 +6,31 @@ START_TIME=$(date +%s)
 # Define Unity package root path (Update this path based on your actual directory)
 UNITY_PACKAGE_ROOT_PATH="../unity-package"
 
+# Set git repo branch name
+GIT_BRANCH_NAME=master
+#Example:
+# v0.0.1 or v0.0.2
+
 # Set environment variables
 IP_ADDRESS="http://[Your_IP_Address]"
 # Example:
 # IP_ADDRESS="http://123.11.22.33"
 
+
 FRONTEND_PORT=8081
 BACKEND_PORT=3006
+
+MONGO_DB_HOST=127.0.0.1
 MONGO_DB_PORT=27017
+MONGO_DB_NAME=unity
+MONGO_DB_DUMP_DIR=./dump/database
+
+# Secure database => https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
+# Use mongosh if mongo not working
+MONGO_DB_SECURED=false # Enable (true|false) if mongo database is secure
+MONGO_DB_USER=""
+MONGO_DB_PASSWORD=""
+MONGO_DB_AUTH=""
 
 COMPANY_NAME="[Company_Name]"
 COMPANY_URL="[Company_Website_URL]"
@@ -72,8 +89,8 @@ fi
 
 # Fetching the latest repository changes
 print_yellow "Fetching the latest repository changes"
-git fetch --depth=1 origin master || handle_error "Failed to fetch from remote repository."
-git reset --hard origin/master || handle_error "Failed to reset to origin/master."
+git fetch --depth=1 origin ${GIT_BRANCH_NAME} || handle_error "Failed to fetch from remote repository."
+git reset --hard origin/${GIT_BRANCH_NAME} || handle_error "Failed to reset to origin/${GIT_BRANCH_NAME}."
 
 # Set 777 permission for Unity package root path
 print_yellow "Setting 0777 permissions for Unity package directory..."
@@ -88,13 +105,22 @@ fi
 print_yellow "Set environment variables dynamically"
 export FRONTEND_PORT=$FRONTEND_PORT
 export BACKEND_PORT=$BACKEND_PORT
+export MONGO_DB_HOST=$MONGO_DB_HOST
 export MONGO_DB_PORT=$MONGO_DB_PORT
+export MONGO_DB_NAME=$MONGO_DB_NAME
+export MONGO_DB_DUMP_DIR=$MONGO_DB_DUMP_DIR
+
+export MONGO_DB_SECURED=$MONGO_DB_SECURED # Enable (true|false) if mongo database is secure
+export MONGO_DB_USER=$MONGO_DB_USER
+export MONGO_DB_PASSWORD=$MONGO_DB_PASSWORD
+export MONGO_DB_AUTH=$MONGO_DB_AUTH
 
 # Construct full API URLs
-FRONTEND_API_URL="${IP_ADDRESS}:${FRONTEND_PORT}"
+FRONTEND_WEB_URL="${IP_ADDRESS}:${FRONTEND_PORT}"
 BACKEND_API_URL="${IP_ADDRESS}:${BACKEND_PORT}"
 
 # Define variables
+ROOT_ENV_FILE="./.env"
 BACKEND_ENV_FILE="./backend/.env"
 FRONTEND_ENV_FILE="./frontend/.env"
 
@@ -118,9 +144,31 @@ update_environment_file() {
 }
 
 # Update backend .env
+print_yellow "Updating root .env file..."
+update_environment_file "$ROOT_ENV_FILE" "FRONTEND_PORT" "$FRONTEND_PORT"
+update_environment_file "$ROOT_ENV_FILE" "BACKEND_PORT" "$BACKEND_PORT"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_HOST" "$MONGO_DB_HOST"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_PORT" "$MONGO_DB_PORT"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_NAME" "$MONGO_DB_NAME"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_DUMP_DIR" "$MONGO_DB_DUMP_DIR"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_SECURED" "$MONGO_DB_SECURED"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_USER" "$MONGO_DB_USER"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_PASSWORD" "$MONGO_DB_PASSWORD"
+update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_AUTH" "$MONGO_DB_AUTH"
+
 print_yellow "Updating backend .env file..."
-update_environment_file "$BACKEND_ENV_FILE" "FRONT_WEB_URL" "$FRONTEND_API_URL"
+update_environment_file "$BACKEND_ENV_FILE" "FRONT_WEB_URL" "$FRONTEND_WEB_URL"
 update_environment_file "$BACKEND_ENV_FILE" "PORT" "$BACKEND_PORT"
+if [ "$MONGO_DB_SECURED" = true ]; then
+    update_environment_file "$BACKEND_ENV_FILE" "APP_MODE" "production"
+else
+    update_environment_file "$BACKEND_ENV_FILE" "APP_MODE" "development"
+fi
+update_environment_file "$BACKEND_ENV_FILE" "DATABASE_NAME" "$MONGO_DB_NAME"
+update_environment_file "$BACKEND_ENV_FILE" "DB_PORT" "$MONGO_DB_PORT"
+update_environment_file "$BACKEND_ENV_FILE" "MONGO_DB_USER" "$DATABASE_USER"
+update_environment_file "$BACKEND_ENV_FILE" "DATABASE_PASSWORD" "$MONGO_DB_PASSWORD"
+update_environment_file "$BACKEND_ENV_FILE" "DATABASE_AUTH" "$MONGO_DB_AUTH"
 update_environment_file "$BACKEND_ENV_FILE" "BACK_UNITY_URL" "$BACKEND_API_URL"
 
 # Update frontend .env
@@ -131,6 +179,13 @@ update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_COMPANY_NAME" "$COMPANY_
 update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_COMPANY_URL" "$COMPANY_URL"
 
 print_green  "Updated .env files successfully."
+
+print_yellow "Executing database import script..."
+if [ -f ./mongoImport.sh ]; then
+  . ./mongoImport.sh
+else
+  print_yellow "No mongoImport.sh file found, proceeding without it."
+fi
 
 # Check and install NGINX
 print_yellow "Check is NGINX installed."
@@ -220,7 +275,7 @@ fi
 # Pull code and run docker-compose up --build -d
 # Assuming your code is already in the current directory
 print_yellow "Running docker-compose up --build -d..."
-docker-compose down && docker-compose up --build -d
+sudo docker-compose down && sudo docker-compose up --build -d
 
 # End time
 END_TIME=$(date +%s)
@@ -235,5 +290,5 @@ print_yellow "Installation completed!"
 echo ""
 print_yellow "Total execution time: ${HOURS} hours, ${MINUTES} minutes, and ${SECONDS} seconds."
 echo ""
-print_yellow "Access the Unity portal at $IP_ADDRESS:$FRONTEND_PORT"
+print_yellow "Access the Unity portal at $FRONTEND_WEB_URL"
 

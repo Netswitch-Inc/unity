@@ -20,42 +20,23 @@ services:
     build:
       context: backend
       target: development
+    network_mode: "host"
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     env_file:
       - backend/.env
     environment:
-      - MONGO_URI=mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@mongodb:${DB_PORT}/${DATABASE_NAME}?authSource=${DATABASE_AUTH}
-    depends_on:
-      - mongo
-    networks:
-      - app-network
+      - HOST=${MONGO_DB_HOST}  # Now 127.0.0.1 refers to the host's loopback interface
+      - DB_PORT=${MONGO_DB_PORT}
+      - DATABASE_NAME=${MONGO_DB_NAME}
+      - DATABASE_USER=${MONGO_DB_USER}
+      - DATABASE_PASSWORD=${MONGO_DB_PASSWORD}
+      - DATABASE_AUTH=${MONGO_DB_AUTH}
     expose:
       - 3000
 
-  mongo:
-    image: mongo:6.0
-    container_name: mongodb
-    ports:
-      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MONGO_INITDB_DATABASE: ${DATABASE_NAME}
-    volumes:
-      - mongodb_data:/data/db # Persistent storage for MongoDB data
-      - ./dump:/dump  # Mount the database dump
-      - ./mongo-init/import.sh:/docker-entrypoint-initdb.d/import.sh  # Mount the import script
-    entrypoint: ["/bin/bash", "/docker-entrypoint-initdb.d/import.sh"]
-    networks:
-      - app-network
-
-volumes:
-  mongodb_data:
-
-networks:
-  app-network:
-    driver: bridge
-    
+networks:    
   react-express:  # Ensure this network is defined if needed
+    driver: bridge
+  app-network:
     driver: bridge
