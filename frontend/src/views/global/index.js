@@ -402,14 +402,16 @@ const GlobalSetting = () => {
                                                     ))}
 
                                                     <Col className="btn-login ml-1">
-                                                        <Button
-                                                            type="button"
-                                                            color="primary"
-                                                            className="mb-3"
-                                                            onClick={() => onSubmit()}
-                                                        >
-                                                            Submit
-                                                        </Button>
+                                                        <div className="buttons">
+                                                            <button
+                                                                type="button"
+                                                                color="primary"
+                                                                className="btnprimary"
+                                                                onClick={() => onSubmit()}
+                                                            >
+                                                                Submit
+                                                            </button>
+                                                        </div>
                                                     </Col>
                                                 </Row>
                                             </Collapse>

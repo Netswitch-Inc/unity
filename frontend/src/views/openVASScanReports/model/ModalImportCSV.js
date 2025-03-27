@@ -73,9 +73,11 @@ const ModalImportCSV = ({ show, closePopup }) => {
     }
 
     return (
-        <Modal className="UpdateUserPopup" size="lg" show={show} centered>
+        <Modal className="UpdateUserPopup modal-design" size="lg" show={show} centered>
             <Modal.Header>
-                <h3 className='border-bottom pb-2 mb-0 mt-0'>Upload OpenVAS Scan Report</h3>
+                <span className='modal-title col-sm-12'>
+                    <h3 className='mb-0 mt-0'>Upload OpenVAS Scan Report</h3>
+                </span>
                 <button type="button" className='Close-button' onClick={handleClose}>×</button>
             </Modal.Header>
 
@@ -83,29 +85,31 @@ const ModalImportCSV = ({ show, closePopup }) => {
                 <Formik initialValues={{}} onSubmit={handleSubmit}>
                     {() => (
                         <Form>
-                            <Row className="mb-3">
+                            <Row className="mb-2 mt-3 ">
                                 <Col md={12}>
                                     <BootstrapForm.Group>
                                         <BootstrapForm.Label>
                                             CSV File (Matching your OpenVAS scan format)
                                         </BootstrapForm.Label>
+                                        <span className='col-photo'>
                                         <Field
                                             name="csvFile"
                                             type="file"
                                             accept=".csv"
-                                            className="form-control"
+                                            className=""
                                             onChange={handleFileUpload}
                                         />
+                                        </span>
                                     </BootstrapForm.Group>
                                 </Col>
                             </Row>
 
                             {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
 
-                            <div className="mt-4 d-flex justify-content-end">
+                            <div className="mt-4 d-flex justify-content-end buttons">
                                 <button
                                     type="submit"
-                                    className="btn btn-primary"
+                                    className="btnprimary"
                                     disabled={isSubmitting || !parsedData}
                                 >
                                     {isSubmitting ? (

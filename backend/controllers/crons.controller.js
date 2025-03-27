@@ -430,223 +430,224 @@ const wazuhIndexerSeverityData = async () => {
         updateScheduleCronLogTime(cronSchdlSlug);
 
         var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null })
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            });
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        });
-
-        var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null })
-        if (connection?._id && connection?.username && connection?.ip_address) {
-            var userName = connection.username;
-            var password = connection?.password || "";
-            var rowCredentials = userName;
-            if (password) {
-                rowCredentials = `${rowCredentials}:${password}`;
-            }
-
-            var todayDate = formatDate(null, "YYYY-MM-DD");
-            var currentTimeHour = formatDate(null, "HH:mm");
-
-            // Get the current time
-            var currentTime = moment();
-            var dateTime = moment();
-            var allowToCreate = false;
-
-            var lastWazuhIndexer = await WazuhIndexerService.getWazuhIndexerOne({ deletedAt: null }, 'createdAt', -1) || null;
-            if (!lastWazuhIndexer || !lastWazuhIndexer?._id) { allowToCreate = true; }
-
-            if (lastWazuhIndexer?._id && lastWazuhIndexer?.date_time) {
-                // Get the difference in minutes
-                var lastRecordTime = moment(lastWazuhIndexer.date_time);
-                var differenceInHours = currentTime.diff(lastRecordTime, 'minutes');
-                if ((differenceInHours >= 55 && differenceInHours <= 65) || differenceInHours >= 60) { allowToCreate = true; }
-            }
-
-            if (allowToCreate) {
-                const agent = new https.Agent({ rejectUnauthorized: false })
-                var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
-
-                var url = `https://${connection.ip_address}`;
-                if (connection?.port) {
-                    url = `${url}:${connection.port}`;
+            var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null })
+            if (connection?._id && connection?.username && connection?.ip_address) {
+                var userName = connection.username;
+                var password = connection?.password || "";
+                var rowCredentials = userName;
+                if (password) {
+                    rowCredentials = `${rowCredentials}:${password}`;
                 }
 
-                var lowSeverityHitsCount = 0;
-                var lowSeverityHitsContent = null;
+                var todayDate = formatDate(null, "YYYY-MM-DD");
+                var currentTimeHour = formatDate(null, "HH:mm");
 
-                var mediumSeverityHitsCount = 0;
-                var mediumSeverityHitsContent = null;
+                // Get the current time
+                var currentTime = moment();
+                var dateTime = moment();
+                var allowToCreate = false;
 
-                var highSeverityHitsCount = 0;
-                var highSeverityHitsContent = null;
+                var lastWazuhIndexer = await WazuhIndexerService.getWazuhIndexerOne({ deletedAt: null }, 'createdAt', -1) || null;
+                if (!lastWazuhIndexer || !lastWazuhIndexer?._id) { allowToCreate = true; }
 
-                var criticalSeverityHitsCount = 0;
-                var criticalSeverityHitsContent = null;
-
-                var lowRangeLevel = { "rule.level": { gte: 0, lte: 6 } }
-                var mediumRangeLevel = { "rule.level": { gte: 7, lte: 11 } }
-                var highRangeLevel = { "rule.level": { gte: 12, lte: 14 } }
-                var criticalRangeLevel = { "rule.level": { gte: 15 } }
-
-                url = `${url}/wazuh-alerts*/_search?pretty=true`;
-                var headers = {
-                    Authorization: `Basic ${credentials}`
+                if (lastWazuhIndexer?._id && lastWazuhIndexer?.date_time) {
+                    // Get the difference in minutes
+                    var lastRecordTime = moment(lastWazuhIndexer.date_time);
+                    var differenceInHours = currentTime.diff(lastRecordTime, 'minutes');
+                    if ((differenceInHours >= 55 && differenceInHours <= 65) || differenceInHours >= 60) { allowToCreate = true; }
                 }
 
-                var apiQuery = {
-                    query: {
-                        bool: {
-                            must: [],
-                            filter: [
-                                {
-                                    range: {
-                                        timestamp: {
-                                            gte: "now-1h",
-                                            lte: "now",
-                                            format: "epoch_millis"
+                if (allowToCreate) {
+                    const agent = new https.Agent({ rejectUnauthorized: false })
+                    var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
+
+                    var url = `https://${connection.ip_address}`;
+                    if (connection?.port) {
+                        url = `${url}:${connection.port}`;
+                    }
+
+                    var lowSeverityHitsCount = 0;
+                    var lowSeverityHitsContent = null;
+
+                    var mediumSeverityHitsCount = 0;
+                    var mediumSeverityHitsContent = null;
+
+                    var highSeverityHitsCount = 0;
+                    var highSeverityHitsContent = null;
+
+                    var criticalSeverityHitsCount = 0;
+                    var criticalSeverityHitsContent = null;
+
+                    var lowRangeLevel = { "rule.level": { gte: 0, lte: 6 } }
+                    var mediumRangeLevel = { "rule.level": { gte: 7, lte: 11 } }
+                    var highRangeLevel = { "rule.level": { gte: 12, lte: 14 } }
+                    var criticalRangeLevel = { "rule.level": { gte: 15 } }
+
+                    url = `${url}/wazuh-alerts*/_search?pretty=true`;
+                    var headers = {
+                        Authorization: `Basic ${credentials}`
+                    }
+
+                    var apiQuery = {
+                        query: {
+                            bool: {
+                                must: [],
+                                filter: [
+                                    {
+                                        range: {
+                                            timestamp: {
+                                                gte: "now-1h",
+                                                lte: "now",
+                                                format: "epoch_millis"
+                                            }
                                         }
-                                    }
-                                },
-                                { range: lowRangeLevel }
-                            ],
-                            should: [],
-                            must_not: []
-                        }
-                    },
-                    aggs: {
-                        date_histogram_aggregation: {
-                            date_histogram: {
-                                field: "timestamp",
-                                min_doc_count: 1, // Ensure empty buckets are excluded
-                                fixed_interval: "1h"
+                                    },
+                                    { range: lowRangeLevel }
+                                ],
+                                should: [],
+                                must_not: []
                             }
+                        },
+                        aggs: {
+                            date_histogram_aggregation: {
+                                date_histogram: {
+                                    field: "timestamp",
+                                    min_doc_count: 1, // Ensure empty buckets are excluded
+                                    fixed_interval: "1h"
+                                }
+                            }
+                        },
+                        script_fields: {},
+                        // size: 10000,
+                        sort: [],
+                        stored_fields: ["*"]
+                    }
+
+                    var lowApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
+                    if (!lowApiResponse?.hits?.total && lowApiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_cron_error";
+                        errorLogMessage = "Please check your connection and cron details.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                        apiErrorLog = {
+                            status: lowApiResponse.response?.status,
+                            statusText: lowApiResponse.response?.statusText,
+                            data: lowApiResponse.response?.data || null
                         }
+                    } else if (lowApiResponse?.hits?.total) {
+                        lowSeverityHitsCount = lowApiResponse?.hits?.total?.value || 0;
+                        lowSeverityHitsContent = lowApiResponse;
+                    }
+
+                    apiQuery.query.bool.filter[1].range = mediumRangeLevel;
+                    var mediumApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
+                    if (!mediumApiResponse?.hits?.total && mediumApiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_cron_error";
+                        errorLogMessage = "Please check your connection and cron details.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                        apiErrorLog = {
+                            status: mediumApiResponse.response?.status,
+                            statusText: mediumApiResponse.response?.statusText,
+                            data: mediumApiResponse.response?.data || null
+                        }
+                    } else if (mediumApiResponse?.hits?.total) {
+                        mediumSeverityHitsCount = mediumApiResponse?.hits?.total?.value || 0;
+                        mediumSeverityHitsContent = mediumApiResponse;
+                    }
+
+                    apiQuery.query.bool.filter[1].range = highRangeLevel;
+                    var highApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
+                    if (!highApiResponse?.hits?.total && highApiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_cron_error";
+                        errorLogMessage = "Please check your connection and cron details.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                        apiErrorLog = {
+                            status: highApiResponse.response?.status,
+                            statusText: highApiResponse.response?.statusText,
+                            data: highApiResponse.response?.data || null
+                        }
+                    } else if (highApiResponse?.hits?.total) {
+                        highSeverityHitsCount = highApiResponse?.hits?.total?.value || 0;
+                        highSeverityHitsContent = highApiResponse;
+                    }
+
+                    apiQuery.query.bool.filter[1].range = criticalRangeLevel;
+                    var criticalApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
+                    if (!criticalApiResponse?.hits?.total && criticalApiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_cron_error";
+                        errorLogMessage = "Please check your connection and cron details.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                        apiErrorLog = {
+                            status: criticalApiResponse.response?.status,
+                            statusText: criticalApiResponse.response?.statusText,
+                            data: criticalApiResponse.response?.data || null
+                        }
+                    } else if (criticalApiResponse?.hits?.total) {
+                        criticalSeverityHitsCount = criticalApiResponse?.hits?.total?.value || 0;
+                        criticalSeverityHitsContent = criticalApiResponse;
+                    }
+
+                    var wzhIndxPayload = {
+                        type: "wazuh-indexer-statistics",
+                        date: todayDate,
+                        date_in_string: todayDate,
+                        date_time: dateTime,
+                        time: currentTimeHour,
+                        low_severity_hits_count: lowSeverityHitsCount || 0,
+                        low_severity_hits_content: lowSeverityHitsContent || null,
+                        medium_severity_hits_count: mediumSeverityHitsCount || 0,
+                        medium_severity_hits_content: mediumSeverityHitsContent || null,
+                        high_severity_hits_count: highSeverityHitsCount || 0,
+                        high_severity_hits_content: highSeverityHitsContent || null,
+                        critical_severity_hits_count: criticalSeverityHitsCount || 0,
+                        critical_severity_hits_content: criticalSeverityHitsContent || null
+                    }
+
+                    await WazuhIndexerService.createWazuhIndexer(wzhIndxPayload);
+                }
+                console.log("wazuhIndexerSeverityData >>> ", currentTimeHour, todayDate)
+            } else {
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
+            }
+
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: wazuhKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog
                     },
-                    script_fields: {},
-                    // size: 10000,
-                    sort: [],
-                    stored_fields: ["*"]
+                    status: true
                 }
 
-                var lowApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
-                if (!lowApiResponse?.hits?.total && lowApiResponse?.response) {
-                    createCronErrorLog = true;
-                    errorLogType = "connection_cron_error";
-                    errorLogMessage = "Please check your connection and cron details.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                    apiErrorLog = {
-                        status: lowApiResponse.response?.status,
-                        statusText: lowApiResponse.response?.statusText,
-                        data: lowApiResponse.response?.data || null
-                    }
-                } else if (lowApiResponse?.hits?.total) {
-                    lowSeverityHitsCount = lowApiResponse?.hits?.total?.value || 0;
-                    lowSeverityHitsContent = lowApiResponse;
-                }
-
-                apiQuery.query.bool.filter[1].range = mediumRangeLevel;
-                var mediumApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
-                if (!mediumApiResponse?.hits?.total && mediumApiResponse?.response) {
-                    createCronErrorLog = true;
-                    errorLogType = "connection_cron_error";
-                    errorLogMessage = "Please check your connection and cron details.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                    apiErrorLog = {
-                        status: mediumApiResponse.response?.status,
-                        statusText: mediumApiResponse.response?.statusText,
-                        data: mediumApiResponse.response?.data || null
-                    }
-                } else if (mediumApiResponse?.hits?.total) {
-                    mediumSeverityHitsCount = mediumApiResponse?.hits?.total?.value || 0;
-                    mediumSeverityHitsContent = mediumApiResponse;
-                }
-
-                apiQuery.query.bool.filter[1].range = highRangeLevel;
-                var highApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
-                if (!highApiResponse?.hits?.total && highApiResponse?.response) {
-                    createCronErrorLog = true;
-                    errorLogType = "connection_cron_error";
-                    errorLogMessage = "Please check your connection and cron details.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                    apiErrorLog = {
-                        status: highApiResponse.response?.status,
-                        statusText: highApiResponse.response?.statusText,
-                        data: highApiResponse.response?.data || null
-                    }
-                } else if (highApiResponse?.hits?.total) {
-                    highSeverityHitsCount = highApiResponse?.hits?.total?.value || 0;
-                    highSeverityHitsContent = highApiResponse;
-                }
-
-                apiQuery.query.bool.filter[1].range = criticalRangeLevel;
-                var criticalApiResponse = await axios.get(url, { data: apiQuery, headers, httpsAgent: agent }).then((res) => res.data).catch((error) => error)
-                if (!criticalApiResponse?.hits?.total && criticalApiResponse?.response) {
-                    createCronErrorLog = true;
-                    errorLogType = "connection_cron_error";
-                    errorLogMessage = "Please check your connection and cron details.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                    apiErrorLog = {
-                        status: criticalApiResponse.response?.status,
-                        statusText: criticalApiResponse.response?.statusText,
-                        data: criticalApiResponse.response?.data || null
-                    }
-                } else if (criticalApiResponse?.hits?.total) {
-                    criticalSeverityHitsCount = criticalApiResponse?.hits?.total?.value || 0;
-                    criticalSeverityHitsContent = criticalApiResponse;
-                }
-
-                var wzhIndxPayload = {
-                    type: "wazuh-indexer-statistics",
-                    date: todayDate,
-                    date_in_string: todayDate,
-                    date_time: dateTime,
-                    time: currentTimeHour,
-                    low_severity_hits_count: lowSeverityHitsCount || 0,
-                    low_severity_hits_content: lowSeverityHitsContent || null,
-                    medium_severity_hits_count: mediumSeverityHitsCount || 0,
-                    medium_severity_hits_content: mediumSeverityHitsContent || null,
-                    high_severity_hits_count: highSeverityHitsCount || 0,
-                    high_severity_hits_content: highSeverityHitsContent || null,
-                    critical_severity_hits_count: criticalSeverityHitsCount || 0,
-                    critical_severity_hits_content: criticalSeverityHitsContent || null
-                }
-
-                await WazuhIndexerService.createWazuhIndexer(wzhIndxPayload);
+                await createCronSchedulerErrorData(payload)
             }
-            console.log("wazuhIndexerSeverityData >>> ", currentTimeHour, todayDate)
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
-
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: wazuhKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog
-                },
-                status: true
-            }
-
-            await createCronSchedulerErrorData(payload)
         }
 
         return { flag: true, message: "Wazuh indexer severity data fetched." }
@@ -701,116 +702,117 @@ const wazuhToolAgentsData = async () => {
         updateScheduleCronLogTime(cronSchdlSlug);
 
         var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null });
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            });
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        });
-
-        var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
-        if (connection?._id && connection?.username && connection?.ip_address) {
-            var userName = connection.username;
-            var password = connection?.password || "";
-            var rowCredentials = userName;
-            if (password) {
-                rowCredentials = `${rowCredentials}:${password}`;
-            }
-
-            const httpsAgent = new https.Agent({ rejectUnauthorized: false })
-            var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
-
-            var url = `https://${connection.ip_address}`;
-            if (connection?.port) {
-                url = `${url}:${connection.port}`;
-            }
-
-            var tokenUrl = `${url}/security/user/authenticate`;
-            var headers = {
-                Authorization: `Basic ${credentials}`
-            }
-
-            var tokenApiResponse = await axios.get(tokenUrl, { headers, httpsAgent })
-                .then((res) => res.data).catch((error) => error)
-            if (!tokenApiResponse?.data?.token && tokenApiResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_error";
-                errorLogMessage = "Please check your connection credentials.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection credentials.`;
-                apiErrorLog = {
-                    status: tokenApiResponse.response?.status,
-                    statusText: tokenApiResponse.response?.statusText,
-                    data: tokenApiResponse.response?.data || null
+            var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
+            if (connection?._id && connection?.username && connection?.ip_address) {
+                var userName = connection.username;
+                var password = connection?.password || "";
+                var rowCredentials = userName;
+                if (password) {
+                    rowCredentials = `${rowCredentials}:${password}`;
                 }
-            } else if (tokenApiResponse?.data?.token) {
-                var accessToken = tokenApiResponse.data.token;
 
-                var agentsUrl = `${url}/agents`;
+                const httpsAgent = new https.Agent({ rejectUnauthorized: false })
+                var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
+
+                var url = `https://${connection.ip_address}`;
+                if (connection?.port) {
+                    url = `${url}:${connection.port}`;
+                }
+
+                var tokenUrl = `${url}/security/user/authenticate`;
                 var headers = {
-                    Authorization: `Bearer ${accessToken}`
+                    Authorization: `Basic ${credentials}`
                 }
 
-                var apiResponse = await axios.get(agentsUrl, { headers, httpsAgent })
+                var tokenApiResponse = await axios.get(tokenUrl, { headers, httpsAgent })
                     .then((res) => res.data).catch((error) => error)
-                if (!apiResponse?.data?.affected_items && apiResponse?.response) {
+                if (!tokenApiResponse?.data?.token && tokenApiResponse?.response) {
                     createCronErrorLog = true;
-                    errorLogType = "connection_cron_error";
-                    errorLogMessage = "Please check your connection and cron details.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    errorLogType = "connection_error";
+                    errorLogMessage = "Please check your connection credentials.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection credentials.`;
                     apiErrorLog = {
-                        status: apiResponse.response?.status,
-                        statusText: apiResponse.response?.statusText,
-                        data: apiResponse.response?.data || null
+                        status: tokenApiResponse.response?.status,
+                        statusText: tokenApiResponse.response?.statusText,
+                        data: tokenApiResponse.response?.data || null
                     }
-                } else if (apiResponse?.data?.affected_items) {
-                    var affectedItems = apiResponse.data.affected_items;
-                    for (let i = 0; i < affectedItems.length; i++) {
-                        var affectedItem = affectedItems[i];
-                        var refId = affectedItem?.id || "";
-                        if (refId) {
-                            var agent = await AgentService.getAgentOne({ ref_id: refId });
-                            if (agent?._id) {
-                                await AgentService.updateAgent({ ...affectedItem, ref_id: refId, _id: agent._id });
-                            } else {
-                                await AgentService.createAgent({ ...affectedItem, ref_id: refId });
+                } else if (tokenApiResponse?.data?.token) {
+                    var accessToken = tokenApiResponse.data.token;
+
+                    var agentsUrl = `${url}/agents`;
+                    var headers = {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+
+                    var apiResponse = await axios.get(agentsUrl, { headers, httpsAgent })
+                        .then((res) => res.data).catch((error) => error)
+                    if (!apiResponse?.data?.affected_items && apiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_cron_error";
+                        errorLogMessage = "Please check your connection and cron details.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                        apiErrorLog = {
+                            status: apiResponse.response?.status,
+                            statusText: apiResponse.response?.statusText,
+                            data: apiResponse.response?.data || null
+                        }
+                    } else if (apiResponse?.data?.affected_items) {
+                        var affectedItems = apiResponse.data.affected_items;
+                        for (let i = 0; i < affectedItems.length; i++) {
+                            var affectedItem = affectedItems[i];
+                            var refId = affectedItem?.id || "";
+                            if (refId) {
+                                var agent = await AgentService.getAgentOne({ ref_id: refId });
+                                if (agent?._id) {
+                                    await AgentService.updateAgent({ ...affectedItem, ref_id: refId, _id: agent._id });
+                                } else {
+                                    await AgentService.createAgent({ ...affectedItem, ref_id: refId });
+                                }
                             }
                         }
+
+                        console.log("wazuhToolAgentsData >>> ", affectedItems?.length);
                     }
-
-                    console.log("wazuhToolAgentsData >>> ", affectedItems?.length);
                 }
-            }
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
-
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: wazuhKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog
-                },
-                status: true
+            } else {
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
             }
 
-            await createCronSchedulerErrorData(payload)
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: wazuhKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog
+                    },
+                    status: true
+                }
+
+                await createCronSchedulerErrorData(payload)
+            }
         }
 
         return { flag: true, message: "Wazuh tool agents data fetched." }
@@ -865,127 +867,128 @@ const wazuhToolAgentsConfigurationAssessmentData = async () => {
         updateScheduleCronLogTime(cronSchdlSlug);
 
         var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null });
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            });
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        });
-
-        var agents = await AgentService.getAgents({ status: 'active' });
-        if (agents?.length) {
-            var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
-            if (connection?._id && connection?.username && connection?.ip_address) {
-                var userName = connection.username;
-                var password = connection?.password || "";
-                var rowCredentials = userName;
-                if (password) {
-                    rowCredentials = `${rowCredentials}:${password}`;
-                }
-
-                var todayDate = formatDate(null, "YYYY-MM-DD");
-
-                const httpsAgent = new https.Agent({ rejectUnauthorized: false })
-                var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
-
-                var url = `https://${connection.ip_address}`;
-                if (connection?.port) {
-                    url = `${url}:${connection.port}`;
-                }
-
-                var tokenUrl = `${url}/security/user/authenticate`;
-                var headers = {
-                    Authorization: `Basic ${credentials}`
-                }
-
-                var tokenApiResponse = await axios.get(tokenUrl, { headers, httpsAgent })
-                    .then((res) => res.data).catch((error) => error)
-                if (!tokenApiResponse?.data?.token && tokenApiResponse?.response) {
-                    createCronErrorLog = true;
-                    errorLogType = "connection_error";
-                    errorLogMessage = "Please check your connection credentials.";
-                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection credentials.`;
-                    apiErrorLog = {
-                        status: tokenApiResponse.response?.status,
-                        statusText: tokenApiResponse.response?.statusText,
-                        data: tokenApiResponse.response?.data || null
+            var agents = await AgentService.getAgents({ status: 'active' });
+            if (agents?.length) {
+                var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
+                if (connection?._id && connection?.username && connection?.ip_address) {
+                    var userName = connection.username;
+                    var password = connection?.password || "";
+                    var rowCredentials = userName;
+                    if (password) {
+                        rowCredentials = `${rowCredentials}:${password}`;
                     }
-                } else if (tokenApiResponse?.data?.token) {
-                    var accessToken = tokenApiResponse.data.token;
 
-                    var scaUrl = `${url}/sca`;
+                    var todayDate = formatDate(null, "YYYY-MM-DD");
+
+                    const httpsAgent = new https.Agent({ rejectUnauthorized: false })
+                    var credentials = new Buffer.from(rowCredentials, "utf8").toString("base64")
+
+                    var url = `https://${connection.ip_address}`;
+                    if (connection?.port) {
+                        url = `${url}:${connection.port}`;
+                    }
+
+                    var tokenUrl = `${url}/security/user/authenticate`;
                     var headers = {
-                        Authorization: `Bearer ${accessToken}`
+                        Authorization: `Basic ${credentials}`
                     }
 
-                    for (let i = 0; i < agents.length; i++) {
-                        var agent = agents[i];
-                        var agnRefId = agent?.ref_id || "";
-                        if (agnRefId) {
-                            var apiResponse = await axios.get(`${scaUrl}/${agnRefId}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-                            if (!apiResponse?.data?.affected_items && apiResponse?.response) {
-                                createCronErrorLog = true;
-                                errorLogType = "connection_cron_error";
-                                errorLogMessage = "Please check your connection and cron details.";
-                                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                                apiErrorLog = {
-                                    status: apiResponse.response?.status,
-                                    statusText: apiResponse.response?.statusText,
-                                    agent_ref_id: agnRefId,
-                                    data: apiResponse.response?.data || null
-                                }
-                            } else if (apiResponse?.data?.affected_items?.length) {
-                                var configurationAssessment = await ConfigurationAssessmentService.getConfigurationAssessmentOne({ agent_ref_id: agnRefId, date_in_string: todayDate });
-                                if (configurationAssessment?._id) {
-                                    await ConfigurationAssessmentService.updateConfigurationAssessment({
-                                        ...apiResponse.data.affected_items[0],
-                                        _id: configurationAssessment._id
-                                    })
-                                } else {
-                                    await ConfigurationAssessmentService.createConfigurationAssessment({
-                                        ...apiResponse.data.affected_items[0],
-                                        date_in_string: todayDate,
-                                        agent_ref_id: agnRefId
-                                    })
+                    var tokenApiResponse = await axios.get(tokenUrl, { headers, httpsAgent })
+                        .then((res) => res.data).catch((error) => error)
+                    if (!tokenApiResponse?.data?.token && tokenApiResponse?.response) {
+                        createCronErrorLog = true;
+                        errorLogType = "connection_error";
+                        errorLogMessage = "Please check your connection credentials.";
+                        errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection credentials.`;
+                        apiErrorLog = {
+                            status: tokenApiResponse.response?.status,
+                            statusText: tokenApiResponse.response?.statusText,
+                            data: tokenApiResponse.response?.data || null
+                        }
+                    } else if (tokenApiResponse?.data?.token) {
+                        var accessToken = tokenApiResponse.data.token;
+
+                        var scaUrl = `${url}/sca`;
+                        var headers = {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+
+                        for (let i = 0; i < agents.length; i++) {
+                            var agent = agents[i];
+                            var agnRefId = agent?.ref_id || "";
+                            if (agnRefId) {
+                                var apiResponse = await axios.get(`${scaUrl}/${agnRefId}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                                if (!apiResponse?.data?.affected_items && apiResponse?.response) {
+                                    createCronErrorLog = true;
+                                    errorLogType = "connection_cron_error";
+                                    errorLogMessage = "Please check your connection and cron details.";
+                                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                                    apiErrorLog = {
+                                        status: apiResponse.response?.status,
+                                        statusText: apiResponse.response?.statusText,
+                                        agent_ref_id: agnRefId,
+                                        data: apiResponse.response?.data || null
+                                    }
+                                } else if (apiResponse?.data?.affected_items?.length) {
+                                    var configurationAssessment = await ConfigurationAssessmentService.getConfigurationAssessmentOne({ agent_ref_id: agnRefId, date_in_string: todayDate });
+                                    if (configurationAssessment?._id) {
+                                        await ConfigurationAssessmentService.updateConfigurationAssessment({
+                                            ...apiResponse.data.affected_items[0],
+                                            _id: configurationAssessment._id
+                                        })
+                                    } else {
+                                        await ConfigurationAssessmentService.createConfigurationAssessment({
+                                            ...apiResponse.data.affected_items[0],
+                                            date_in_string: todayDate,
+                                            agent_ref_id: agnRefId
+                                        })
+                                    }
                                 }
                             }
                         }
                     }
+
+                    console.log("wazuhToolAgentsConfigurationAssessmentData >>> ", todayDate);
+                }
+            } else {
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
+            }
+
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: wazuhKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog
+                    },
+                    status: true
                 }
 
-                console.log("wazuhToolAgentsConfigurationAssessmentData >>> ", todayDate);
+                await createCronSchedulerErrorData(payload)
             }
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
-
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: wazuhKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog
-                },
-                status: true
-            }
-
-            await createCronSchedulerErrorData(payload)
         }
 
         return { flag: true, message: "Wazuh tool agents configuration assessment data fetched." }
@@ -1040,238 +1043,240 @@ const helpdeskSupportTicketData = async () => {
         updateScheduleCronLogTime(cronSchdlSlug);
 
         var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null });
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            });
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        });
+            var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
+            if (connection?._id && connection?.password && connection?.ip_address) {
+                var userName = connection.username;
+                var password = connection?.password || "";
 
-        var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
-        if (connection?._id && connection?.password && connection?.ip_address) {
-            var userName = connection.username;
-            var password = connection?.password || "";
+                const httpsAgent = new https.Agent({ rejectUnauthorized: false })
 
-            const httpsAgent = new https.Agent({ rejectUnauthorized: false })
+                var url = `${connection.ip_address}`;
+                if (connection?.port) {
+                    url = `${url}:${connection.port}`;
+                }
 
-            var url = `${connection.ip_address}`;
-            if (connection?.port) {
-                url = `${url}:${connection.port}`;
-            }
+                var currentTimeHour = formatDate(null, "HH:mm");
+                var dateTime = moment();
+                var todayDate = formatDate(null, "YYYY-MM-DD");
 
-            var currentTimeHour = formatDate(null, "HH:mm");
-            var dateTime = moment();
-            var todayDate = formatDate(null, "YYYY-MM-DD");
+                if (currentTimeHour == "00:00") {
+                    var previousDate = new Date(todayDate);
+                    previousDate.setUTCDate(previousDate.getUTCDate() - 1)
+                    previousDate.setUTCHours(0, 0, 0, 0);
 
-            if (currentTimeHour == "00:00") {
-                var previousDate = new Date(todayDate);
-                previousDate.setUTCDate(previousDate.getUTCDate() - 1)
-                previousDate.setUTCHours(0, 0, 0, 0);
+                    todayDate = formatDate(previousDate, "YYYY-MM-DD");
+                    dateTime = moment(todayDate)
+                }
 
-                todayDate = formatDate(previousDate, "YYYY-MM-DD");
-                dateTime = moment(todayDate)
-            }
+                var startDate = new Date(todayDate);
+                startDate.setUTCHours(0, 0, 0, 0);
 
-            var startDate = new Date(todayDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+                var endDate = new Date(startDate);
+                endDate.setUTCDate(endDate.getUTCDate()); // Move to the next day
+                endDate.setUTCHours(23, 59, 59, 999);
 
-            var endDate = new Date(startDate);
-            endDate.setUTCDate(endDate.getUTCDate()); // Move to the next day
-            endDate.setUTCHours(23, 59, 59, 999);
-            var helpdeskSupport = await HelpdeskSupportService.getHelpdeskSupportOne({ date_in_string: todayDate })
+                var helpdeskSupport = await HelpdeskSupportService.getHelpdeskSupportOne({ date_in_string: todayDate })
 
-            var queries = {
-                closed_request: {
-                    list_info: {
-                        fields_required: ["sla", "status", "created_time"],
-                        search_criteria: [
-                            { condition: "is", field: "status.name", value: "close" },
-                            { condition: "gte", field: "created_time", logical_operator: "and", value: startDate.getTime().toString() },
-                            { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
-                        ]
+                var queries = {
+                    closed_request: {
+                        list_info: {
+                            fields_required: ["sla", "status", "created_time"],
+                            search_criteria: [
+                                { condition: "is", field: "status.name", value: "close" },
+                                { condition: "gte", field: "created_time", logical_operator: "and", value: startDate.getTime().toString() },
+                                { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
+                            ]
+                        }
+                    },
+                    open_request: {
+                        list_info: {
+                            fields_required: ["technician", "status", "created_time"],
+                            search_criteria: [
+                                { condition: "is", field: "status.name", value: "open" },
+                                { condition: "gte", field: "created_time", logical_operator: "and", value: startDate.getTime().toString() },
+                                { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
+                            ]
+                        }
+                    },
+                    received_request: {
+                        list_info: {
+                            fields_required: ["sla", "created_time", "sla_violated_technician", "sla_violated_group"],
+                            search_criteria: [
+                                { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
+                                { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
+                            ]
+                        }
+                    },
+                    request_summary: {
+                        list_info: {
+                            fields_required: ["is_overdue", "completed_time"],
+                            search_criteria: [
+                                { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
+                                { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
+                            ]
+                        }
+                    },
+                    sla_violated: {
+                        list_info: {
+                            fields_required: ["sla", "status", "created_time"],
+                            search_criteria: [
+                                { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
+                                { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
+                            ]
+                        }
                     }
-                },
-                open_request: {
-                    list_info: {
-                        fields_required: ["technician", "status", "created_time"],
-                        search_criteria: [
-                            { condition: "is", field: "status.name", value: "open" },
-                            { condition: "gte", field: "created_time", logical_operator: "and", value: startDate.getTime().toString() },
-                            { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
-                        ]
+                }
+
+                var apiResponseData = {
+                    closed_request_content: helpdeskSupport?.closed_request_content || null,
+                    open_request_content: helpdeskSupport?.open_request_content || null,
+                    received_request_content: helpdeskSupport?.received_request_content || null,
+                    request_summary_content: helpdeskSupport?.request_summary_content || null,
+                    sla_violated_request_content: helpdeskSupport?.sla_violated_request_content || null
+                }
+
+                var closedQueryParams = encodeURIComponent(JSON.stringify(queries.closed_request));
+                var openQueryParams = encodeURIComponent(JSON.stringify(queries.open_request));
+                var receivedQueryParams = encodeURIComponent(JSON.stringify(queries.received_request));
+                var summaryQueryParams = encodeURIComponent(JSON.stringify(queries.request_summary));
+                var slaViolatedQueryParams = encodeURIComponent(JSON.stringify(queries.sla_violated));
+
+                url = `${url}/v3/requests?input_data=`;
+                var headers = { Authtoken: password }
+                var apiClosedResponse = await axios.get(`${url}${closedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                if (!apiClosedResponse?.response_status && apiClosedResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiClosedResponse.response?.status,
+                        statusText: apiClosedResponse.response?.statusText,
+                        data: apiClosedResponse.response?.data || null
                     }
-                },
-                received_request: {
-                    list_info: {
-                        fields_required: ["sla", "created_time", "sla_violated_technician", "sla_violated_group"],
-                        search_criteria: [
-                            { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
-                            { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
-                        ]
+                } else if (apiClosedResponse?.response_status && apiClosedResponse?.list_info) {
+                    apiResponseData.closed_request_content = apiClosedResponse;
+                }
+
+                var apiSummaryResponse = await axios.get(`${url}${summaryQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                if (!apiSummaryResponse?.response_status && apiSummaryResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiSummaryResponse.response?.status,
+                        statusText: apiSummaryResponse.response?.statusText,
+                        data: apiSummaryResponse.response?.data || null
                     }
-                },
-                request_summary: {
-                    list_info: {
-                        fields_required: ["is_overdue", "completed_time"],
-                        search_criteria: [
-                            { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
-                            { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
-                        ]
+                } else if (apiSummaryResponse?.response_status && apiSummaryResponse?.list_info) {
+                    apiResponseData.request_summary_content = apiSummaryResponse;
+                }
+
+                var apiOpenResponse = await axios.get(`${url}${openQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                if (!apiOpenResponse?.response_status && apiOpenResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiOpenResponse.response?.status,
+                        statusText: apiOpenResponse.response?.statusText,
+                        data: apiOpenResponse.response?.data || null
                     }
-                },
-                sla_violated: {
-                    list_info: {
-                        fields_required: ["sla", "status", "created_time"],
-                        search_criteria: [
-                            { condition: "gte", field: "created_time", value: startDate.getTime().toString() },
-                            { condition: "lte", field: "created_time", logical_operator: "and", value: endDate.getTime().toString() }
-                        ]
+                } else if (apiOpenResponse?.response_status && apiOpenResponse?.list_info) {
+                    apiResponseData.open_request_content = apiOpenResponse;
+                }
+
+                var apiReceivedResponse = await axios.get(`${url}${receivedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                if (!apiReceivedResponse?.response_status && apiReceivedResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiReceivedResponse.response?.status,
+                        statusText: apiReceivedResponse.response?.statusText,
+                        data: apiReceivedResponse.response?.data || null
                     }
+                } else if (apiReceivedResponse?.response_status && apiReceivedResponse?.list_info) {
+                    apiResponseData.request_summary_content = apiReceivedResponse;
                 }
-            }
 
-            var apiResponseData = {
-                closed_request_content: helpdeskSupport?.closed_request_content || null,
-                open_request_content: helpdeskSupport?.open_request_content || null,
-                received_request_content: helpdeskSupport?.received_request_content || null,
-                request_summary_content: helpdeskSupport?.request_summary_content || null,
-                sla_violated_request_content: helpdeskSupport?.sla_violated_request_content || null
-            }
-
-            var closedQueryParams = encodeURIComponent(JSON.stringify(queries.closed_request));
-            var openQueryParams = encodeURIComponent(JSON.stringify(queries.open_request));
-            var receivedQueryParams = encodeURIComponent(JSON.stringify(queries.received_request));
-            var summaryQueryParams = encodeURIComponent(JSON.stringify(queries.request_summary));
-            var slaViolatedQueryParams = encodeURIComponent(JSON.stringify(queries.sla_violated));
-
-            url = `${url}/v3/requests?input_data=`;
-            var headers = { Authtoken: password }
-            var apiClosedResponse = await axios.get(`${url}${closedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-            if (!apiClosedResponse?.response_status && apiClosedResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiClosedResponse.response?.status,
-                    statusText: apiClosedResponse.response?.statusText,
-                    data: apiClosedResponse.response?.data || null
+                var apiSlaViolatedResponse = await axios.get(`${url}${slaViolatedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
+                if (!apiSlaViolatedResponse?.response_status && apiSlaViolatedResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiSlaViolatedResponse.response?.status,
+                        statusText: apiSlaViolatedResponse.response?.statusText,
+                        data: apiSlaViolatedResponse.response?.data || null
+                    }
+                } else if (apiSlaViolatedResponse?.response_status && apiSlaViolatedResponse?.list_info) {
+                    apiResponseData.sla_violated_request_content = apiSlaViolatedResponse;
                 }
-            } else if (apiClosedResponse?.response_status && apiClosedResponse?.list_info) {
-                apiResponseData.closed_request_content = apiClosedResponse;
-            }
 
-            var apiSummaryResponse = await axios.get(`${url}${summaryQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-            if (!apiSummaryResponse?.response_status && apiSummaryResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiSummaryResponse.response?.status,
-                    statusText: apiSummaryResponse.response?.statusText,
-                    data: apiSummaryResponse.response?.data || null
+                if (helpdeskSupport?._id) {
+                    await HelpdeskSupportService.updateHelpdeskSupport({
+                        ...apiResponseData,
+                        date: todayDate,
+                        date_time: dateTime,
+                        time: currentTimeHour,
+                        date_in_string: todayDate,
+                        _id: helpdeskSupport._id
+                    })
+                } else {
+                    await HelpdeskSupportService.createHelpdeskSupport({
+                        ...apiResponseData,
+                        date: todayDate,
+                        date_time: dateTime,
+                        time: currentTimeHour,
+                        date_in_string: todayDate
+                    })
                 }
-            } else if (apiSummaryResponse?.response_status && apiSummaryResponse?.list_info) {
-                apiResponseData.request_summary_content = apiSummaryResponse;
-            }
 
-            var apiOpenResponse = await axios.get(`${url}${openQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-            if (!apiOpenResponse?.response_status && apiOpenResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiOpenResponse.response?.status,
-                    statusText: apiOpenResponse.response?.statusText,
-                    data: apiOpenResponse.response?.data || null
-                }
-            } else if (apiOpenResponse?.response_status && apiOpenResponse?.list_info) {
-                apiResponseData.open_request_content = apiOpenResponse;
-            }
-
-            var apiReceivedResponse = await axios.get(`${url}${receivedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-            if (!apiReceivedResponse?.response_status && apiReceivedResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiReceivedResponse.response?.status,
-                    statusText: apiReceivedResponse.response?.statusText,
-                    data: apiReceivedResponse.response?.data || null
-                }
-            } else if (apiReceivedResponse?.response_status && apiReceivedResponse?.list_info) {
-                apiResponseData.request_summary_content = apiReceivedResponse;
-            }
-
-            var apiSlaViolatedResponse = await axios.get(`${url}${slaViolatedQueryParams}`, { headers, httpsAgent }).then((res) => res.data).catch((error) => error)
-            if (!apiSlaViolatedResponse?.response_status && apiSlaViolatedResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiSlaViolatedResponse.response?.status,
-                    statusText: apiSlaViolatedResponse.response?.statusText,
-                    data: apiSlaViolatedResponse.response?.data || null
-                }
-            } else if (apiSlaViolatedResponse?.response_status && apiSlaViolatedResponse?.list_info) {
-                apiResponseData.sla_violated_request_content = apiSlaViolatedResponse;
-            }
-
-            if (helpdeskSupport?._id) {
-                await HelpdeskSupportService.updateHelpdeskSupport({
-                    ...apiResponseData,
-                    date: todayDate,
-                    date_time: dateTime,
-                    time: currentTimeHour,
-                    date_in_string: todayDate,
-                    _id: helpdeskSupport._id
-                })
+                console.log("helpdeskSupportTicketData >>> ", currentTimeHour, todayDate)
             } else {
-                await HelpdeskSupportService.createHelpdeskSupport({
-                    ...apiResponseData,
-                    date: todayDate,
-                    date_time: dateTime,
-                    time: currentTimeHour,
-                    date_in_string: todayDate
-                })
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
             }
 
-            console.log("helpdeskSupportTicketData >>> ", currentTimeHour, todayDate)
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: cronScheduler?.tool_slug || wazuhKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog
+                    },
+                    status: true
+                }
 
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: cronScheduler?.tool_slug || wazuhKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog
-                },
-                status: true
+                await createCronSchedulerErrorData(payload)
             }
-
-            await createCronSchedulerErrorData(payload)
         }
 
         return { flag: true, message: "Helpdesk Support Ticket data fetched." }
@@ -1326,109 +1331,110 @@ const netswitchThreatIntelTxtData = async () => {
         updateScheduleCronLogTime(cronSchdlSlug);
 
         var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null });
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            });
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        });
+            var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
+            if (connection?._id && connection?.ip_address) {
+                const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+                var url = `${connection.ip_address}`;
 
-        var connection = await ConnetionService.getConnectionOne({ type: connectionType, status: true, deletedAt: null });
-        if (connection?._id && connection?.ip_address) {
-            const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-            var url = `${connection.ip_address}`;
+                var currentTimeHour = formatDate(null, "HH:mm");
+                var dateTime = moment();
+                var todayDate = formatDate(null, "YYYY-MM-DD");
 
-            var currentTimeHour = formatDate(null, "HH:mm");
-            var dateTime = moment();
-            var todayDate = formatDate(null, "YYYY-MM-DD");
+                var apiResponse = await axios.get(`${url}`, { httpsAgent })
+                    .then((res) => res.data).catch((error) => error);
+                if (apiResponse?.response?.statusText) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiReceivedResponse.response?.status,
+                        statusText: apiReceivedResponse.response?.statusText,
+                        data: apiResponse?.response?.statusText ? { status: apiResponse?.response?.status, statusText: apiResponse?.response?.statusText } : null
+                    }
+                } else if (apiResponse && typeof apiResponse == "string") {
+                    if (apiResponse?.split('\n')) {
+                        var lines = apiResponse.split('\n');
+                        if (lines?.length > 1) {
+                            const jsonData = lines.slice(1).filter(line => line.trim()).map(line => {
+                                const values = line.split(',');
+                                return {
+                                    "ip_address": values[0] || "",
+                                    "as_number": values[1] || "",
+                                    "company": values[2] || "",
+                                    "country": values[3] || "",
+                                    "date_in_string": todayDate || "",
+                                    "date": todayDate || null,
+                                    "date_time": dateTime || null,
+                                    "time": currentTimeHour || "",
+                                }
+                            })
 
-            var apiResponse = await axios.get(`${url}`, { httpsAgent })
-                .then((res) => res.data).catch((error) => error);
-            if (apiResponse?.response?.statusText) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiReceivedResponse.response?.status,
-                    statusText: apiReceivedResponse.response?.statusText,
-                    data: apiResponse?.response?.statusText ? { status: apiResponse?.response?.status, statusText: apiResponse?.response?.statusText } : null
-                }
-            } else if (apiResponse && typeof apiResponse == "string") {
-                if (apiResponse?.split('\n')) {
-                    var lines = apiResponse.split('\n');
-                    if (lines?.length > 1) {
-                        const jsonData = lines.slice(1).filter(line => line.trim()).map(line => {
-                            const values = line.split(',');
-                            return {
-                                "ip_address": values[0] || "",
-                                "as_number": values[1] || "",
-                                "company": values[2] || "",
-                                "country": values[3] || "",
-                                "date_in_string": todayDate || "",
-                                "date": todayDate || null,
-                                "date_time": dateTime || null,
-                                "time": currentTimeHour || "",
-                            }
-                        })
+                            if (jsonData?.length) {
+                                var deletingAllrecord = await NetSwitchThreatIntelService.deleteManyNetSwitchThreatIntel({});
 
-                        if (jsonData?.length) {
-                            var deletingAllrecord = await NetSwitchThreatIntelService.deleteManyNetSwitchThreatIntel({});
+                                const createDataInTheDb = await NetSwitchThreatIntelService.createManyNetswitchThreatIntel(jsonData);
 
-                            const createDataInTheDb = await NetSwitchThreatIntelService.createManyNetswitchThreatIntel(jsonData);
-
-                            if (createDataInTheDb?.length) {
-                                const threatCountryCountQuery = [{
-                                    $group: { _id: "$country", count: { $sum: 1 } }
-                                }, { $project: { _id: 0, country_name: "$_id", count: 1 } },
-                                { $sort: { count: -1 } }];
-                                var netswitchThreatCountryCountsStats = await NetSwitchThreatIntelService.getTotalCountBasedOnCountry(threatCountryCountQuery);
-                                if (netswitchThreatCountryCountsStats?.length) {
-                                    var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.getNetswitchThreatIntelStatsOne({ date_in_string: todayDate })
-                                    if (netswitchThreatIntelStats?._id) {
-                                        var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.updateNetSwitchThreatIntelStats({ _id: netswitchThreatIntelStats._id, stats_data: netswitchThreatCountryCountsStats, date_time: dateTime })
-                                    } else {
-                                        var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.createNetswitchThreatIntelStats({ stats_data: netswitchThreatCountryCountsStats, date_in_string: todayDate, date: todayDate, date_time: dateTime })
+                                if (createDataInTheDb?.length) {
+                                    const threatCountryCountQuery = [{
+                                        $group: { _id: "$country", count: { $sum: 1 } }
+                                    }, { $project: { _id: 0, country_name: "$_id", count: 1 } },
+                                    { $sort: { count: -1 } }];
+                                    var netswitchThreatCountryCountsStats = await NetSwitchThreatIntelService.getTotalCountBasedOnCountry(threatCountryCountQuery);
+                                    if (netswitchThreatCountryCountsStats?.length) {
+                                        var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.getNetswitchThreatIntelStatsOne({ date_in_string: todayDate })
+                                        if (netswitchThreatIntelStats?._id) {
+                                            var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.updateNetSwitchThreatIntelStats({ _id: netswitchThreatIntelStats._id, stats_data: netswitchThreatCountryCountsStats, date_time: dateTime })
+                                        } else {
+                                            var netswitchThreatIntelStats = await NetswitchThreatIntelStatsService.createNetswitchThreatIntelStats({ stats_data: netswitchThreatCountryCountsStats, date_in_string: todayDate, date: todayDate, date_time: dateTime })
+                                        }
                                     }
                                 }
-                            }
 
-                            console.log("netswitchThreatIntelTxtData >>> ", jsonData?.length, createDataInTheDb?.length, deletingAllrecord);
+                                console.log("netswitchThreatIntelTxtData >>> ", jsonData?.length, createDataInTheDb?.length, deletingAllrecord);
+                            }
                         }
                     }
                 }
-            }
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
-
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: cronScheduler?.tool_slug || netswitchThreatIntelKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog
-                },
-                status: true
+            } else {
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
             }
 
-            await createCronSchedulerErrorData(payload)
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: cronScheduler?.tool_slug || netswitchThreatIntelKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog
+                    },
+                    status: true
+                }
+
+                await createCronSchedulerErrorData(payload)
+            }
         }
 
         return { flag: true, message: "NetSwitch Threat Intel data fetched successfully." }
@@ -1483,190 +1489,187 @@ const zendeskSupportTicketData = async () => {
     try {
         updateScheduleCronLogTime(cronSchdlSlug);
 
-        const cronScheduler = await CronSchedulerService.getCronSchedulerOne({
-            slug: cronSchdlSlug,
-            status: true,
-            deletedAt: null
-        })
+        var cronScheduler = await CronSchedulerService.getCronSchedulerOne({ slug: cronSchdlSlug, status: true, deletedAt: null })
+        if (cronScheduler?._id) {
+            manageCronRunningLog({
+                connection_type: connectionType,
+                cron_slug: cronSchdlSlug,
+                cron_id: cronScheduler?._id || "",
+                date_time: currentDate.toString(),
+                utc_date_time: currentDate.toUTCString(),
+                status: "running"
+            })
 
-        manageCronRunningLog({
-            connection_type: connectionType,
-            cron_slug: cronSchdlSlug,
-            cron_id: cronScheduler?._id || "",
-            date_time: currentDate.toString(),
-            utc_date_time: currentDate.toUTCString(),
-            status: "running"
-        })
-
-        const connection = await ConnetionService.getConnectionOne({
-            type: connectionType,
-            status: true,
-            deletedAt: null
-        })
-
-        if (connection?._id && connection?.password && connection?.ip_address) {
-            const userName = connection.username;
-            const password = connection?.password || "";
-
-            const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-
-            let baseUrl = `${connection?.ip_address}`;
-            if (connection?.port) {
-                baseUrl = `${baseUrl}:${connection.port}`;
-            }
-
-            let apiUrl = `${baseUrl}/v2/search.json`;
-
-            const currentTimeHour = formatDate(null, "HH:mm");
-            let dateTime = moment();
-            let todayDate = formatDate(null, "YYYY-MM-DD");
-
-            if (currentTimeHour === "00:00") {
-                const previousDate = new Date(todayDate);
-                previousDate.setUTCDate(previousDate.getUTCDate() - 1);
-                previousDate.setUTCHours(0, 0, 0, 0);
-
-                todayDate = formatDate(previousDate, "YYYY-MM-DD");
-                dateTime = moment(todayDate);
-            }
-
-            var startDate = new Date(todayDate);
-            startDate.setUTCHours(0, 0, 0, 0);
-
-            var endDate = new Date(startDate);
-            endDate.setUTCDate(endDate.getUTCDate());
-            endDate.setUTCHours(23, 59, 59, 999);
-
-            var startDateISO = startDate.toISOString();
-            var endDateISO = endDate.toISOString();
-
-            var zendeskSupport = await ZendeskSupportService.getZendeskSupportOne({
-                date_in_string: todayDate,
+            const connection = await ConnetionService.getConnectionOne({
+                type: connectionType,
+                status: true,
                 deletedAt: null
             })
 
-            var closedQuery = `status:closed created>${startDateISO} created<${endDateISO}`;
-            var openQuery = `status:open created>${startDateISO} created<${endDateISO}`;
-            var receivedQuery = `status:open assignee_id:none, created>${startDateISO} created<${endDateISO}`;
+            if (connection?._id && connection?.password && connection?.ip_address) {
+                const userName = connection.username;
+                const password = connection?.password || "";
 
-            var apiResponseData = {
-                closed_request_content: zendeskSupport?.closed_request_content || null,
-                open_request_content: zendeskSupport?.open_request_content || null,
-                received_request_content: zendeskSupport?.received_request_content || null
-            }
+                const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
-            var headers = {
-                Authorization: `Basic ${Buffer.from(`${userName}/token:${password}`).toString("base64")}`,
-                "Content-Type": "application/json"
-            }
+                let baseUrl = `${connection?.ip_address}`;
+                if (connection?.port) {
+                    baseUrl = `${baseUrl}:${connection.port}`;
+                }
 
-            // Make the API calls with properly encoded queries
-            var apiClosedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(closedQuery)}`, { headers, httpsAgent })
-                .then((res) => res.data).catch((error) => error);
-            if (!apiClosedResponse?.results && apiClosedResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiClosedResponse.response?.status,
-                    statusText: apiClosedResponse.response?.statusText,
-                    data: apiClosedResponse.response?.data || null
-                }
-            } else if (apiClosedResponse?.results) {
-                apiResponseData.closed_request_content = {
-                    count: apiClosedResponse?.results?.length || 0,
-                    results: apiClosedResponse?.results
-                }
-            }
+                let apiUrl = `${baseUrl}/v2/search.json`;
 
-            var apiOpenResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(openQuery)}`, { headers, httpsAgent })
-                .then((res) => res.data).catch((error) => error);
-            if (!apiOpenResponse?.results && apiOpenResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiOpenResponse.response?.status,
-                    statusText: apiOpenResponse.response?.statusText,
-                    data: apiOpenResponse.response?.data || null
-                }
-            } else if (apiOpenResponse?.results) {
-                apiResponseData.open_request_content = {
-                    count: apiOpenResponse?.results?.length || 0,
-                    results: apiOpenResponse?.results
-                }
-            }
+                const currentTimeHour = formatDate(null, "HH:mm");
+                let dateTime = moment();
+                let todayDate = formatDate(null, "YYYY-MM-DD");
 
-            var apiReceivedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(receivedQuery)}`, { headers, httpsAgent })
-                .then((res) => res.data).catch((error) => error);
-            if (!apiReceivedResponse?.results && apiReceivedResponse?.response) {
-                createCronErrorLog = true;
-                errorLogType = "connection_cron_error";
-                errorLogMessage = "Please check your connection and cron details.";
-                errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
-                apiErrorLog = {
-                    status: apiReceivedResponse.response?.status,
-                    statusText: apiReceivedResponse.response?.statusText,
-                    data: apiReceivedResponse.response?.data || null
-                }
-            } else if (apiReceivedResponse?.results) {
-                apiResponseData.received_request_content = {
-                    count: apiReceivedResponse?.results?.length || 0,
-                    results: apiReceivedResponse?.results
-                }
-            }
+                if (currentTimeHour === "00:00") {
+                    const previousDate = new Date(todayDate);
+                    previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+                    previousDate.setUTCHours(0, 0, 0, 0);
 
-            // Save or update the data
-            if (zendeskSupport?._id) {
-                await ZendeskSupportService.updateZendeskSupport({
-                    ...apiResponseData,
-                    date: todayDate,
-                    date_time: dateTime,
-                    time: currentTimeHour,
+                    todayDate = formatDate(previousDate, "YYYY-MM-DD");
+                    dateTime = moment(todayDate);
+                }
+
+                var startDate = new Date(todayDate);
+                startDate.setUTCHours(0, 0, 0, 0);
+
+                var endDate = new Date(startDate);
+                endDate.setUTCDate(endDate.getUTCDate());
+                endDate.setUTCHours(23, 59, 59, 999);
+
+                var startDateISO = startDate.toISOString();
+                var endDateISO = endDate.toISOString();
+
+                var zendeskSupport = await ZendeskSupportService.getZendeskSupportOne({
                     date_in_string: todayDate,
-                    _id: zendeskSupport._id
+                    deletedAt: null
+                })
 
-                });
+                var closedQuery = `status:closed created>${startDateISO} created<${endDateISO}`;
+                var openQuery = `status:open created>${startDateISO} created<${endDateISO}`;
+                var receivedQuery = `status:open assignee_id:none, created>${startDateISO} created<${endDateISO}`;
+
+                var apiResponseData = {
+                    closed_request_content: zendeskSupport?.closed_request_content || null,
+                    open_request_content: zendeskSupport?.open_request_content || null,
+                    received_request_content: zendeskSupport?.received_request_content || null
+                }
+
+                var headers = {
+                    Authorization: `Basic ${Buffer.from(`${userName}/token:${password}`).toString("base64")}`,
+                    "Content-Type": "application/json"
+                }
+
+                // Make the API calls with properly encoded queries
+                var apiClosedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(closedQuery)}`, { headers, httpsAgent })
+                    .then((res) => res.data).catch((error) => error);
+                if (!apiClosedResponse?.results && apiClosedResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiClosedResponse.response?.status,
+                        statusText: apiClosedResponse.response?.statusText,
+                        data: apiClosedResponse.response?.data || null
+                    }
+                } else if (apiClosedResponse?.results) {
+                    apiResponseData.closed_request_content = {
+                        count: apiClosedResponse?.results?.length || 0,
+                        results: apiClosedResponse?.results
+                    }
+                }
+
+                var apiOpenResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(openQuery)}`, { headers, httpsAgent })
+                    .then((res) => res.data).catch((error) => error);
+                if (!apiOpenResponse?.results && apiOpenResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiOpenResponse.response?.status,
+                        statusText: apiOpenResponse.response?.statusText,
+                        data: apiOpenResponse.response?.data || null
+                    }
+                } else if (apiOpenResponse?.results) {
+                    apiResponseData.open_request_content = {
+                        count: apiOpenResponse?.results?.length || 0,
+                        results: apiOpenResponse?.results
+                    }
+                }
+
+                var apiReceivedResponse = await axios.get(`${apiUrl}?query=${encodeURIComponent(receivedQuery)}`, { headers, httpsAgent })
+                    .then((res) => res.data).catch((error) => error);
+                if (!apiReceivedResponse?.results && apiReceivedResponse?.response) {
+                    createCronErrorLog = true;
+                    errorLogType = "connection_cron_error";
+                    errorLogMessage = "Please check your connection and cron details.";
+                    errorLogDescription = `Connection (${connectionType}) and Cron (${cronSchdlSlug}): Please check your connection and cron details.`;
+                    apiErrorLog = {
+                        status: apiReceivedResponse.response?.status,
+                        statusText: apiReceivedResponse.response?.statusText,
+                        data: apiReceivedResponse.response?.data || null
+                    }
+                } else if (apiReceivedResponse?.results) {
+                    apiResponseData.received_request_content = {
+                        count: apiReceivedResponse?.results?.length || 0,
+                        results: apiReceivedResponse?.results
+                    }
+                }
+
+                // Save or update the data
+                if (zendeskSupport?._id) {
+                    await ZendeskSupportService.updateZendeskSupport({
+                        ...apiResponseData,
+                        date: todayDate,
+                        date_time: dateTime,
+                        time: currentTimeHour,
+                        date_in_string: todayDate,
+                        _id: zendeskSupport._id
+
+                    });
+                } else {
+                    await ZendeskSupportService.createZendeskSupport({
+                        ...apiResponseData,
+                        date: todayDate,
+                        date_time: dateTime,
+                        time: currentTimeHour,
+                        date_in_string: todayDate
+                    });
+                }
+                console.log("zendeskSupportTicketData >>> ", currentTimeHour, todayDate);
             } else {
-                await ZendeskSupportService.createZendeskSupport({
-                    ...apiResponseData,
-                    date: todayDate,
-                    date_time: dateTime,
-                    time: currentTimeHour,
-                    date_in_string: todayDate
-                });
+                createCronErrorLog = true;
+                errorLogType = "connection_setup";
+                errorLogMessage = "Please setup connection data.";
+                errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
             }
-            console.log("zendeskSupportTicketData >>> ", currentTimeHour, todayDate);
-        } else {
-            createCronErrorLog = true;
-            errorLogType = "connection_setup";
-            errorLogMessage = "Please setup connection data.";
-            errorLogDescription = `Connection (${connectionType}): Please setup connection data.`;
-        }
 
-        if (createCronErrorLog) {
-            const payload = {
-                connection_id: connection?._id || null,
-                cron_scheduler_id: cronScheduler?._id || null,
-                tool_slug: cronScheduler?.tool_slug || zendeskSupportTicketKey,
-                date: currentDate,
-                slug: cronSchdlSlug,
-                cron_style: cronScheduler?.cron_style || "",
-                cron_style_disabled: cronScheduler?.cron_style_disabled || false,
-                description: errorLogDescription,
-                error_logs: {
-                    type: errorLogType,
-                    cron_slug: cronSchdlSlug,
-                    connection_slug: connectionType,
-                    message: errorLogMessage,
-                    api_errors: apiErrorLog,
-                },
-                status: true,
-            };
+            if (createCronErrorLog) {
+                const payload = {
+                    connection_id: connection?._id || null,
+                    cron_scheduler_id: cronScheduler?._id || null,
+                    tool_slug: cronScheduler?.tool_slug || zendeskSupportTicketKey,
+                    date: currentDate,
+                    slug: cronSchdlSlug,
+                    cron_style: cronScheduler?.cron_style || "",
+                    cron_style_disabled: cronScheduler?.cron_style_disabled || false,
+                    description: errorLogDescription,
+                    error_logs: {
+                        type: errorLogType,
+                        cron_slug: cronSchdlSlug,
+                        connection_slug: connectionType,
+                        message: errorLogMessage,
+                        api_errors: apiErrorLog,
+                    },
+                    status: true,
+                };
 
-            await createCronSchedulerErrorData(payload);
+                await createCronSchedulerErrorData(payload);
+            }
         }
 
         return { flag: true, message: "Zendesk Support Ticket data fetched." }

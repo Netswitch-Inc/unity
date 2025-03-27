@@ -96,12 +96,12 @@ const AddNewRoleModal = ({
                             </Row>
                                         
                             <div className="w-100 PadR0 ItemInfo-right mt-3">
-                                <div className="row justify-content-between m-0">
-                                    <button type="submit" className="float-end btn btn-primary">
+                                <div className="row justify-content-between m-0 buttons">
+                                    <button type="submit" className="float-end btnprimary">
                                         Submit
                                     </button>
 
-                                    <button type="button" onClick={handleModalClose} className="float-end btn btn-primary">
+                                    <button type="button" onClick={handleModalClose} className="float-end btnprimary">
                                         Cancel
                                     </button>
                                 </div>

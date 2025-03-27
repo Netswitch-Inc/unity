@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 // ** Third Party Components
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 // ** SVG Icons
 import editIcon from "assets/img/edit.svg";
 import deleteIcon from "assets/img/delete.svg";
@@ -46,9 +47,9 @@ const DroppableComp = ({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="section mb-2 card"
+                      className="section mb-3 col-input"
                     >
-                      <div className="row mb-3 border-bottom card-header align-items-center justify-content-between pt-0 pl-0 pr-0 pb-2">
+                      <div className="row mb-1 border-bottom card-header align-items-center justify-content-between pt-0 pl-0 pr-0 pb-2">
                         <div className="col-12 col-sm-5">
                           <h3 className="card-title mb-0 mt-0">{item.name}</h3>
                         </div>
@@ -74,7 +75,7 @@ const DroppableComp = ({
                               onClick={() => handleDeleteSection(item?.section_id)}
                             />
 
-                            <div className="buttons">
+                            <div className="buttons blue-btn">
                               <button
                                 className="btnprimary"
                                 onClick={() => navigate(`/admin/questions/add?assessmentId=${assessmentStore?.assessmentItem?._id}&sectionId=${item?.section_id}`)}
@@ -88,7 +89,7 @@ const DroppableComp = ({
                       </div>
 
                       {item.questions?.length > 0 ? (
-                        <div className="mt-2 assesment-data-list">
+                        <div className="assesment-data-list">
                           <DragDropContext onDragEnd={handleOnDragEnd}>
                             <Droppable
                               type="QUESTION"
@@ -96,7 +97,7 @@ const DroppableComp = ({
                             >
                               {(provided) => (
                                 <table
-                                  className="table table-bordered"
+                                  className="table"
                                   ref={provided.innerRef}
                                   {...provided.droppableProps}
                                 >
@@ -138,7 +139,7 @@ const DroppableComp = ({
                                                 ) : null}
                                               </td>
 
-                                              <td> 
+                                              <td className="type-td"> 
                                                 {question.option_type}
                                                 {question?.child_questions
                                                   ?.length > 0 ? (
@@ -169,7 +170,7 @@ const DroppableComp = ({
                                                     height={20}
                                                     title="Edit"
                                                     src={editIcon}
-                                                    className="cursor-pointer mr-1"
+                                                    className="cursor-pointer mr-2"
                                                     onClick={() =>
                                                       navigate(`/admin/questions/edit/${question?._id}?assessmentId=${id}`)
                                                     }
@@ -204,7 +205,7 @@ const DroppableComp = ({
               ))}
               {provided.placeholder}
             </div>
-          // </Card>
+        //  </Card>
         )}
       </Droppable>
     </DragDropContext>

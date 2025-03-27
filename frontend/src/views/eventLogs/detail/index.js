@@ -116,13 +116,15 @@ const EventLogDetail = () => {
 
       <div className="p-0 role-name d-flex justify-content-between mb-3">
         <h3 className="card-title mb-0 mt-0">{""}</h3>
+        <div className="buttons">
         <button
           type="button"
-          className="btn btn-primary"
+          className="btnprimary"
           onClick={() => navigate("/admin/event-logs")}
         >
           Back
         </button>
+        </div>
       </div>
 
       <div>
