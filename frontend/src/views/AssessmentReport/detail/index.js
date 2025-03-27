@@ -23,8 +23,8 @@ const AssessmentReportFront = () => {
   }
 
   return (
-    <div className="content profile-management">
-      <div className="d-flex justify-content-between align-items-baseline">
+    <div className="content">
+      <div className="d-flex justify-content-between align-items-baseline tab-design">
         <Nav tabs className="mb-4">
           <NavItem>
             <NavLink

@@ -190,7 +190,7 @@ const EditAssessmentForm = () => {
                         )}
                       </Col>
 
-                      <Col xl={12} lg={12} md={12}>
+                      <Col xl={12} lg={12} md={12} className="mb-2">
                         <p>
                           <a
                             target="_blank"

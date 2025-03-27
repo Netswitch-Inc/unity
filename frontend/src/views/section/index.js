@@ -221,7 +221,7 @@ const SectionsList = () => {
                   </Col>
                 </Row>
 
-                <Row className="userManagement mt-3">
+                <Row className="section-table mt-3">
                   <Col md="12">
                     <DatatablePagination
                       data={store?.sectionItems || []}

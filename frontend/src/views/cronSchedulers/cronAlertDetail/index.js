@@ -84,13 +84,15 @@ const CronAlertDetail = () => {
 
       <div className="p-0 role-name d-flex justify-content-between mb-3">
         <h3 className="card-title mb-0 mt-0">{""}</h3>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => navigate('/admin/cron-schedulers')}
-        >
-          Back
-        </button>
+        <div className="buttons black-btn">
+          <button
+            type="button"
+            className="btnprimary"
+            onClick={() => navigate('/admin/cron-schedulers')}
+          >
+            Back
+          </button>
+        </div>
       </div>
 
       <div>
@@ -142,7 +144,7 @@ const CronAlertDetail = () => {
           <Row>
             <Col xxs="12" className="mb-4">
               <Card className="m-0">
-                <CardBody className='m-0 p-0'>
+                <CardBody className='m-0 p-0 assesment-detail'>
                   {store.cronSchedulerErrorItems.map((item, ind) => (
                     <div key={`${item?._id}-${ind}`} className={classnames("accrodion-permi mt-2", {
                       "accordion-border-left": selectedAccordion === ind
@@ -159,9 +161,9 @@ const CronAlertDetail = () => {
                         aria-expanded={selectedAccordion === ind}
                       >
                         <div className="d-flex justify-content-between w-100 pr-4">
-                          <span className="pr-2 w-75">{item?.description}</span>
+                          <span className="pr-2 w-75 heading-fonts">{item?.description}</span>
 
-                          {item?.date ? (<span className="h4 text-white mb-0 w-25 text-right">{getFormatDate(item.date, "DD-MM-YYYY HH:mm:ss")} </span>) : null}
+                          {item?.date ? (<span className="h4 text-white mb-0 w-25 text-right right-percent">{getFormatDate(item.date, "DD-MM-YYYY HH:mm:ss")} </span>) : null}
                         </div>
 
                         {selectedAccordion === ind ? (

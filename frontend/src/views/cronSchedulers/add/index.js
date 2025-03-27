@@ -101,7 +101,7 @@ const AddCronScheduler = () => {
 
       <div className="container-fluid">
         <Row>
-          <Col className="col-md-12 col-xxl-10 mx-auto">
+          <Col className="col-md-12 col-xxl-10 mx-auto main-cron-scheduler">
             <Card className="card-content p-0">
               <CardBody>
                 <Formik

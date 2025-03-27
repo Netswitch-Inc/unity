@@ -179,13 +179,15 @@ const ModulePermission = () => {
                             <h3 className='card-title mb-0 mt-0'>
                                 {store?.roleItem?.name || ""} - Module Permissions
                             </h3>
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={() => navigate('/admin/roles')}
-                            >
-                                Back
-                            </button>
+                            <div class="buttons black-btn">
+                                <button
+                                    type="button"
+                                    className="btnprimary"
+                                    onClick={() => navigate('/admin/roles')}
+                                >
+                                    Back
+                                </button>
+                            </div>
                         </div>
 
                         <Card className="card-category card-subcategories m-0">

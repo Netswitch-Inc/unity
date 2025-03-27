@@ -128,7 +128,7 @@ const EditCronScheduler = () => {
 
       <div className="container-fluid">
         <Row>
-          <Col className="col-md-12 col-xxl-10 mx-auto">
+          <Col className="col-md-12 col-xxl-10 mx-auto main-cron-scheduler">
             <Card className="card-content p-0">
               {/* <div className="p-0 border-bottom pb-2 card-header row justify-content-between align-items-center m-0">
                 <h3 className='card-title mb-0 mt-0'>Edit Cron Scheduler</h3>

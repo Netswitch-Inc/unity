@@ -38,8 +38,8 @@ const Editassessment = () => {
 
   return (
     <div className="content asssessment-forms">
-      <div className="tab-buttons row align-items-center m-0 mb-3 justify-content-between">
-        <Nav tabs className="">
+      <div className="tab-buttons row align-items-center m-0 mb-3 justify-content-between tab-design">
+        <Nav tabs>
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}
@@ -49,7 +49,7 @@ const Editassessment = () => {
             </NavLink>
           </NavItem>
 
-          <NavItem className="ml-3">
+          <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "2" })}
               onClick={() => toggle("2")}

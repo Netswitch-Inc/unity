@@ -38,7 +38,6 @@ import Gauge from "./Gauge";
 import Comments from "./Comments";
 import Attachments from "./Attachments";
 
-
 const ProjectDetailsCard = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -65,6 +64,8 @@ const ProjectDetailsCard = (props) => {
 
   const slider1Ref = useRef(null);
   const slider2Ref = useRef(null);
+  const leftSectionRef = useRef(null)
+
 
   const callApies = async (payload) => {
     dispatch(updateProject(payload))
@@ -301,6 +302,7 @@ const ProjectDetailsCard = (props) => {
 
       <Row>
         <Col lg={8}>
+        <div ref={leftSectionRef}>
           <Row className="mb-3">
             <Col md={6}>
               <Card role="description" className="h-100 pb-0">
@@ -486,7 +488,7 @@ const ProjectDetailsCard = (props) => {
           <Row>
             <Col md={6}>
               {/* Comments */}
-              <Card className="main-comment-card common-comment-attach">
+              <Card className="main-comment-card common-comment-attach mb-0 h-100">
                 <div className="description mb-2">Comments ({store.commentItems?.length ? store.commentItems?.length : 0})</div>
                 <CardBody>
                   <Comments />
@@ -495,7 +497,7 @@ const ProjectDetailsCard = (props) => {
             </Col>
 
             <Col md={6} className="pl-md-0">
-              <Card className="common-comment-attach">
+              <Card className="common-comment-attach mb-0">
                 <div className="description mb-2">Attachments</div>
                 <CardBody>
                   <Attachments />
@@ -503,10 +505,14 @@ const ProjectDetailsCard = (props) => {
               </Card>
             </Col>
           </Row>
+        </div>
         </Col>
 
         <Col lg={4} className="pl-lg-0">
-          <Card className="card-timeline">
+          <Card className="card-timeline pt-0" style={{
+            maxHeight: leftSectionRef?.current?.offsetHeight > 0 ? `${leftSectionRef.current.offsetHeight}px` : "0px",
+            overflow: "auto",
+          }}>
             <div className="description time-history">Project History</div>
 
             <CardBody>{timelineItems}</CardBody>

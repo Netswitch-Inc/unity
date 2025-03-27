@@ -146,7 +146,7 @@ const AddSectionModel = ({
                       </Col>
                     </Row>
 
-                    <div className="buttons">
+                    <div className="buttons text-center">
                       <button
                         type="submit"
                         className="btnprimary"

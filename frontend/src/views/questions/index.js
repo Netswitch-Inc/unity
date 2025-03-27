@@ -215,7 +215,7 @@ const QuestionsList = () => {
                   </Col>
                 </Row>
 
-                <Row className="userManagement mt-3">
+                <Row className="question-table mt-3">
                   <Col md="12">
                     <DatatablePagination
                       data={store?.questionItems || []}
