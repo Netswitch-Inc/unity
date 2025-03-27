@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable react-hooks/exhaustive-deps */
 
 // ** React Imports
 import React, { useRef, useState, useEffect } from "react";
@@ -13,9 +13,11 @@ import classNames from "classnames";
 import PerfectScrollbar from "perfect-scrollbar";
 
 const Sidebar = (props) => {
+  // ** Hooks
   const sidebarRef = useRef(null);
   const location = useLocation();
 
+  // ** States
   const [state, setState] = useState({});
 
   useEffect(() => {
@@ -28,8 +30,8 @@ const Sidebar = (props) => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(sidebarRef.current, {
         suppressScrollX: true,
-        suppressScrollY: false,
-      });
+        suppressScrollY: false
+      })
     }
 
     return function cleanup() {
@@ -50,7 +52,7 @@ const Sidebar = (props) => {
         initialState = {
           [prop.state]: getCollapseInitialState(prop.views),
           ...getCollapseStates(prop.views),
-          ...initialState,
+          ...initialState
         };
       }
 
@@ -65,10 +67,7 @@ const Sidebar = (props) => {
   // while on the src/views/forms/RegularForms.js - route /admin/regular-forms
   const getCollapseInitialState = (routes) => {
     for (let i = 0; i < routes.length; i++) {
-      if (
-        routes[i].collapse &&
-        getCollapseInitialState(routes[i].views)
-      ) {
+      if (routes[i].collapse && getCollapseInitialState(routes[i].views)) {
         return true;
       } else if (window.location.href.indexOf(routes[i].path) !== -1) {
         return true;
@@ -172,7 +171,7 @@ const Sidebar = (props) => {
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return location.pathname === routeName ? "active" : "";
-  };
+  }
 
   const { activeColor, logo } = props;
   let logoImg = null;
@@ -181,26 +180,29 @@ const Sidebar = (props) => {
     if (logo.outterLink !== undefined) {
       logoImg = (
         <a
+          rel="noreferrer"
+          target="_blank"
           href={logo.outterLink}
           className="simple-text logo-mini"
-          target="_blank"
           onClick={props.closeSidebar}
         >
           <div className="logo-img">
             <img src={logo.imgSrc} alt="react-logo" />
           </div>
         </a>
-      );
+      )
+
       logoText = (
         <a
+          rel="noreferrer"
+          target="_blank"
           href={logo.outterLink}
           className="simple-text logo-normal"
-          target="_blank"
           onClick={props.closeSidebar}
         >
           {logo.text}
         </a>
-      );
+      )
     } else {
       logoImg = (
         <NavLink
@@ -212,7 +214,8 @@ const Sidebar = (props) => {
             <img src={logo.imgSrc} alt="react-logo" />
           </div>
         </NavLink>
-      );
+      )
+
       logoText = (
         <NavLink
           to={logo.innerLink}
@@ -221,7 +224,7 @@ const Sidebar = (props) => {
         >
           {logo.text}
         </NavLink>
-      );
+      )
     }
   }
 
@@ -237,8 +240,8 @@ const Sidebar = (props) => {
         <Nav className="nav-custom main-sidenav">{createLinks(props.routes)}</Nav>
       </div>
     </div>
-  );
-};
+  )
+}
 
 Sidebar.propTypes = {
   activeColor: PropTypes.oneOf(["primary", "blue", "green", "orange", "red"]),
@@ -248,16 +251,16 @@ Sidebar.propTypes = {
     PropTypes.shape({
       innerLink: PropTypes.string.isRequired,
       imgSrc: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired
     }),
     PropTypes.shape({
       outterLink: PropTypes.string.isRequired,
       imgSrc: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-    }),
+      text: PropTypes.string.isRequired
+    })
   ]),
   // this is used on responsive to close the sidebar on route navigation
-  closeSidebar: PropTypes.func,
-};
+  closeSidebar: PropTypes.func
+}
 
 export default Sidebar;

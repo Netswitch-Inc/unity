@@ -19,17 +19,19 @@ import PerfectScrollbar from "perfect-scrollbar";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
+// ** Logo
 import logo from "assets/img/react-logo.png";
 
 var ps;
 
 // const companyUrl = process.env.REACT_APP_COM === "sec" ? process.env.REACT_APP_PRO_SEC_URL : process.env.REACT_APP_PRO_NET_URL;
+const companyName = process.env?.REACT_APP_COMPANY_NAME || "";
 const companyUrl = process.env?.REACT_APP_COMPANY_URL || "";
 
 const Admin = (props) => {
   const location = useLocation();
   const mainPanelRef = useRef(null);
-  const { menuRoutes, error } = useRoutesByRole()
+  const { error, menuRoutes } = useRoutesByRole()
 
   const store = useSelector((state) => state.login)
 
@@ -203,15 +205,16 @@ const Admin = (props) => {
                 {...props}
                 routes={menuRoutes}
                 logo={{
-                  outterLink: companyUrl,
-                  text: "Unity",
                   imgSrc: logo,
+                  outterLink: companyUrl,
+                  text: companyName || "Unity"
                 }}
                 activeColor="blue"
                 closeSidebar={closeSidebar}
                 toggleSidebar={toggleSidebar}
               />
             ) : null}
+
             <div className="main-panel" ref={mainPanelRef} data={color}>
               <AdminNavbar
                 {...props}
@@ -233,11 +236,10 @@ const Admin = (props) => {
               )}
             </div>
           </div>
-
         </React.Fragment>
       )}
     </BackgroundColorContext.Consumer>
-  );
+  )
 }
 
 export default Admin;
