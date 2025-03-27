@@ -1,5 +1,5 @@
 // ** React Imports
-import { useLayoutEffect, useCallback, useEffect, useState } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect } from "react";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
@@ -79,10 +79,10 @@ const useRoutesByRole = () => {
         if (loginStore?.error && loginStore?.actionFlag === "AUTH_ROLE_PERMISSION_ERR") {
             setError(true);
         }
-    }, [loginStore.actionFlag, loginStore.success, loginStore.error, loginStore.authRolePermission, dispatch])
+    }, [loginStore.actionFlag, loginStore.success, loginStore.error, loginStore.authRolePermission, dispatch])  
 
     return (
-        { menuRoutes: filteredRoutes, error: error }
+        { error, menuRoutes: filteredRoutes }
     )
 }
 
