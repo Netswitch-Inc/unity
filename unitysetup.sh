@@ -11,12 +11,24 @@ GIT_BRANCH_NAME=master
 #Example:
 # v0.0.1 or v0.0.2
 
+#=============================================================================
 # Set environment variables
+# Below is the essential configuration that must be adjusted to suit your environment.
+# If you are behind NAT and using port redirection, ensure you enter your public IP, not the private IP.
+# Also, do not include a trailing slash (/) at the end of the URL.
 IP_ADDRESS="http://[Your_IP_Address]"
-# Example:
+# Example: (Use public IP, DON'T use private IP)
 # IP_ADDRESS="http://123.11.22.33"
 
+# You can enter your company information here, and it will be displayed on the dashboard.
+COMPANY_NAME="[Company_Name]"
+COMPANY_URL="[Company_Website_URL]"
+# Example:
+# COMPANY_NAME="Netswitch Inc."
+# COMPANY_URL="https://netswitch.net"
 
+#=============================================================================
+# Below is the critical connection setting. Do not modify it unless you are an advanced user.
 FRONTEND_PORT=8081
 BACKEND_PORT=3006
 
@@ -31,12 +43,6 @@ MONGO_DB_SECURED=false # Enable (true|false) if mongo database is secure
 MONGO_DB_USER=""
 MONGO_DB_PASSWORD=""
 MONGO_DB_AUTH=""
-
-COMPANY_NAME="[Company_Name]"
-COMPANY_URL="[Company_Website_URL]"
-# Example:
-# COMPANY_NAME="Netswitch Inc."
-# COMPANY_URL="https://netswitch.net"
 
 
 # Function to print descriptions in color
