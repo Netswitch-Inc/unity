@@ -5,7 +5,11 @@
 Please refer to the following link for the automatic installation guide:
 [Unity Risk Indicator Setup Guide](https://github.com/Netswitch-Inc/unity/blob/master/Unity%20Risk%20Indicator%20Setup%20Guide%20Rel_0_2.pdf)
 
-Option 2: [Unity Unity Risk Indicator Setup Guide Option 2](https://docs.google.com/document/d/1NvafrRxwTOrgk66y_Dvu2wnVp11CPyp7e2ZMHtbXR4Y/edit)
+
+### TIPs
+1. The new installation will take approximately 15 minutes. Once the installation is complete, please wait about 10 minutes to allow the Node.js service to start up.
+2. The initial username is "super" and the password is "Admin@123".
+3. If you wish to upgrade to a new version, simply run the "unitysetup.sh" script again. Keep in mind that you will need to update the IP address within the script once more, as each time the script runs, it retrieves all files from GitHub and overwrites your previous settings.
 
 ---
 
