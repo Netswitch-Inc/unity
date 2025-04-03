@@ -20,6 +20,12 @@ const ModalImportCSV = ({ show, closePopup }) => {
         return key.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
     }
 
+    const handleOpen = () => {
+        setError(null)
+        setParsedData(null)
+        setIsSubmitting(false)
+    }
+
     const handleFileUpload = (event) => {
         const selectedFile = event.target.files[0];
         setError(null);
@@ -73,7 +79,13 @@ const ModalImportCSV = ({ show, closePopup }) => {
     }
 
     return (
-        <Modal className="UpdateUserPopup modal-design" size="lg" show={show} centered>
+        <Modal
+            size="lg"
+            centered
+            show={show}
+            onShow={handleOpen}
+            className="UpdateUserPopup modal-design"
+        >
             <Modal.Header>
                 <span className='modal-title col-sm-12'>
                     <h3 className='mb-0 mt-0'>Upload OpenVAS Scan Report</h3>
@@ -92,13 +104,13 @@ const ModalImportCSV = ({ show, closePopup }) => {
                                             CSV File (Matching your OpenVAS scan format)
                                         </BootstrapForm.Label>
                                         <span className='col-photo'>
-                                        <Field
-                                            name="csvFile"
-                                            type="file"
-                                            accept=".csv"
-                                            className=""
-                                            onChange={handleFileUpload}
-                                        />
+                                            <Field
+                                                name="csvFile"
+                                                type="file"
+                                                accept=".csv"
+                                                className=""
+                                                onChange={handleFileUpload}
+                                            />
                                         </span>
                                     </BootstrapForm.Group>
                                 </Col>
