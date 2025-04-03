@@ -120,7 +120,7 @@ exports.insertMultipleOpenVASScanReport = async function (req, res, next) {
 
         const result = await OpenVASScanReportService.insertMultipleOpenVASScanReport(scanReports);
 
-        return res.status(200).send({ status: 200, flag: true, data: result, message: "OpenVAS Scan Report Multiple record inserted successfully." });
+        return res.status(200).json({ status: 200, flag: true, data: result, message: "OpenVAS Scan Report Multiple record inserted successfully." });
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message });
     }
