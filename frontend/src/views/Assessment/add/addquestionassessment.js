@@ -1,14 +1,14 @@
 import AddSectionModel from "views/section/model/AddSectionModel";
 import { Row, Col } from "react-bootstrap";
-import { Card, CardBody } from "reactstrap";
+import { CardBody } from "reactstrap";
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuestionModel from "views/questions/model/AddQuestionModel";
 import { initQuestion } from "utility/reduxConstant";
 import {
-  updateBulkOrderQuestion,
   deleteQuestion,
   getQuestionListFilter,
+  updateBulkOrderQuestion
 } from "views/questions/store";
 import Swal from "sweetalert2";
 import { deleteSection } from "views/section/store";
@@ -187,39 +187,38 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
         Swal.fire("Error!", "There was an error deleting the user.", "error");
       }
     }
-  };
+  }
 
   return (
     <>
       <Row className="add-edit-form">
         <Col>
-          {/* <Card> */}
-            <CardBody className="pl-0 pr-0 pt-0">
-              {questionItems?.length === 0 && (
-                <div className="buttons">
-                  <button
-                    type="button"
-                    className="btnprimary"
-                    onClick={() => handleAddSection()}
-                  >
-                    Add Section
-                  </button>
-                </div>
-              )}
-              {questionItems?.length > 0 && (
-                <DroppableComp
-                  questionItems={questionItems}
-                  handleEditSection={handleEditSection}
-                  handleDeleteSection={handleDeleteSection}
-                  handleOnDragEnd={handleOnDragEnd}
-                  handleDeleteQuestion={handleDeleteQuestion}
-                />
-                
-              )}
-            </CardBody>
-          {/* </Card> */}
+          <CardBody className="pl-0 pr-0 pt-0">
+            {questionItems?.length === 0 && (
+              <div className="buttons">
+                <button
+                  type="button"
+                  className="btnprimary"
+                  onClick={() => handleAddSection()}
+                >
+                  Add Section
+                </button>
+              </div>
+            )}
+            {questionItems?.length > 0 && (
+              <DroppableComp
+                questionItems={questionItems}
+                handleEditSection={handleEditSection}
+                handleDeleteSection={handleDeleteSection}
+                handleOnDragEnd={handleOnDragEnd}
+                handleDeleteQuestion={handleDeleteQuestion}
+              />
+
+            )}
+          </CardBody>
         </Col>
       </Row>
+
       {openModel && (
         <AddSectionModel
           show={openModel}
@@ -229,6 +228,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
           initialValues={initSectionValues}
         />
       )}
+
       {openQuestionModel && (
         <QuestionModel
           show={openQuestionModel}
@@ -239,6 +239,7 @@ const AssessmentQuestion = ({ childFunc, triggered, cancelTrigger }) => {
         />
       )}
     </>
-  );
-};
+  )
+}
+
 export default AssessmentQuestion;
