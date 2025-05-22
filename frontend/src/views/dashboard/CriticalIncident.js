@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { wazuhIndexerSeverityCountData } from "./store";
 
 import {
-  CardBody,
-  CardHeader,
-  CardTitle,
   Dropdown,
+  CardBody,
+  CardTitle,
+  CardHeader,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
@@ -16,15 +16,15 @@ import {
 
 import { Radar } from "react-chartjs-2";
 import {
-  Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
   Filler,
   ArcElement,
+  LineElement,
+  PointElement,
+  Chart as ChartJS,
+  RadialLinearScale
 } from "chart.js";
 import { OptionsForCriticalGraph } from "utility/reduxConstant";
 
@@ -45,25 +45,13 @@ const CritcalIncident = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.dashboard);
 
-  const [timeInterval, setTimeInterval] = useState({
-    label: "Day",
-    value: "day",
-  });
+  const [timeInterval, setTimeInterval] = useState({ label: "Year", value: "year" });
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggleDropdown = useCallback(
-    () => setDropdownOpen((prevState) => !prevState),
-    []
-  );
-  const handleWazuhSeverityDashboardCountData = useCallback(
-    (filterType = timeInterval) => {
-      dispatch(
-        wazuhIndexerSeverityCountData({
-          timeRange: filterType?.value || "",
-        })
-      );
-    },
-    [dispatch, timeInterval]
-  );
+  const toggleDropdown = useCallback(() => setDropdownOpen((prevState) => !prevState), []);
+
+  const handleWazuhSeverityDashboardCountData = useCallback((filterType = timeInterval) => {
+    dispatch(wazuhIndexerSeverityCountData({ timeRange: filterType?.value || "" }));
+  }, [dispatch, timeInterval]);
 
   useLayoutEffect(() => {
     handleWazuhSeverityDashboardCountData();
@@ -77,6 +65,7 @@ const CritcalIncident = () => {
     setTimeInterval(values);
     handleWazuhSeverityDashboardCountData(values);
   };
+
   // Data for the spider chart (Radar chart)
   const chartData = {
     labels: ["Critical", "High", "Medium", "Low"],
@@ -104,9 +93,9 @@ const CritcalIncident = () => {
         pointHoverBackgroundColor: "#fff",
         pointHoverBorderColor: "rgb(54, 162, 235)",
         pointRadius: 6,
-        pointHoverRadius: 14,
-      },
-    ],
+        pointHoverRadius: 14
+      }
+    ]
   };
 
   // Options for the Radar chart
@@ -126,25 +115,25 @@ const CritcalIncident = () => {
           ) + 10,
         angleLines: {
           display: true,
-          color: "#ffffff",
+          color: "#ffffff"
         },
         grid: {
-          color: "#ffffff",
+          color: "#ffffff"
         },
         ticks: {
-          display: false,
+          display: false
         },
         pointLabels: {
           color: "#ffffff",
           font: {
-            size: 14,
-          },
-        },
-      },
+            size: 14
+          }
+        }
+      }
     },
     plugins: {
       legend: {
-        display: false,
+        display: false
       },
       tooltip: {
         backgroundColor: "#333333",
@@ -168,19 +157,19 @@ const CritcalIncident = () => {
               1: "Rule level 12 to 14",
               2: "Rule level 7 to 11",
               3: "Rule level 0 to 6",
-              4: ` Active: ${store?.wazuhSeverityCount?.agents_count}`,
+              4: ` Active: ${store?.wazuhSeverityCount?.agents_count}`
             };
 
             return `${severityTypes[context.dataIndex]}`;
-          },
+          }
         },
         customDataLabels: {
           display: true,
           color: "white",
           font: {
-            size: 12,
-          },
-        },
+            size: 12
+          }
+        }
       },
       // Custom plugin to render data point values
       afterDraw: (chart) => {
@@ -196,9 +185,9 @@ const CritcalIncident = () => {
             ctx.font = "12px Arial"; // Font style
             ctx.textAlign = "center"; // Center alignment
             ctx.fillText(value, x, y - 10); // Draw value slightly above the point
-          });
-        });
-      },
+          })
+        })
+      }
     },
     onClick: (e, elements) => {
       if (elements.length > 0) {
@@ -209,13 +198,11 @@ const CritcalIncident = () => {
           navigate("/admin/configuration-assessment-chart");
         } else {
           const severity = label.toLowerCase();
-          navigate("/admin/level-severity-graph", {
-            state: { severity: severity },
-          });
+          navigate("/admin/level-severity-graph", { state: { severity: severity } });
         }
       }
-    },
-  };
+    }
+  }
 
   const plugins = [
     {
@@ -234,8 +221,8 @@ const CritcalIncident = () => {
           ctx.fillText(datapoint.toString(), x, y - 15);
         });
         ctx.restore();
-      },
-    },
+      }
+    }
   ];
 
   return (
@@ -412,7 +399,7 @@ const CritcalIncident = () => {
         </div> */}
       </CardBody>
     </div>
-  );
-};
+  )
+}
 
 export default CritcalIncident;

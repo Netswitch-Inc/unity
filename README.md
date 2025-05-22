@@ -1,5 +1,29 @@
 # Installation Guide for Unity Risk Indicator
 
+### Minium requirements:
+OS: Ubuntu 20.04 (LTS)
+
+CPU: 4 x vCPU 
+
+### (CPU must support AVX)
+
+Ram: 4GB Ram
+
+Hard disk: HDD 30GB
+
+### Recommend requirements:
+OS: Ubuntu 24.04 (LTS)
+
+CPU: 8 x vCPU
+
+### (CPU must support AVX)
+
+Ram: 8GB Ram
+
+Hard disk: SDD 100GB
+
+---
+
 ## Option 1: Preferred Method
 ### Using the Automatic Installation Guide
 Please refer to the following link for the automatic installation guide:
