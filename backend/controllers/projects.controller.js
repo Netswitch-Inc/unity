@@ -1,5 +1,7 @@
-const Projectservice = require("../services/projects.service");
-const projectHistoryService = require("../services/projecthistories.service")
+var Projectservice = require("../services/projects.service");
+var projectHistoryService = require("../services/projecthistories.service");
+var CompanyComplianceControlService = require("../services/companyComplianceControl.service");
+
 exports.getProjects = async function (req, res, next) {
   // Check the existence of the query parameters, If doesn't exists assign a default value
   try {
@@ -28,7 +30,7 @@ exports.getProjects = async function (req, res, next) {
       const isNumberSearch = !isNaN(parsedCost);
       query["$or"] = [
         { name: { $regex: ".*" + search + ".*", $options: "i" } }
-      ];
+      ]
 
       if (isNumberSearch) {
         query["$or"].push({ fix_projected_cost: parsedCost });
@@ -36,8 +38,6 @@ exports.getProjects = async function (req, res, next) {
         query["$or"].push({ affected_scope: parsedCost });
         query["$or"].push({ affected_risk: parsedCost });
         query["$or"].push({ fix_projected_cost: parsedCost });
-      } else {
-        query["$or"].push({ name: { $regex: ".*" + search + ".*", $options: "i" } });
       }
     }
 
@@ -54,23 +54,11 @@ exports.getProjects = async function (req, res, next) {
     }
 
     var count = await Projectservice.getProjectsCount(query);
-    var Projects = await Projectservice.getProjects(
-      query,
-      page,
-      limit,
-      sortColumn,
-      sort
-    );
+    var Projects = await Projectservice.getProjects(query, page, limit, sortColumn, sort)
     if (!Projects || !Projects.length) {
       if (Number(req.query?.page || 0) > 0) {
         page = 1;
-        Projects = await Projectservice.getProjects(
-          query,
-          page,
-          limit,
-          sortColumn,
-          sort
-        );
+        Projects = await Projectservice.getProjects(query, page, limit, sortColumn, sort)
       }
     }
 
@@ -85,8 +73,8 @@ exports.getProjects = async function (req, res, next) {
       total: count,
       pageIndex,
       startIndex,
-      endIndex,
-    };
+      endIndex
+    }
 
     // Return the Projects list with the appropriate HTTP password Code and Message.
     return res.status(200).json({
@@ -94,13 +82,13 @@ exports.getProjects = async function (req, res, next) {
       flag: true,
       data: Projects,
       pagination,
-      message: "Projects received successfully!",
+      message: "Projects received successfully."
     });
-  } catch (e) {
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.getProject = async function (req, res, next) {
   // Check the existence of the query parameters, If doesn't exists assign a default value
@@ -113,66 +101,85 @@ exports.getProject = async function (req, res, next) {
       status: 200,
       flag: true,
       data: Project,
-      message: "Projects received successfully!",
-    });
-  } catch (e) {
+      message: "Projects received successfully."
+    })
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.createProject = async function (req, res, next) {
   try {
+    var companyComplianceControlId = req.body?.company_compliance_control_id || "";
     req.body.auth_user_name = req?.userName || "";
     req.body.auth_user_id = req?.userId || "";
 
     var createdProject = await Projectservice.createProject(req.body);
+    if (createdProject?._id) {
+      if (companyComplianceControlId) {
+        await CompanyComplianceControlService.updateCompanyComplianceControl({
+          _id: companyComplianceControlId,
+          project_id: createdProject._id
+        })
+      }
+    }
 
     return res.status(200).json({
       status: 200,
       flag: true,
       data: createdProject,
-      message: "Project created successfully!",
-    });
-  } catch (e) {
+      message: "Project created successfully."
+    })
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.updateProject = async function (req, res, next) {
   // Id is necessary for the update
   if (!req.body._id) {
-    return res.status(200).json({ status: 200, flag: false, message: "Id must be present!" });
+    return res.status(200).json({ status: 200, flag: false, message: "Id must be present." });
   }
 
   try {
+    var companyComplianceControlId = req.body?.company_compliance_control_id || "";
     req.body.auth_user_name = req?.userName || "";
     req.body.auth_user_id = req?.userId || "";
 
     // Calling the Service function with the new object from the Request Body
     var updatedProject = await Projectservice.updateProject(req.body);
-    if (updatedProject?._id && req.body?.type) {
-      const description = req.body?.projectHistoryDescription
-      await projectHistoryService.createProjectHistory({ ...req.body, description, project_id: req.body?._id })
+    if (updatedProject?._id) {
+      if (companyComplianceControlId) {
+        await CompanyComplianceControlService.updateCompanyComplianceControl({
+          _id: companyComplianceControlId,
+          project_id: updatedProject._id
+        })
+      }
+
+      if (req.body?.type) {
+        var description = req.body?.projectHistoryDescription
+        await projectHistoryService.createProjectHistory({ ...req.body, description, project_id: req.body?._id })
+      }
     }
 
     return res.status(200).json({
       status: 200,
       flag: true,
       data: updatedProject,
-      message: "Project updated successfully!",
-    });
-  } catch (e) {
+      message: "Project updated successfully."
+    })
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
-};
+}
 
 exports.removeProject = async function (req, res, next) {
   var id = req.params.id;
   if (!id) {
-    return res.status(200).json({ status: 200, flag: true, message: "Id must be present" });
+    return res.status(200).json({ status: 200, flag: true, message: "Id must be present." })
   }
 
   try {
@@ -181,9 +188,9 @@ exports.removeProject = async function (req, res, next) {
     return res.status(200).send({
       status: 200,
       flag: true,
-      message: "Project deleted successfully.",
-    });
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+      message: "Project deleted successfully."
+    })
+  } catch (error) {
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }

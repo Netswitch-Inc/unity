@@ -107,7 +107,7 @@ const DatatablePagination = ({
         // {...props}
         data={data}
         columns={columns}
-        pagination={true}
+        pagination={pagination}
         sortServer={true}
         responsive={true}
         onSort={onSortChange}

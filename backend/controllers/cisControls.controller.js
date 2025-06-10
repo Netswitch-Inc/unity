@@ -56,11 +56,11 @@ exports.getCISControls = async function (req, res, next) {
       flag: true,
       data: cisControls,
       pagination,
-      message: "CIS controls received successfully",
+      message: "CIS controls received successfully"
     });
-  } catch (e) {
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 
@@ -75,11 +75,11 @@ exports.getCISControl = async function (req, res, next) {
       status: 200,
       flag: true,
       data: cisControl,
-      message: "CIS control received successfully.",
+      message: "CIS control received successfully."
     });
-  } catch (e) {
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 
@@ -92,11 +92,11 @@ exports.createCISControl = async function (req, res, next) {
       status: 200,
       flag: true,
       data: createdCISControl,
-      message: "CIS control created successfully.",
+      message: "CIS control created successfully."
     });
-  } catch (e) {
+  } catch (error) {
     // Return an Error Response Message with Code and the Error Message.
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 
@@ -112,10 +112,10 @@ exports.updateCISControl = async function (req, res, next) {
       status: 200,
       flag: true,
       data: updatedCISControl,
-      message: "CIS control updated successfully.",
+      message: "CIS control updated successfully."
     });
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+  } catch (error) {
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 
@@ -130,10 +130,10 @@ exports.removeCISControl = async function (req, res, next) {
     return res.status(200).send({
       status: 200,
       flag: true,
-      message: "CIS control deleted successfully.",
+      message: "CIS control deleted successfully."
     });
-  } catch (e) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+  } catch (error) {
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 
@@ -154,7 +154,7 @@ exports.getComplinceCISControl = async function (req, res, next) {
       return res.status(200).json({
         status: 200,
         flag: false,
-        message: "Please provide both framework_id and control_id",
+        message: "Please provide both framework_id and control_id"
       });
     }
 
@@ -180,27 +180,20 @@ exports.getComplinceCISControl = async function (req, res, next) {
       total: count,
       pageIndex,
       startIndex,
-      endIndex,
+      endIndex
     };
+
     return res.status(200).json({
       status: 200,
       flag: true,
       data: cisControl,
       pagination,
-      message: "CIS control we get succsessfully",
+      message: "CIS control we get succsessfully"
     });
   } catch (error) {
-    return res.status(200).json({ status: 200, flag: false, message: e.message });
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
-// exports.importIcons = async function (req, res, next) {
-//   try {
-//     const data = await CISControlService.getCISControls()
-//     if (!data) return res.status(200).json({ status: 200, flag: false, message: "No CIS controls found" });
-//   } catch (error) {
-
-//   }
-// }
 
 exports.importIcons = async function (req, res, next) {
   try {
@@ -216,7 +209,7 @@ exports.importIcons = async function (req, res, next) {
       'PENTEST',
       'SIEM',
       "LOC",
-      "VA",
+      "VA"
     ];
 
     const updatedData = data.map(item => ({
@@ -232,4 +225,4 @@ exports.importIcons = async function (req, res, next) {
     console.error(error); // Log the error for debugging
     return res.status(500).json({ status: 500, flag: false, message: "Internal server error" });
   }
-};
+}

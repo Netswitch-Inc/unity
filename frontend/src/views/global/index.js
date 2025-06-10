@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { getAuthRolePermission } from "views/login/store";
-import { cleanGlobalSettingMessage, getGlobalSettingsList, updateGlobalSettingsList } from "./store";
+import { getAppSettings, cleanGlobalSettingMessage, getGlobalSettingsList, updateGlobalSettingsList } from "./store";
 
 // ** Reactstrap Imports
 import {
@@ -16,12 +16,13 @@ import {
     Button,
     CardBody,
     Collapse,
-    CustomInput
+    CustomInput,
+    UncontrolledTooltip
 } from 'reactstrap';
-import { FormikReactSelect } from "components/FormikFields";
+import Select from "react-select";
 
 // ** Utils
-import { splitWithPipe, arrayJoinWithPipe, onImageSrcError } from "utility/Utils";
+import { splitWithPipe, arrayJoinWithPipe /*, onImageSrcError */ } from "utility/Utils";
 
 // ** Custom Components
 import SimpleSpinner from 'components/spinner/simple-spinner';
@@ -35,15 +36,18 @@ import { TiMessages } from "react-icons/ti";
 import { hostRestApiUrl, superAdminRole } from "utility/reduxConstant";
 
 // ** Default Avatar
-import defaultAvatar from "assets/img/avatar-default.jpg";
+// import defaultAvatar from "assets/img/avatar-default.jpg";
 
-// ** SVG Icons
+// ** Icons
+import infoIcon from "assets/img/info.png";
 import openedIcon from "../../assets/img/openedPolygon.svg"
 import closedIcon from "../../assets/img/closedPolygon.svg"
 
 const GlobalSetting = () => {
+    // ** Hooks
     const navigate = useNavigate()
 
+    // ** Store vars
     const dispatch = useDispatch();
     const store = useSelector((state) => state.globalSetting);
 
@@ -51,6 +55,7 @@ const GlobalSetting = () => {
     const [reRenderKey, setReRenderKey] = useState("")
     const [selectedAccordion, setSelectedAccordion] = useState();
     const [settingValues, setSettingValues] = useState([]);
+    const [makeRefresh, setMakeRefresh] = useState(false);
 
     const [showSnackBar, setshowSnackbar] = useState(false);
     const [snakebarMessage, setSnakbarMessage] = useState("");
@@ -70,7 +75,10 @@ const GlobalSetting = () => {
     const handleSettingUpdateSuccess = useCallback(() => {
         dispatch(getGlobalSettingsList());
         dispatch(getAuthRolePermission());
-    }, [dispatch])
+        if (makeRefresh) {
+            dispatch(getAppSettings());
+        }
+    }, [dispatch, makeRefresh])
 
     useEffect(() => {
         if (authUserItem?.role_id?._id !== superAdminRole) {
@@ -256,6 +264,9 @@ const GlobalSetting = () => {
                 data: settingValues
             }
 
+            const isMatch = settingValues.some((item) => item?.slug.includes('app_setting'));
+            setMakeRefresh(isMatch);
+
             dispatch(updateGlobalSettingsList(settingData));
         }
     }
@@ -314,10 +325,33 @@ const GlobalSetting = () => {
                                                 <Row>
                                                     {group.settings.map((setting, ind) => (
                                                         <Col xxs="12" lg="12" xl="12" key={`custom_${setting.slug}`}>
-                                                            <div className={classnames("full-width", {
-                                                                "": setting?.type === "select"
-                                                            })}>
-                                                                <Label className="col-label w-100">{setting.name}</Label>
+                                                            <div
+                                                                id={`container-${setting.slug}`}
+                                                                className={classnames("full-width", {
+                                                                    "": setting?.type === "select"
+                                                                })}
+                                                            >
+                                                                <Label className="col-label w-100">
+                                                                    {setting.name}
+
+                                                                    {setting?.note ? (
+                                                                        <span className="ml-1">
+                                                                            <img
+                                                                                alt="icon"
+                                                                                width={16}
+                                                                                height={16}
+                                                                                src={infoIcon}
+                                                                                className="i-icon-img cursor-pointer"
+                                                                                id={`tooltip-icon-${setting.slug}`}
+                                                                            />
+
+                                                                            <UncontrolledTooltip placement="auto" container={`container-${setting.slug}`} target={`tooltip-icon-${setting.slug}`}>
+                                                                                <div className="inner-desc">{setting.note}</div>
+                                                                            </UncontrolledTooltip>
+                                                                        </span>
+                                                                    ) : null}
+                                                                </Label>
+
                                                                 {setting?.type === "text" ? (
                                                                     <CustomInput
                                                                         type="text"
@@ -326,6 +360,7 @@ const GlobalSetting = () => {
                                                                         defaultValue={setting.value}
                                                                         className="col-input w-100"
                                                                         onInput={(event) => onInputChange(setting?._id, setting?.slug, event?.target?.value)}
+                                                                        disabled={setting?.disabled || false}
                                                                     />
                                                                 ) : null}
 
@@ -337,6 +372,7 @@ const GlobalSetting = () => {
                                                                                 accept="image/*"
                                                                                 name={setting.slug}
                                                                                 onChange={(event) => handleChangeImage(setting?._id, setting?.slug, event)}
+                                                                                disabled={setting?.disabled || false}
                                                                             />
                                                                         </span>
 
@@ -351,14 +387,14 @@ const GlobalSetting = () => {
                                                                                     marginLeft: "10px",
                                                                                     maxWidth: "100%"
                                                                                 }}
-                                                                                onError={(currentTarget) => onImageSrcError(currentTarget, defaultAvatar)}
+                                                                            // onError={(currentTarget) => onImageSrcError(currentTarget, defaultAvatar)}
                                                                             />
                                                                         ) : null}
                                                                     </div>
                                                                 ) : null}
 
                                                                 {setting?.type === "select" ? (
-                                                                    <FormikReactSelect
+                                                                    <Select
                                                                         id={setting.slug}
                                                                         name={setting.slug}
                                                                         onBlur={() => null}
@@ -367,7 +403,8 @@ const GlobalSetting = () => {
                                                                         className="react-select col-select w-100"
                                                                         options={setting?.options || []}
                                                                         value={getSelectOpsValue(setting)}
-                                                                        onChange={(name, val) => handleChangeSelect(setting, val)}
+                                                                        onChange={(val) => handleChangeSelect(setting, val)}
+                                                                        isDisabled={setting?.disabled || false}
                                                                     />
                                                                 ) : null}
 
@@ -383,6 +420,7 @@ const GlobalSetting = () => {
                                                                                         className="pointer mr-1 align-middle"
                                                                                         checked={(getCheckboxOpsValue(setting, opt.value) === opt?.value) || false}
                                                                                         onChange={() => handleChangeCheckbox(setting, opt)}
+                                                                                        disabled={setting?.disabled || false}
                                                                                     />
                                                                                     <span className="checkmark" for={`${opt.value}-${ind}`}></span>
                                                                                 </label>
@@ -407,6 +445,7 @@ const GlobalSetting = () => {
                                                                 type="button"
                                                                 color="primary"
                                                                 className="btnprimary"
+                                                                disabled={!settingValues?.length}
                                                                 onClick={() => onSubmit()}
                                                             >
                                                                 Submit

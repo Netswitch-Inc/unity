@@ -1,5 +1,4 @@
 import React from "react";
-import { Col, Row } from "reactstrap";
 import { DialDiv, DialDivFrameworks } from "./DialDiv";
 /**
  * Generates an array of Row components containing Column components with DialDivs.
@@ -19,33 +18,33 @@ export const GenerateRows = (
   const numRow = Math.ceil(data.length / columnsPerRow);
   const handlePassControlData = (item) => {
     handleSelectedControlData(item);
-  };
+  }
+
   return Array.from({ length: numRow }, (_, rowIndex) => {
-    const columns = data && data
-      .slice(rowIndex * columnsPerRow, rowIndex * columnsPerRow + columnsPerRow)
-      .map((item, colIndex) => (
-        <Col
-          className="dial-div-framwork-card test"
-          // sm="6"
-          key={`${item?.name}-${colIndex}`}
-        >
-          <DialDiv
-            text={item.name ? item.name : defaultData?.name}
-            des={item.description ? item.description : defaultData?.description}
-            value={item?._id}
-            handlePassControlData={() => handlePassControlData(item)}
-            defaultData={defaultData?._id}
-          />
-        </Col>
-      ));
+    const columns = data ? (
+      data.slice(rowIndex * columnsPerRow, rowIndex * columnsPerRow + columnsPerRow)
+        .map((item, colIndex) => (
+          <div key={`${item?.name}-${colIndex}`} className="dial-div-framwork-card">
+            <DialDiv
+              value={item?._id}
+              name={item.name ? item.name : defaultData?.name}
+              identifier={item?.identifier || defaultData?.identifier || ""}
+              framework_name={item?.framework_id?.label || defaultData?.framework_id?.label || ""}
+              description={item.description ? item.description : defaultData?.description}
+              handlePassControlData={() => handlePassControlData(item)}
+              defaultData={defaultData?._id}
+            />
+          </div>
+        ))
+    ) : null
 
     return (
-      <Row className="border-light ml-2 mr-2" key={rowIndex.toString()}>
+      <div className="border-light frame-box resilience-index" key={rowIndex.toString()}>
         {columns}
-      </Row>
-    );
-  });
-};
+      </div>
+    )
+  })
+}
 
 export const GenerateFrameworkRows = (
   data,
@@ -56,34 +55,31 @@ export const GenerateFrameworkRows = (
   const handlePassFramework = (id) => {
     const idArr = [];
     idArr.push(id);
-    handleControllerLists(idArr);
-  };
+    handleControllerLists(idArr)
+  }
 
   return Array.from({ length: numRow }, (_, rowIndex) => {
-    const columns = data && data
-      .slice(rowIndex * columnsPerRow, rowIndex * columnsPerRow + columnsPerRow)
-      .map((item, colIndex) => (
-        <Col
-          className="dial-div-framwork-card"
-          sm="6"
-          key={`${item?.name}-${colIndex}`}
-          onClick={() => handlePassFramework(item._id)}
-        >
-          <DialDivFrameworks
-            text={item.label}
-
-          // des={item.description}
-          // handlePassControlData={() => handlePassControlData(item)}
-          />
-        </Col>
-      ));
+    const columns = data ? (
+      data.slice(rowIndex * columnsPerRow, rowIndex * columnsPerRow + columnsPerRow)
+        .map((item, colIndex) => (
+          <div
+            key={`${item?.name}-${colIndex}`}
+            className="dial-div-framwork-card"
+            onClick={() => handlePassFramework(item._id)}
+          >
+            <DialDivFrameworks
+              text={item.label}
+            // des={item.description}
+            // handlePassControlData={() => handlePassControlData(item)}
+            />
+          </div>
+        ))
+    ) : null
 
     return (
-      <Row className="border-light ml-2 mr-2" key={rowIndex.toString()}>
+      <div className="border-light frame-box" key={rowIndex.toString()}>
         {columns}
-      </Row>
-    );
-  });
-};
-
-// export default GenerateRows;
+      </div>
+    )
+  })
+}

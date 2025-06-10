@@ -13,22 +13,37 @@ import { createAnswer, updateAnswer, cleanAnswerMessage } from "../assessment-re
 import { Card } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
 import DynamicInput from "components/AssessmentReportQuestionType/DynamicInput";
 
+// ** Constant
+import { defaultLogo } from 'utility/reduxConstant';
+
 // ** Logo
-import reactLogo from "assets/img/react-logo.png";
+import logo from "assets/img/react-logo.png";
 
 const AsessmentReport = () => {
+  // ** Hooks
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const assessmentReportId = queryParams.get("id");
+
+  // ** Store vars
   const dispatch = useDispatch();
   const assessmentReport = useSelector((state) => state.assessmentReport);
   const assessmentReportAnswerList = useSelector((state) => state.questionAnswer)
+  const settingStore = useSelector((state) => state.globalSetting);
+
+  // ** Const
+  const appSettingItem = settingStore?.appSettingItem || null;
+  const appLogo = appSettingItem?.logo || defaultLogo;
+
+  const assessmentReportId = queryParams.get("id");
 
   const [show, setShow] = useState(true);
   const [sectionIndex, setSectionIndex] = useState(0);
@@ -314,7 +329,7 @@ const AsessmentReport = () => {
         <Card className="main-progress col-md-3 mb-0">
           <div className="main-logo-img">
             <div className="logo">
-              <img alt="..." src={reactLogo} />
+              <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
             </div>
           </div>
 
@@ -341,7 +356,7 @@ const AsessmentReport = () => {
                   <h4>Verification</h4>
                 </div>
               </div>
-              
+
               <div className="steps active-class">
                 <div className="borders step-line">
                   <div className="step-icon ">

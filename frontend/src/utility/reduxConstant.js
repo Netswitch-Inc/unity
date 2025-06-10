@@ -1,5 +1,16 @@
+// ** Utils
+import { getLocalAppSetting } from "./Utils";
+
+// ** Logo
+import logo from "assets/img/react-logo.png";
+
 const hostRestApiUrl = process.env?.REACT_APP_BACKEND_REST_API_URL || "";
 const hostRestApiPrefix = process.env?.REACT_APP_BACKEND_REST_API_PREFIX || "";
+const dashboardTopWidgetDefault = process.env?.REACT_APP_DASHBOARD_TOP_WIDGET_DEFAULT === true || false;
+const defaultCompanyName = getLocalAppSetting()?.name || process.env?.REACT_APP_COMPANY_NAME || "Unity";
+const defaultCompanyUrl = getLocalAppSetting()?.url || process.env?.REACT_APP_COMPANY_URL || "";
+const defaultLogo = getLocalAppSetting()?.logo || logo;
+
 const superAdminRole = "6694b16dc2bc754ae7c64e0a";
 const companyAdminRole = "6694b643c788405b9fcafbe1";
 
@@ -103,7 +114,7 @@ const initQuestion = { section_id: "", question: "", description: "", option_typ
 
 const initialProject = { company_id: "", user_id: "", framework_id: [], involved_parties: [], submitted_by: "", name: "", description: "", cost_of_risk: 0, fix_cost_risk_ratio: 0, affected_scope: "", priority: "", fix_projected_cost: 0, likelyhood: 1, impact_assessment: 1, affected_risk: 0, status: "" }
 
-const initAssessmentItem = { _id: "", name: "", description: "", order: "", status: 1, show_score_calculation: false }
+const initAssessmentItem = { _id: "", name: "", description: "", order: "", additional_description: "", status: 1, show_score_calculation: false }
 
 const priority = [
   { label: "Low", value: "low" },
@@ -203,9 +214,36 @@ const initEventLogItem = { _id: "", company_id: null, module_id: null, action_us
 
 const initNetswitchThreatIntelItem = { _id: "", ip_address: "", as_number: "", company: "", country: "", time: "", date_in_string: "", date: null, date_time: null, status: true }
 
+const initCompanyComplianceControlItem = { _id: "", company_id: null, user_id: null, compliance_priority_id: null, framework_id: null, control_id: null, project_id: null, cis_tool_icons: null, status: true }
+
+const initCompliancePriorityItem = { _id: "", company_id: null, user_id: null, name: "", description: "", status: true }
+
+const draftEditorToolbarConfig = {
+  options: ["blockType", "inline", "list", "textAlign", "history", "remove"],
+  blockType: {
+    inDropdown: true,
+    options: ["Normal", "H1", "H2", "H3", "H4", "H5", "H6"]
+  },
+  inline: {
+    inDropdown: false,
+    options: ["bold", "italic", "underline", "strikethrough"]
+  },
+  textAlign: {
+    options: ["left", "center", "right"],
+  },
+  history: {
+    options: ["undo", "redo"],
+  },
+  remove: { icon: undefined, className: undefined, component: undefined, popupClassName: undefined }
+}
+
 export {
   hostRestApiUrl,
   hostRestApiPrefix,
+  dashboardTopWidgetDefault,
+  defaultCompanyName,
+  defaultCompanyUrl,
+  defaultLogo,
   superAdminRole,
   companyAdminRole,
 
@@ -275,5 +313,8 @@ export {
   initConfigurationAssessmentItem,
   initOpenVASScanReportItem,
   initEventLogItem,
-  initNetswitchThreatIntelItem
+  initNetswitchThreatIntelItem,
+  initCompanyComplianceControlItem,
+  initCompliancePriorityItem,
+  draftEditorToolbarConfig
 }

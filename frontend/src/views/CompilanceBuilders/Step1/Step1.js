@@ -4,13 +4,13 @@ import React, { useEffect, useState, useCallback, useLayoutEffect } from "react"
 
 import { useDispatch, useSelector } from "react-redux";
 import { getFrameworkList, getControllerListByFrameworkId } from "../store";
-import { getCompanyComplianceControlList } from "views/companyComplianceControls/store";
+import { getCompanyComplianceControlList, cleanCompanyComplianceControlMessage } from "views/companyComplianceControls/store";
 
 import { Row, Col, FormGroup, Button, UncontrolledTooltip } from "reactstrap";
 import Select from "react-select";
 
 import { scrollTop } from "utility/Utils";
-import iIcon from "assets/img/cis-icon.png";
+import infoIcon from "assets/img/info.png";
 
 // ** Third Party Components
 import classnames from "classnames";
@@ -32,10 +32,9 @@ const Step1 = React.forwardRef((props, ref) => {
   const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
 
   // ** States
-  const [modalOpen, setModalOpen] = useState(false);
-  const [loadFirst, setLoadFirst] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const [currentStep] = useState(1)
-  const [compliance, setCompliance] = useState([]);
+  const [compliance, setCompliance] = useState([])
   const [tiles, setTiles] = useState([]);
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
@@ -57,14 +56,13 @@ const Step1 = React.forwardRef((props, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.wizardData]);
 
-
   const GenericTile = ({ header, footer, footer2, description, keyVal }) => {
     return (
       <div id={`map-tile-${keyVal}`}> {/* Ensure matching id */}
         <div className="tile-header">
           <img
             alt="icon"
-            src={iIcon}
+            src={infoIcon}
             className="i-icon-img"
             id={`tooltip-icon-${keyVal}`}
           />
@@ -86,8 +84,7 @@ const Step1 = React.forwardRef((props, ref) => {
   }
 
   React.useImperativeHandle(ref, () => ({
-    isValidated: () =>
-      selectedTiles.length > 0 && compliance.length > 0 ? true : false,
+    isValidated: () => selectedTiles.length > 0 && compliance.length > 0 ? true : false,
     state: { selectedTiles, selectedFrameworks: compliance, currentStep: currentStep },
   }));
 
@@ -97,16 +94,15 @@ const Step1 = React.forwardRef((props, ref) => {
     setSelectedTiles([])
     setAllSelected(false)
     dispatch(getCompanyComplianceControlList({
-      company_id: authUserItem?.company_id?._id || authUserItem?.company_id || ""
+      company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
+      user_id: authUserItem?._id || ""
     }));
     dispatch(getFrameworkList());
   }, [dispatch, authUserItem]);
 
   const handleControllerLists = useCallback((framework_id) => {
     const frameworkId = framework_id.join(",");
-    const params = {
-      framework_id: frameworkId,
-    };
+    const params = { framework_id: frameworkId }
 
     dispatch(getControllerListByFrameworkId(params));
   }, [dispatch])
@@ -121,110 +117,102 @@ const Step1 = React.forwardRef((props, ref) => {
   }, [allSelected, selectedTiles])
 
   useEffect(() => {
-    if (store?.controllerItem) {
-      const data =
-        store?.controllerItem?.length > 0 &&
-        store?.controllerItem.map((item) => ({
+    if (companyComplianceControls?.actionFlag) {
+      dispatch(cleanCompanyComplianceControlMessage());
+    }
+  }, [companyComplianceControls.actionFlag])
+
+  useEffect(() => {
+    if (store.actionFlag === "CONTROL_VIA_FRAMEWORK_ID") {
+      let list = []
+      if (store?.controllerItem?.length) {
+        list = store.controllerItem.map((item) => ({
           ...item,
           value: item._id,
           label: item.name,
           framework_name: item.framework_id.label,
           description: item.description
         }))
-
-      setTiles(() => data)
-    }
-
-    if (companyComplianceControls?.companyComplianceControlList && companyComplianceControls?.companyComplianceControlList?.length > 0 && !loadFirst) {
-      const selectedData = companyComplianceControls.companyComplianceControlList.map(item => ({
-        ...(item?.control_id ? { ...item.control_id } : {}),
-        value: item?.control_id?._id, // Example of adding or overriding properties
-        label: item?.control_id?.name,
-        framework_name: item?.control_id?.framework_id?.label,
-        description: item?.control_id?.description
-      }));
-
-      setSelectedTiles(selectedData);
-
-
-      const complienceMap = new Map();
-
-      if (companyComplianceControls?.companyComplianceControlList && companyComplianceControls?.companyComplianceControlList.length > 0) {
-        companyComplianceControls.companyComplianceControlList.forEach(item => {
-          const frameworkId = item?.control_id?.framework_id?.label;
-          if (frameworkId) {
-            complienceMap.set(frameworkId, item?.control_id?.framework_id);
-          }
-        });
       }
 
-      const complienceArr = Array.from(complienceMap.values());
-      if (complienceArr && !loadFirst) {
-        setCompliance(complienceArr)
-        const selectedFrameworkIds = complienceArr.map(
-          (element) => element._id
-        );
-        if (!tiles?.length) {
-          handleControllerLists(selectedFrameworkIds);
+      setTiles(() => list)
+    }
 
+    if (store.actionFlag === "CONTROL_VIA_FRAMEWORK_ID_ERROR") {
+      setTiles([])
+      setCompliance([])
+      setSelectedTiles(() => [])
+    }
+
+    if (companyComplianceControls?.actionFlag === 'CMPN_CONTRL_LST_ERR') {
+      setCompliance([])
+      setSelectedTiles(() => [])
+    }
+
+    if (companyComplianceControls?.actionFlag === "CMPN_CONTRL_LST") {
+      if (companyComplianceControls?.companyComplianceControlData?.data?.length) {
+        const selectedData = companyComplianceControls.companyComplianceControlData.data.map(item => ({
+          ...(item?.control_id ? { ...item.control_id } : {}),
+          value: item?.control_id?._id, // Example of adding or overriding properties
+          label: item?.control_id?.name,
+          framework_name: item?.control_id?.framework_id?.label,
+          description: item?.control_id?.description
+        }));
+
+        setSelectedTiles(selectedData);
+
+        const complienceMap = new Map();
+        if (companyComplianceControls?.companyComplianceControlData?.data?.length > 0) {
+          companyComplianceControls.companyComplianceControlData.data.forEach(item => {
+            const frameworkId = item?.control_id?.framework_id?.label;
+            if (frameworkId) {
+              complienceMap.set(frameworkId, item?.control_id?.framework_id);
+            }
+          })
+        }
+
+        const complienceArr = Array.from(complienceMap.values());
+        if (complienceArr) {
+          setCompliance(complienceArr)
+          const selectedFrameworkIds = complienceArr.map((element) => element._id)
+          if (!tiles?.length) {
+            handleControllerLists(selectedFrameworkIds);
+          }
         }
       }
     }
-  }, [store?.controllerItem, companyComplianceControls?.companyComplianceControlList, handleControllerLists, tiles?.length])
+  }, [store?.controllerItem, store.actionFlag, companyComplianceControls.actionFlag, companyComplianceControls?.companyComplianceControlData, handleControllerLists, tiles?.length, authUserItem])
 
-  useEffect(() => {
-    if (store.actionFlag === "CONTROL_VIA_FRAMEWORK_ID" && store?.error) {
-      setTiles([]);
-      setSelectedTiles(() => []);
-      setCompliance([]);
-    }
-  }, [store.actionFlag, store.error])
-
-  useEffect(() => {
-    if (companyComplianceControls?.actionFlag === 'CMPN_CONTRL_LST' && companyComplianceControls?.companyComplianceControlList?.length === 0) {
-      setSelectedTiles(() => []);
-      setCompliance([]);
-    }
-  }, [companyComplianceControls?.actionFlag, companyComplianceControls?.companyComplianceControlList])
-
-  function handleTileClick(compliance) {
-    const isSelected = selectedTiles.some(
-      (item) => item.value === compliance?.value
-    );
-
+  const handleTileClick = (compliance) => {
+    const isSelected = selectedTiles.some((item) => item.value === compliance?.value)
     if (!isSelected) {
-      setSelectedTiles((prevSelectedTiles) => [
-        ...prevSelectedTiles,
-        compliance,
-      ]);
+      setSelectedTiles((prevSelectedTiles) => [...prevSelectedTiles, compliance])
     } else {
-      setSelectedTiles(
-        selectedTiles.filter((item) => item.value !== compliance.value)
-      );
+      setSelectedTiles(selectedTiles.filter((item) => item.value !== compliance.value))
     }
   }
 
-  function generateComplianceTile(compliance, index) {
-    const isComplianceSelected = selectedTiles && selectedTiles.some((selected) => selected.value === compliance.value)
+  const generateComplianceTile = (item, index) => {
+    const isComplianceSelected = selectedTiles && selectedTiles.some((selected) => selected.value === item.value)
 
     return (
       <div
-        key={compliance.value}
+        key={item.value}
         className="compliance-box">
         <div
-          onClick={() => handleTileClick(compliance)}
+          onClick={() => handleTileClick(item)}
           className={classnames({
             "tile-container w-100": true,
-            "selected-tile-container w-100": isComplianceSelected,
+            "selected-tile-container w-100": isComplianceSelected
           })}
         >
           <div className="content-wrap h-100">
             <GenericTile
-              header={compliance.label}
-              footer={compliance.framework_name}
-              footer2={compliance.identifier}
-              description={compliance.description}
-              keyVal={compliance.value}
+              header={item.label}
+              keyVal={item.value}
+              footer2={item.identifier}
+              footer={item.framework_name}
+              description={item.description}
             />
           </div>
         </div>
@@ -232,7 +220,7 @@ const Step1 = React.forwardRef((props, ref) => {
     )
   }
 
-  function handleSelectAll() {
+  const handleSelectAll = () => {
     if (allSelected) {
       setSelectedTiles([]);
       setAllSelected(false);
@@ -252,23 +240,20 @@ const Step1 = React.forwardRef((props, ref) => {
     }
   }
 
-  function updateComplianceTiles(selectedCompliances) {
-    setLoadFirst(() => true)
+  const updateComplianceTiles = (selectedCompliances) => {
     const selectedFrameworkIds = selectedCompliances.map((element) => element._id)
     handleControllerLists(selectedFrameworkIds);
     setCompliance(() => selectedCompliances);
   }
 
   return (<>
-    <h5 className="info-text ps">Let's start with the basic information.</h5>
-    <div className="text-center buttons">
+    <div className="text-center buttons mt-3">
       <button type="button" className="btnprimary" onClick={() => openModal()}>
         Select Framework
       </button>
     </div>
 
-    <Row className="justify-content-center mt-5">
-      {/*  sm="10" */}
+    <Row className="justify-content-center mt-3">
       <Col sm="12" className="mb-3">
         <FormGroup className="d-none">
           <label>Compliance</label>
@@ -307,11 +292,11 @@ const Step1 = React.forwardRef((props, ref) => {
     </Row>
 
     {compliance?.length ? (
-      // col-sm-10
       <div className="col-sm-12 mx-auto compliance-box-content">
         <Row className="complianceTilesRow">
-          {tiles?.length > 0 &&
-            tiles.map((compliance, index) => generateComplianceTile(compliance, index))}
+          {tiles?.length ? (
+            tiles.map((item, index) => generateComplianceTile(item, index))
+          ) : null}
         </Row>
       </div>
     ) : null}
@@ -319,10 +304,10 @@ const Step1 = React.forwardRef((props, ref) => {
     <SelectFramewroksModal
       open={modalOpen}
       closeModal={closeModal}
-      handleSetTiles={handleSetTiles}
-      updateComplianceTiles={updateComplianceTiles}
       compliance={compliance}
+      handleSetTiles={handleSetTiles}
       frameworkItems={store?.frameworkItems}
+      updateComplianceTiles={updateComplianceTiles}
     />
   </>)
 })

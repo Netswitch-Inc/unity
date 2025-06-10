@@ -7,10 +7,16 @@ import { NavLink, useLocation } from "react-router-dom";
 // ** Reactstrap Imports
 import { Nav, Collapse } from "reactstrap";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** Third Party Components
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import PerfectScrollbar from "perfect-scrollbar";
+
+// ** Logo
+import sourceLogo from "assets/img/react-logo.png";
 
 const Sidebar = (props) => {
   // ** Hooks
@@ -187,7 +193,7 @@ const Sidebar = (props) => {
           onClick={props.closeSidebar}
         >
           <div className="logo-img">
-            <img src={logo.imgSrc} alt="react-logo" />
+            <img src={logo.imgSrc} alt="Logo" onError={(currentTarget) => onImageSrcError(currentTarget, sourceLogo)} />
           </div>
         </a>
       )

@@ -70,6 +70,7 @@ const EventLogDetail = () => {
       "framework_id",
       "involved_parties",
       "submitted_by",
+      "company_compliance_control_id",
       "password",
       "logo",
       "image",
@@ -116,7 +117,7 @@ const EventLogDetail = () => {
 
       <div className="p-0 role-name d-flex justify-content-between mb-3">
         <h3 className="card-title mb-0 mt-0">{""}</h3>
-        <div className="buttons">
+        <div className="buttons black-btn">
         <button
           type="button"
           className="btnprimary"

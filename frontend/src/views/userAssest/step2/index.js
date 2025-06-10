@@ -13,28 +13,44 @@ import {
 import { Card, FormGroup } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** Third Party Components
 import OtpInput from "react-otp-input";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
+// ** Constant
+import { defaultLogo } from 'utility/reduxConstant';
+
 // ** Logo
-import reactLogo from "assets/img/react-logo.png";
+import logo from "assets/img/react-logo.png";
 
 const VarificationCode = () => {
+    // ** Hooks
     const { id } = useParams();
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const assessmentId = queryParams.get("id");
     const navigate = useNavigate();
+    const queryParams = new URLSearchParams(location.search);
+    
+    // ** Store vars
     const dispatch = useDispatch();
+    const assessmentReport = useSelector((state) => state.assessmentReport);
+    const settingStore = useSelector((state) => state.globalSetting);
+    
+    // ** Const
+    const appSettingItem = settingStore?.appSettingItem || null;
+    const appLogo = appSettingItem?.logo || defaultLogo;    
+    const assessmentId = queryParams.get("id");
+    
+    // ** States
     const [emailCode, setEmailCode] = useState("");
     const [smsCode, setSmsCode] = useState("");
     const [errorMessage, setErrorMessage] = useState({ email: false }, { smsCode: false })
     const [showSnackBar, setshowSnackbar] = useState(false);
     const [snakebarMessage, setSnakbarMessage] = useState("");
-
-    const assessmentReport = useSelector((state) => state.assessmentReport);
+    
 
     useLayoutEffect(() => {
         if (assessmentId) {
@@ -139,7 +155,7 @@ const VarificationCode = () => {
                 <Card className="main-progress col-md-3 mb-0">
                     <div className="main-logo-img">
                         <div className="logo">
-                            <img alt="..." src={reactLogo} />
+                            <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
                         </div>
                     </div>
 

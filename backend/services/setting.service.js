@@ -105,6 +105,7 @@ exports.createSetting = async function (setting) {
         type: setting.type ? setting.type : "",
         note: setting.note ? setting.note : "",
         value: setting.value ? setting.value : "",
+        disabled: setting.disabled ? setting.disabled : false,
         deletedAt: null
     })
 
@@ -132,7 +133,7 @@ exports.updateSetting = async function (setting) {
 
     // Edit the Setting Object
     if (setting.options) {
-        oldSetting.options = setting.options;
+        oldSetting.options = setting.options?.length ? setting.options : null;
     }
 
     if (setting.group_name) {
@@ -160,9 +161,8 @@ exports.updateSetting = async function (setting) {
         if (typeof isImage != "undefined" && isImage != null && isImage != "") {
             try {
                 var filePath = publicPath + "/" + oldSetting.value;
-                //console.log("\n filePath >>>>>>",filePath,"\n");
                 fs.unlinkSync(filePath);
-            } catch (e) {
+            } catch (err) {
                 //console.log("\n\nImage Remove Issues >>>>>>>>>>>>>>\n\n");
             }
 
@@ -172,6 +172,10 @@ exports.updateSetting = async function (setting) {
 
     if (setting?.value || setting.value == "") {
         oldSetting.value = setting?.value || "";
+    }
+
+    if (setting?.disabled || setting.disabled == false) {
+        oldSetting.disabled = setting?.disabled || false;
     }
 
     if (setting.deletedAt) {

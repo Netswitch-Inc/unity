@@ -22,17 +22,23 @@ import {
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
+
+// ** Constant
+import { defaultLogo } from 'utility/reduxConstant';
 
 // ** SVG Icons
 import { EyeView, EyeSlash } from "components/SVGIcons";
 
 // ** Logo and PNG Icons
-import mainImage from "assets/img/loginimg.png";
-import logo from "assets/img/react-logo.png";
 import Lock from "assets/img/lock.svg";
+import logo from "assets/img/react-logo.png";
+import mainImage from "assets/img/loginimg.png";
 
 const ResetPassword = () => {
   // ** Hooks
@@ -42,6 +48,11 @@ const ResetPassword = () => {
   // ** Store vars
   const dispatch = useDispatch();
   const loginStore = useSelector((state) => state.login);
+  const settingStore = useSelector((state) => state.globalSetting);
+
+  // ** Const
+  const appSettingItem = settingStore?.appSettingItem || null;
+  const appLogo = appSettingItem?.logo || defaultLogo;
 
   const validationSchema = Yup.object().shape({
     password: Yup.string()
@@ -121,7 +132,7 @@ const ResetPassword = () => {
               className="w-100 d-lg-flex align-items-center mb-3 justify-content-center"
               style={{ textAlign: "center" }}
             >
-              <img alt="..." src={logo} style={{ height: "150px" }} />
+              <img alt="..." src={appLogo} style={{ height: "150px" }} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
             </div>
 
             <div className="login-text">Reset Your Password</div>

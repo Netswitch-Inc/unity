@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 
-// ** Store & Actions
+// ** Store
 import { useSelector } from "react-redux";
 
 // ** Core components
@@ -19,26 +19,29 @@ import PerfectScrollbar from "perfect-scrollbar";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
-// ** Logo
-import logo from "assets/img/react-logo.png";
+// ** Constant
+import { defaultLogo, defaultCompanyName, defaultCompanyUrl } from "utility/reduxConstant";
 
 var ps;
 
 // const companyUrl = process.env.REACT_APP_COM === "sec" ? process.env.REACT_APP_PRO_SEC_URL : process.env.REACT_APP_PRO_NET_URL;
-const companyName = process.env?.REACT_APP_COMPANY_NAME || "";
-const companyUrl = process.env?.REACT_APP_COMPANY_URL || "";
 
 const Admin = (props) => {
+  // ** Hooks
   const location = useLocation();
   const mainPanelRef = useRef(null);
-  const { error, menuRoutes } = useRoutesByRole()
+  const { error, menuRoutes } = useRoutesByRole();
 
-  const store = useSelector((state) => state.login)
+  // ** Const
+  const companyName = defaultCompanyName || "";
+  const companyUrl = defaultCompanyUrl || "";
 
-  const [sidebarOpened, setsidebarOpened] = useState(
-    document.documentElement.className.indexOf("nav-open") !== -1
-  )
+  // ** Store vars
+  const store = useSelector((state) => state.login);
+  const settingStore = useSelector((state) => state.globalSetting);
+  const appSettingItem = settingStore?.appSettingItem || null;
 
+  const [sidebarOpened, setsidebarOpened] = useState(document.documentElement.className.indexOf("nav-open") !== -1)
   const [opacity, setOpacity] = useState(0)
   const [showSnackBar, setshowSnackbar] = useState(false)
   const [SnackMessage] = useState("Unable to connect to the backend server...")
@@ -178,15 +181,9 @@ const Admin = (props) => {
       {({ color, changeColor }) => (
         <React.Fragment>
           <div className="wrapper">
-            <ReactSnackBar
-              Icon={(
-                <span>
-                  {" "}
-                  <TiMessages size={25} />{" "}
-                </span>
-              )}
-              Show={showSnackBar}
-            >
+            <ReactSnackBar Icon={(
+              <span>{" "}<TiMessages size={25} />{" "}</span>
+            )} Show={showSnackBar}>
               {SnackMessage}
             </ReactSnackBar>
 
@@ -205,9 +202,9 @@ const Admin = (props) => {
                 {...props}
                 routes={menuRoutes}
                 logo={{
-                  imgSrc: logo,
-                  outterLink: companyUrl,
-                  text: companyName || "Unity"
+                  imgSrc: appSettingItem?.logo || defaultLogo,
+                  outterLink: appSettingItem?.url || companyUrl,
+                  text: appSettingItem?.name || companyName || "Unity"
                 }}
                 activeColor="blue"
                 closeSidebar={closeSidebar}

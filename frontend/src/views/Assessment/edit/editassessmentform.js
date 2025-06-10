@@ -7,11 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { cleanQuestionMessage } from "views/questions/store";
-import {
-  updateAssessment,
-  getAssessment,
-  cleanAssessmentMessage
-} from "../store";
+import { getAssessment, updateAssessment, cleanAssessmentMessage } from "../store";
 
 // ** Reactstrap Imports
 import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
@@ -20,14 +16,23 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
 // ** Utils
-import { getDomailUrl } from "utility/Utils";
+import { getDomailUrl, htmlToString } from "utility/Utils";
 
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 import { TbCheckbox, TbCopyright } from "react-icons/tb";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Editor } from "react-draft-wysiwyg";
+import draftToHtml from "draftjs-to-html";
+import htmlToDraft from "html-to-draftjs";
+import { EditorState, ContentState, convertToRaw } from "draft-js";
 
+// ** Constant
+import { draftEditorToolbarConfig } from "utility/reduxConstant";
+
+// ** Styles
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const EditAssessmentForm = () => {
   // ** Hooks
@@ -43,18 +48,52 @@ const EditAssessmentForm = () => {
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [editorHtmlContent, setEditorHtmlContent] = useState("");
+  const [editorStateContent, setEditorStateContent] = useState(null);
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required."),
     description: Yup.string().required("Description is required.")
   })
 
+  const handleEditorStateChange = (state) => {
+    // console.log("handleEditorStateChange >>> ", state)
+    setEditorStateContent(state);
+    setEditorHtmlContent(draftToHtml(convertToRaw(state.getCurrentContent())));
+  }
+
+  /* set initial html while edit */
+  const getInitialHTML = (value) => {
+    const contentBlock = htmlToDraft(value);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      handleEditorStateChange(editorState);
+      return editorState;
+    }
+
+    return value;
+  }
+
+  const handleReset = () => {
+    if (store?.assessmentItem?.additional_description) {
+      getInitialHTML(store.assessmentItem.additional_description)
+    }
+  }
+
   useLayoutEffect(() => {
+    setEditorHtmlContent("")
+    setEditorStateContent(null)
+
     const query = { id: id };
     dispatch(getAssessment(query));
   }, [dispatch, id]);
 
   useEffect(() => {
+    if (store.actionFlag === "ASESMNT_ITM_SCS") {
+      handleReset();
+    }
+
     if (store.actionFlag === "ASESMNT_UPDT_SCS" && store.success) {
       setshowSnackbar(true);
       setSnakbarMessage(store.success);
@@ -85,6 +124,10 @@ const EditAssessmentForm = () => {
         description: values?.description || "",
         status: values?.status || 0,
         show_score_calculation: values?.show_score_calculation || ""
+      }
+
+      if (editorHtmlContent) {
+        payload.additional_description = editorHtmlContent;
       }
 
       dispatch(updateAssessment(payload));
@@ -187,6 +230,27 @@ const EditAssessmentForm = () => {
                         />
                         {errors.description && touched.description && (
                           <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                        )}
+                      </Col>
+
+                      <Col xl={12} lg={12} md={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
+                        <BootstrapForm.Label className="col-label">Additional Description</BootstrapForm.Label>
+                        <Editor
+                          id="additional_description"
+                          name="additional_description"
+                          wrapperClassName="col-draft-wrapper"
+                          toolbar={draftEditorToolbarConfig}
+                          placeholder=""
+                          editorState={editorStateContent}
+                          onEditorStateChange={handleEditorStateChange}
+                        // onBlur={() => setFieldTouched("additional_description", true)}
+                        />
+                        {touched.additional_description && (
+                          !htmlToString(editorHtmlContent.trim()) ? (
+                            <FormFeedback className="d-block">Additional Description is required.</FormFeedback>
+                          ) : errors.additional_description ? (
+                            <FormFeedback className="d-block">{errors?.additional_description}</FormFeedback>
+                          ) : null
                         )}
                       </Col>
 

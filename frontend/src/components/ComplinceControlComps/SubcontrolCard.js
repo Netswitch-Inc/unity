@@ -1,90 +1,85 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// ** React Imports
+import React, { useMemo, useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
+// ** Reactstrap Imports
 import {
-  Card,
-  CardBody,
-  CardHeader,
   Col,
   Row,
-  Button,
+  Card,
+  Progress,
   FormGroup,
   CardTitle,
-  Progress,
+  CardHeader,
   UncontrolledTooltip
 } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import SubControlFullScreenPopup from "./model/SubControlFullScreenPopup";
+
+// ** Utils
+import { splitWithPipe } from "utility/Utils";
+
+// ** Custom Components
 import ReactTable from "./ReactTable";
-import { useSelector, useDispatch } from "react-redux";
-import { getComplinceSubcontrolListing } from "views/CompilanceControl/cisstore";
-import { complianceTools } from "views/sampleData/ComplianceControlData";
-import InfoDialForIndustryStandard from "./model/IndustrialGraph";
-import { useNavigate } from "react-router-dom";
-import ScoreHistoryLineChartComp from "./model/HistoryChartLine";
 import InfoDial from "./model/RadialDial";
-import PenTsting from "../../assets/img/toollogo/Pen-Testing.png";
-import Loc from "../../assets/img/toollogo/image_592.png";
-import VA from "../../assets/img/toollogo/image_593.png";
-import SIEM from "../../assets/img/toollogo/SIEM.png";
+import SubControlFullScreenPopup from "./model/SubControlFullScreenPopup";
+import ScoreHistoryLineChartComp from "./model/HistoryChartLine";
+// import InfoDialForIndustryStandard from "./model/IndustrialGraph";
+
+// ** Third Party Components
+import { TiArrowLeft } from "react-icons/ti";
+
+import ToolDetailModal from "views/CompilanceControl/models/ToolDetailModal";
+
+import { solutionToolIcons } from "utility/toolIcons";
+
+// ** Icons
+import openedIcon from "../../assets/img/openedPolygon.svg";
+import closedIcon from "../../assets/img/closedPolygon.svg";
+import gearIcon from "assets/img/gear.svg";
 
 function SubControlCard(props) {
-  let values = [2, 2, 5, 4, 3, 5, 3, 6, 2, 7];
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const store = useSelector((state) => state.cis);
-  // cisSubcontrol
-  const [subControlData, setSubControlData] = useState([]);
+
+  let values = [2, 2, 5, 4, 3, 5, 3, 6, 2, 7];
+
+  // ** Const
+  const { authUserItem, selectedControl, handleOpenSolutionModal } = props;
+  const projectItemData = selectedControl?.project_id || null;
+  const projectStatus = ["cancelled", "completed"];
+
+  // ** States
+  const [toolModalOpen, setToolModalOpen] = useState("");
   const [ComplianceScorinfHistoryGraphData] = useState([]);
   const [loadedSUbControl] = useState(true);
-  const [toolsIcon, setToolsIcon] = useState([]);
   const [valuesArr, setValuesArr] = useState(values);
   const [currentResilience, setCurrentResilience] = useState(0);
 
-  const ToolsArray = [
-    { icon: "PENTEST", path: PenTsting, fullName: "Penetration Testing" },
-    { icon: "SIEM", path: SIEM, fullName: 'Security Information and Event Management' },
-    { icon: "LOC", path: Loc, fullName: 'Log Collector' },
-    { icon: "VA", path: VA, fullName: 'Vulnerability Assessment' },
-  ];
+  const openToolModal = (value = "") => {
+    setToolModalOpen(value)
+  }
 
-  const handleReturnIcon = (givenIcon) => {
-    return ToolsArray.find((icon) => icon.icon === givenIcon).path;
-  };
+  const closeToolModal = () => {
+    setToolModalOpen("")
+  }
 
-  const handleReturnIconFullName = (givenIcon) => {
-    return ToolsArray.find((icon) => icon.icon === givenIcon).fullName;
-  };
+  const handleGetIcons = (toolIcons = "") => {
+    let icons = toolIcons;
+    if (toolIcons) {
+      icons = splitWithPipe(toolIcons);
 
-  useEffect(() => {
-    const uniqueArr = [];
-    props.selectedTiles.cis_control_id?.length > 0 && props.selectedTiles.cis_control_id.forEach((item) => {
-      if (!uniqueArr.includes(item.tool_icon)) {
-        uniqueArr.push(item.tool_icon);
+      if (icons?.length) {
+        icons = solutionToolIcons.filter((x) => icons.includes(x.key));
       }
-    });
-    setToolsIcon(uniqueArr);
+    }
+
+    return icons;
+  }
+
+  useEffect(() => {
     setCurrentResilience(0)
-  }, [props.selectedTiles]);
+  }, [selectedControl])
 
-  useEffect(() => {
-    // framework_id,control_id
-    const query = {
-      framework_id: props.selectedTiles.framework_id?._id,
-      control_id: props.selectedTiles._id,
-    };
-    dispatch(getComplinceSubcontrolListing(query));
-  }, [dispatch, props.selectedTiles]);
-
-  useEffect(() => {
-    if (store.cisSubcontrol && store.cisSubcontrol.length > 0) {
-      setSubControlData(store.cisSubcontrol);
-    }
-    if (store.cisSubcontrol.length === 0) {
-      setSubControlData([]);
-    }
-  }, [store.cisSubcontrol]);
-
-  function getColorCode(val) {
+  const getColorCode = (val) => {
     if (val >= 70) {
       return "progressLow";
     } else if (val >= 40 && val < 70) {
@@ -94,29 +89,27 @@ function SubControlCard(props) {
     }
   }
 
-  function SubControlTable(props) {
-    function SubRows({ row, rowProps, visibleColumns, data, loading }) {
-      const [description] = React.useState(row.original.description);
-      return (
-        <>
-          <tr>
-            <td />
-            <td colSpan={visibleColumns.length - 1}>
-              <FormGroup>
-                <label className="text-info">Description</label>
-                <p>{description}</p>
-                <br />
-                <Button className="btn btn-primary btn-next mt-0">
-                  Rewrite with AI
-                </Button>
-              </FormGroup>
-            </td>
-          </tr>
-        </>
-      );
+  const SubControlTable = (props) => {
+    const SubRows = ({ row, rowProps, visibleColumns, data, loading }) => {
+      const [description] = useState(row.original.description);
+      return (<>
+        <tr>
+          <td />
+          <td colSpan={visibleColumns.length - 1}>
+            <FormGroup>
+              <label className="text-info">Description</label>
+              <p>{description}</p>
+              <br />
+              <div className="buttons">
+                <button className="btnprimary mt-0">Rewrite with AI</button>
+              </div>
+            </FormGroup>
+          </td>
+        </tr>
+      </>)
     }
 
-    function SubRowAsync({ row, rowProps, visibleColumns, passedData }) {
+    const SubRowAsync = ({ row, rowProps, visibleColumns, passedData }) => {
       return (
         <SubRows
           row={row}
@@ -125,7 +118,7 @@ function SubControlCard(props) {
           data={passedData}
           loading={false}
         />
-      );
+      )
     }
 
     let tempData = props.data;
@@ -156,25 +149,22 @@ function SubControlCard(props) {
           {
             Header: "description",
             accessor: (d) => d.description,
-          },
-        ],
-      },
-    ];
+          }
+        ]
+      }
+    ]
 
-    const data = React.useMemo(() => tempData, [tempData]);
-    const columns = React.useMemo(() => tempColumns, [tempColumns]);
+    const data = useMemo(() => tempData, [tempData]);
+    const columns = useMemo(() => tempColumns, [tempColumns]);
 
-    const renderRowSubComponent = React.useCallback(
-      ({ row, rowProps, visibleColumns, data }) => (
-        <SubRowAsync
-          row={row}
-          rowProps={rowProps}
-          visibleColumns={visibleColumns}
-          data={data}
-        />
-      ),
-      []
-    );
+    const renderRowSubComponent = useCallback(({ row, rowProps, visibleColumns, data }) => (
+      <SubRowAsync
+        row={row}
+        data={data}
+        rowProps={rowProps}
+        visibleColumns={visibleColumns}
+      />
+    ), [])
 
     return (
       <div className="content">
@@ -184,13 +174,8 @@ function SubControlCard(props) {
           renderRowSubComponent={renderRowSubComponent}
         />
       </div>
-    );
+    )
   }
-
-  // const handleBack = () => {
-  //   props.setIsGoingBack(true);
-  // };
-
 
   // const ScoreHistoryLineChart = React.memo((props) => {
   //   let categories = [];
@@ -284,233 +269,264 @@ function SubControlCard(props) {
 
   let subControlColumns = [
     {
-      Header: () => null, // No header
-      id: "expander", // It needs an ID
-      Cell: ({ row }) => (
-        <span {...row.getToggleRowExpandedProps()}>
-          {row.isExpanded ? (
-            <i className="tim-icons icon-minimal-down" />
-          ) : (
-            <i className="tim-icons icon-minimal-right" />
-          )}
-        </span>
-      ),
-      // We can override the cell renderer with a SubCell to be used with an expanded row
-      SubCell: () => null, // No expander on an expanded row
-    },
-    {
       Header: () => null,
       id: "1",
       columns: [
         {
           Header: "Title",
-          // We re-map data using accessor functions for subRows
-          accessor: (d) => (
-            <>
-              {d?.title} ({d?.name})
-            </>
+          Cell: ({ row }) => (
+            <span {...row.getToggleRowExpandedProps()}>
+              {row?.original?.name}
+            </span>
           ),
-          // We can render something different for subRows
-          SubCell: (cellProps) => (
-            <>
-              <p>{cellProps.description}</p>
-            </>
-          ),
-          maxWidth: 450,
+          SubCell: (cellProps) => (<>
+            <p>{cellProps.description}</p>
+          </>),
+          maxWidth: 450
         },
         {
-          Header: "Type",
-          accessor: (d) => d?.security_function,
+          Header: "Safeguard",
+          accessor: (d) => d?.cis_sub_control
         },
         {
-          Header: "Progress",
-          accessor: (d) => (
-            <div className="progress-container progress-sm">
-              <Progress multi width={100}>
-                <Progress bar className={getColorCode(0)} max="100" value={0} />
-                <span className="progress-value">{0} %</span>
-              </Progress>
-            </div>
-          ),
+          Header: "Project",
+          Cell: ({ row }) => (<>
+            {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+              <div className="buttons">
+                <button
+                  className="btnprimary mt-0"
+                  onClick={() => navigate(`/admin/project/add`, { state: { control_data: { ...selectedControl, cis_control_id: row?.original?._id || "" } } })}
+                >
+                  Add Project
+                </button>
+              </div>
+            ) : (
+              <div className="progress-container progress-sm">
+                <Progress multi width={100}>
+                  <Progress bar className={getColorCode(0)} max="100" value={0} />
+                  <span className="progress-value">{0} %</span>
+                </Progress>
+              </div>
+            )}
+          </>),
           minWidth: 200,
           align: "right",
-          padding: 30,
-        },
-      ],
+          padding: 20
+        }
+      ]
     },
-  ];
-
-  // const handleUpdateHistoricGraph = (toolVal) => {
-  //   const toolItemStatic = complianceTools.find(
-  //     (toolItem) => toolItem.logoPath === toolVal
-  //   );
-  //   setValuesArr(() => toolItemStatic.historicData);
-  //   setCurrentResilience(() => toolItemStatic.resilienceIndex);
-  // };
+    {
+      Header: () => null, // No header
+      id: "expander", // It needs an ID
+      Cell: ({ row }) => (
+        <span {...row.getToggleRowExpandedProps()}>
+          {row.isExpanded ? (
+            // <i className="tim-icons icon-minimal-down" />
+            <img alt="Open" src={openedIcon} height={10} width={16} />
+          ) : (
+            // <i className="tim-icons icon-minimal-right" />
+            <img alt="Close" src={closedIcon} height={10} width={16} />
+          )}
+        </span>
+      ),
+      minWidth: 30,
+      padding: 10,
+      // We can override the cell renderer with a SubCell to be used with an expanded row
+      SubCell: () => null // No expander on an expanded row
+    }
+  ]
 
   const handleUpdateHistoricGraph = (toolVal) => {
-    const toolItemStatic = complianceTools.find(
-      (toolItem) => toolItem.logoPath === toolVal
-    );
-
-    if (toolItemStatic) {
-      const updatedHistoricData = toolItemStatic.historicData.map(() =>
-        Math.floor(Math.random() * (70 - 20 + 1)) + 20
-      );
-
-      setValuesArr(updatedHistoricData);
-      setCurrentResilience(updatedHistoricData[updatedHistoricData.length - 1]);
+    const toolItemStatic = solutionToolIcons.find((x) => x.key === toolVal)
+    if (!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status))) {
+      if (toolItemStatic?.historicData) {
+        const updatedHistoricData = toolItemStatic.historicData.map(() => Math.floor(Math.random() * (70 - 20 + 1)) + 20)
+        setValuesArr(updatedHistoricData);
+        setCurrentResilience(updatedHistoricData[updatedHistoricData.length - 1]);
+      }
     }
-  };
 
-
+    openToolModal(toolVal)
+  }
 
   return (
-    <Card className="element-backCard mb-0 h-100">
-      {/* <Col lg="12">
-        <Row>
-          <Col xm="1">
-            <Button
-              className="btn btn-primary btn-next"
-              onClick={handleBack}
-            >
-              <i className="tim-icons icon-minimal-left" /> Back
-            </Button>
-          </Col>
-        </Row>
-      </Col> */}
-      <CardHeader className={"" /* Some padding pb-5 ?*/}>
-        <h3>{props.selectedTiles?.text}</h3>
-      </CardHeader>
-      <CardBody>
-        <Col lg="12">
-          <Row className="">
-            <Col lg="8">
-              <Row role="displayName">
-                <Col>
-                  <FormGroup>
-                    <label className="text-info">Name</label>
-                    <p>{props.selectedTiles?.name}</p>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row role="description">
-                <Col>
-                  <FormGroup className="element-description">
-                    <label className="text-info">Description</label>
-                    <p>
-                      <small>{props.selectedTiles?.description}</small>
-                    </p>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Button className="btn btn-primary btn-next mt-0">
-                Rewrite with AI
-              </Button>
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <CardHeader className="d-flex justify-content-between p-0  border-bottom">
-                      <CardTitle tag="h4">
-                        Resilience Index Historic Data
-                      </CardTitle>
-                      <Row>
-                        <Col className="text-left">
-                          <span className="d-flex justify-content-end pr-1">
-                            {" "}
-                            <SubControlFullScreenPopup
-                              values={valuesArr}
-                              loadedSUbControl={loadedSUbControl}
-                              ComplianceScorinfHistoryGraphData={
-                                ComplianceScorinfHistoryGraphData
-                              }
-                            />
-                          </span>
-                        </Col>
-                      </Row>
-                    </CardHeader>
-                    <ScoreHistoryLineChartComp
-                      values={valuesArr}
-                      loadedSUbControl={loadedSUbControl}
-                      data={ComplianceScorinfHistoryGraphData}
-                      height="200px"
-                      toolIcon={toolsIcon}
-                    />
-                  </FormGroup>
-                </Col>
-              </Row>
-              <div className="icons-tools">
-                {toolsIcon &&
-                  toolsIcon.map((tool, index) => {
-                    return (
+    <div>
+      <Row role="displayName">
+        <Col>
+          <FormGroup>
+            <h4 className="frame-heading pt-0 pb-1 pl-0">
+              <div className="d-flex align-items-center">
+                {selectedControl ? (
+                  <TiArrowLeft
+                    size={30}
+                    className="arrow-left cursor-pointer d-none"
+                    onClick={props.handleBackControl}
+                  />
+                ) : null}
+                <div className="ml-1">
+                  {selectedControl?.name}
+                </div>
+              </div>
+            </h4>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <div>
+        <Col lg={12} className="pl-1 pr-0">
+          <Card className="mb-3">
+            <Row role="framework_name">
+              <Col md={6}>
+                <FormGroup className="element-framework_name">
+                  <label className="text-info">Framework</label>
+                  <p>{selectedControl?.framework_id?.label}</p>
+                </FormGroup>
+              </Col>
+
+              <Col md={6}>
+                <FormGroup className="element-identifier">
+                  <label className="text-info">Identifier</label>
+                  <p>{selectedControl?.identifier}</p>
+                </FormGroup>
+              </Col>
+
+              <Col>
+                <FormGroup className="element-description">
+                  <label className="text-info">Description</label>
+                  <p>{selectedControl?.description}</p>
+                </FormGroup>
+              </Col>
+            </Row>
+
+            {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+              <div className="buttons">
+                <button className="btnprimary mt-0">Rewrite with AI</button>
+              </div>
+            ) : null}
+          </Card>
+
+          <Card className="mb-3 h-100">
+            <Row>
+              <div className="col-6">
+                <InfoDial
+                  height={200}
+                  label={"Resilience Index"}
+                  values={[currentResilience]}
+                />
+              </div>
+
+              <div className="col-6">
+                <div className="icons-tools">
+                  {selectedControl?.tool_icons && handleGetIcons(selectedControl?.tool_icons)?.length ? (
+                    handleGetIcons(selectedControl.tool_icons)?.map((tool, index) => (
                       <Col key={`toolIcon_${index}`}>
                         <img
-                          src={handleReturnIcon(tool)}
-                          id={`complience-sub-control-${tool}-image`}
-                          alt="toolIcon"
-                          height={50}
                           width={50}
-                          onClick={() => handleUpdateHistoricGraph(tool)}
+                          height={50}
                           className="cursor-pointer"
+                          alt={tool?.value}
+                          src={tool?.source}
+                          id={`tool-icon-${tool?.key}`}
+                          // id={`complience-sub-control-${tool}-image`}
+                          onClick={() => handleUpdateHistoricGraph(tool?.key)}
                         />
                         <UncontrolledTooltip
                           placement="auto"
-                          target={`complience-sub-control-${tool}-image`}
-                        // container={`complience-sub-control-${cisControl?.tool_icon}`}
+                          target={`tool-icon-${tool?.key}`}
                         >
-                          {handleReturnIconFullName(tool)}
+                          {tool?.value}
                         </UncontrolledTooltip>
                       </Col>
-                    );
-                  })}
-              </div>
-              <div>
-                <Button
-                  onClick={() =>
-                    navigate(
-                      `/admin/project/add`,
-                      { state: { control_data: props.selectedTiles } }
-                    )
-                  }
-                  className="btn btn-primary btn-next mt-0"
-                >
-                  Add Project
-                </Button>
-              </div>
-            </Col>
+                    ))
+                  ) : null}
 
-            <Col lg="4">
-              <Row>
-                {/* Column for gauge */}
-                <InfoDial
-                  values={[currentResilience]}
-                  width={300}
-                  label={"Resilience Index"}
-                />
-              </Row>
-              <Row>
+                  {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+                    <Col onClick={() => handleOpenSolutionModal()}>
+                      <img
+                        width={30}
+                        height={30}
+                        alt={"Tool"}
+                        src={gearIcon}
+                        className="cursor-pointer mb-md-2"
+                        id={`gear-icon-${selectedControl?._id}`}
+                      />
+                      <UncontrolledTooltip
+                        placement="top"
+                        target={`gear-icon-${selectedControl?._id}`}
+                      >
+                        Select Solution
+                      </UncontrolledTooltip>
+                    </Col>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* <div className="col-6">
                 <InfoDialForIndustryStandard
-                  values={Math.random() * (85 - 70) + 70}
-                  controllerId={props.selectedTiles._id}
-                  width={300}
+                  height={200}
+                  // width={300}
                   label={"Peer Index"}
+                  controllerId={selectedControl._id}
+                  values={Math.random() * (85 - 70) + 70}
                 />
-              </Row>
+              </div> */}
+            </Row>
+          </Card>
 
-            </Col>
+          <Card className="mb-3">
+            <Row>
+              <Col>
+                <SubControlTable
+                  data={selectedControl?.cis_control_id || []}
+                  columns={subControlColumns}
+                />
+              </Col>
+            </Row>
+          </Card>
 
-          </Row>
-          <Row className="">
-            <Col>
-              <SubControlTable
-                data={subControlData}
-                columns={subControlColumns}
-              />
-            </Col>
-          </Row>
+          <Card className="mb-0">
+            <Row>
+              <Col>
+                <FormGroup>
+                  <CardHeader className="d-flex justify-content-between p-0">
+                    <CardTitle tag="h4" className="resilience-data">
+                      Resilience Index Historic Data
+                    </CardTitle>
+                    <Row>
+                      <Col className="text-left">
+                        <span className="d-flex justify-content-end pr-1">
+                          {" "}
+                          <SubControlFullScreenPopup
+                            values={valuesArr}
+                            loadedSUbControl={loadedSUbControl}
+                            ComplianceScorinfHistoryGraphData={ComplianceScorinfHistoryGraphData}
+                          />
+                        </span>
+                      </Col>
+                    </Row>
+                  </CardHeader>
+
+                  <ScoreHistoryLineChartComp
+                    height="200px"
+                    values={valuesArr}
+                    loadedSUbControl={loadedSUbControl}
+                    data={ComplianceScorinfHistoryGraphData}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+          </Card>
         </Col>
-      </CardBody>
-    </Card>
-  );
+      </div>
+
+      <ToolDetailModal
+        isOpen={toolModalOpen}
+        closeModal={closeToolModal}
+        authUserItem={authUserItem}
+        selectedControl={selectedControl}
+      />
+    </div>
+  )
 }
+
 export default React.memo(SubControlCard);

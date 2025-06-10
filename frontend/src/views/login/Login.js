@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 // ** React Imports
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 // ** Store & Actions
@@ -26,13 +26,19 @@ import * as Yup from 'yup';
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** SVG Icons
 import { EyeView, EyeSlash } from 'components/SVGIcons';
 
+// ** Constant
+import { defaultLogo, defaultCompanyName } from 'utility/reduxConstant';
+
 // ** Logo and PNG Icons
-import mainImage from "assets/img/loginimg.png";
-import logo from "assets/img/react-logo.png";
 import Lock from "assets/img/lock.svg";
+import logo from "assets/img/react-logo.png";
+import mainImage from "assets/img/loginimg.png";
 
 const LoginForm = () => {
     // ** Hooks
@@ -41,6 +47,11 @@ const LoginForm = () => {
     // ** Store vars
     const dispatch = useDispatch();
     const store = useSelector((state) => state.login);
+    const settingStore = useSelector((state) => state.globalSetting);
+    
+    // ** Const
+    const appSettingItem = settingStore?.appSettingItem || null;
+    const appLogo = appSettingItem?.logo || defaultLogo;
 
     // ** States
     const [showSnackBar, setshowSnackbar] = useState(false);
@@ -49,7 +60,7 @@ const LoginForm = () => {
 
     const togglePasswordVisiblity = () => {
         setPasswordShown(passwordShown ? false : true);
-    };
+    }
 
     // Define validation schema using Yup
     const validationSchema = Yup.object().shape({
@@ -61,11 +72,15 @@ const LoginForm = () => {
     const initialValues = {
         user_name: '',
         password: ''
-    };
+    }
+
+    const handleDefaults = useCallback(() => {
+        navigate(`/admin/dashboard`);
+    }, [navigate]);
 
     useEffect(() => {
         if (store?.actionFlag === "LOGGED") {
-            navigate(`/admin/dashboard`);
+            handleDefaults()
         }
 
         if (store?.actionFlag || store?.success || store?.error) {
@@ -81,7 +96,7 @@ const LoginForm = () => {
             setshowSnackbar(true);
             setSnackMessage(store.error);
         }
-    }, [store.actionFlag, store.success, store.error, navigate, dispatch])
+    }, [handleDefaults, store.actionFlag, store.success, store.error, dispatch])
 
     useEffect(() => {
         setTimeout(() => {
@@ -91,11 +106,11 @@ const LoginForm = () => {
 
     // Form submit handler
     const onSubmit = (values, { setSubmitting }) => {
-        // Example of what you might do with the form values
-        dispatch(login(values));
-        // You can make API calls, validate credentials, etc.
         setSubmitting(false);
-    };
+        if (values) {
+            dispatch(login(values));
+        }
+    }
 
     return (
         <div className="auth-wrapper auth-cover">
@@ -115,13 +130,14 @@ const LoginForm = () => {
                         <div className='w-100 d-lg-flex align-items-center mb-3 justify-content-center' style={{ textAlign: 'center' }}>
                             <img
                                 alt="..."
-                                src={logo}
+                                src={appLogo}
                                 style={{ height: "150px" }}
+                                onError={(currentTarget) => onImageSrcError(currentTarget, logo)}
                             />
                         </div>
 
                         <div className='login-text'>
-                            Welcome to unity!
+                            Welcome to {appSettingItem?.name || defaultCompanyName}!
                         </div>
                         <div className='small-text'>
                             Please sign-in to your account and start the adventure

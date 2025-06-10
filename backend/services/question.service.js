@@ -421,6 +421,7 @@ exports.getSectionsWithQuestionsAndAnswers = async function (assessmentId, asses
         assessment_name: { $first: "$assessmentDetails.name" },
         assessment_description: { $first: "$assessmentDetails.description" },
         assessment_show_score_calculation: { $first: "$assessmentDetails.show_score_calculation" },
+        assessment_additional_description: { $first: "$assessmentDetails.additional_description" },
         sections: {
           $push: {
             _id: "$_id",
@@ -439,6 +440,7 @@ exports.getSectionsWithQuestionsAndAnswers = async function (assessmentId, asses
         assessment_name: 1,
         assessment_description: 1,
         assessment_show_score_calculation: 1,
+        assessment_additional_description: 1,
         sections: 1
       }
     }])

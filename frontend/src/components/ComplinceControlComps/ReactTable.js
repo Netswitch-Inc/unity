@@ -2,98 +2,105 @@ import React from "react";
 import { useTable, useExpanded } from "react-table";
 import { Table } from "reactstrap";
 
-function ReactTable({ columns: userColumns, data, renderRowSubComponent }) {
+// ** Third Party Components
+import classnames from "classnames";
+
+// Define this inside the file
+const renderRowSubComponent = ({ row, visibleColumns }) => {
+  return (
+    <tr className="expanded-row">
+      <td colSpan={visibleColumns.length}>
+        <div className="my-expanded-content">
+          <p className="description-text">Type: <span className="font-weight-light">{row.original.security_function}</span></p>
+        </div>
+
+        <div className="my-expanded-content">
+          <p className="description-text">Description</p><p>{row.original.description}</p>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+function ReactTable({ columns: userColumns, data }) {
   const {
     headerGroups,
     rows,
     prepareRow,
     visibleColumns,
-    // state: {expanded}
   } = useTable(
     {
       columns: userColumns,
-      data,
+      data
     },
-    useExpanded // We can useExpanded to track the expanded state
-    // for sub components too!
-  );
+    useExpanded
+  )
 
-  return (
-    <>
-      <div className="flex-column">
-        <div>
-          <div className="mb-2" style={{ textAlign: "end" }}>
-            Showing the first {rows.length >= 20 ? 20 : rows.length} results of{" "}
-            {rows.length} rows
-          </div>
-        </div>
-
-        <div className="PopupSrollingEffect">
-          <Table striped className="table">
-            <thead className="thead-fixed">
-              {headerGroups.map((headerGroup, headerRowIndex) => (
-                <tr key={`${headerRowIndex}-header`}>
-                  {headerGroup.headers.map((column, headerIndex) => (
-                    <th
-                      {...column.getHeaderProps({
-                        style: {
-                          maxWidth: column.maxWidth,
-                          minWidth: column.minWidth,
-                          padding: column.padding,
-                        },
-                      })}
-                      key={`${headerIndex}-header`}
-                    >
-                      {column.render("Header")}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {rows.map((row, i) => {
-                prepareRow(row);
-                const rowProps = row.getRowProps();
-                const rowKey = rowProps.key ?? `row-${i}`;
-
-                return (
-                  // Use a React.Fragment here so the table markup is still valid
-                  <React.Fragment key={`${rowProps?.key}-${i}`}>
-                    <tr key={`${rowKey}-row`}>
-                      {row.cells.map((cell, cellIndex) => {
-                        return (
-                          <td
-                            {...cell.getCellProps({
-                              style: {
-                                minWidth: cell.column.minWidth,
-                                maxWidth: cell.column.maxWidth,
-                                padding: cell.column.padding,
-                              },
-                            })}
-                            key={`${rowProps?.key}-${cellIndex}-cell`}
-                          >
-                            {cell.render("Cell")}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {/* We could pass anything into this */}
-                    {row.isExpanded &&
-                      renderRowSubComponent({
-                        row,
-                        rowProps,
-                        visibleColumns,
-                        data,
-                      })}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </Table>
+  return (<>
+    <div className="flex-column">
+      <div>
+        <div className="mb-2" style={{ textAlign: "end" }}>
+          Showing the first {rows.length >= 20 ? 20 : rows.length} results of {rows.length} rows
         </div>
       </div>
-    </>
-  );
+
+      <div className="PopupSrollingEffect sub-resilience-table">
+        <Table className="table">
+          <thead className="thead-fixed">
+            {headerGroups.slice(1).map((headerGroup, headerRowIndex) => (
+              <tr key={`${headerRowIndex}-header`} className="table-header-row">
+                {headerGroup.headers.map((column, headerIndex) => (
+                  <th
+                    {...column.getHeaderProps({
+                      style: {
+                        maxWidth: column.maxWidth,
+                        minWidth: column.minWidth,
+                      },
+                    })}
+                    key={`${headerIndex}-header`}
+                  >
+                    {column.render("Header")}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+              const rowKey = rowProps.key ?? `row-${i}`;
+              return (
+                <React.Fragment key={`${rowProps?.key}-${i}`}>
+                  <tr key={`${rowKey}-row`} className={classnames("table-data-row", {
+                    "expanded-main": row.isExpanded
+                  })}>
+                    {row.cells.map((cell, cellIndex) => (
+                      <td
+                        {...cell.getCellProps({
+                          style: {
+                            minWidth: cell.column.minWidth,
+                            maxWidth: cell.column.maxWidth,
+                            padding: cell.column.padding,
+                          },
+                        })}
+                        key={`${rowProps?.key}-${cellIndex}-cell`}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    ))}
+                  </tr>
+                  {row.isExpanded ? (
+                    renderRowSubComponent({ row, rowProps, visibleColumns, data })
+                  ) : null}
+                </React.Fragment>
+              )
+            })}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  </>)
 }
 
 export default ReactTable;

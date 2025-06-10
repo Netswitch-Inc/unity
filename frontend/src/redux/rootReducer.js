@@ -26,6 +26,8 @@ import agent from "../views/agents/store";
 import configurationAssessment from "../views/configurationAssessments/store";
 import openVASScanReport from "../views/openVASScanReports/store";
 import netswitchThreatIntel from "views/netswitchThreatIntels/store";
+import compliancePriority from "views/compliancePriority/store";
+import contact from "views/contacts/store";
 
 const rootReducer = {
   login,
@@ -54,7 +56,9 @@ const rootReducer = {
   agent,
   configurationAssessment,
   openVASScanReport,
-  netswitchThreatIntel
+  netswitchThreatIntel,
+  compliancePriority,
+  contact
 };
 
 export default rootReducer;

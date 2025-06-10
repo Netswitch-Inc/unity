@@ -13,21 +13,37 @@ import { assessmentReportPdf, assessmentReportPdfSentEmail } from "../store";
 import { Card } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
 
+// ** Utils
+import { setInnerHtml, htmlToString, onImageSrcError } from "utility/Utils";
+
 // ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
 
+// ** Constant
+import { defaultLogo } from 'utility/reduxConstant';
+
 // ** Icons
-import reactLogo from "assets/img/react-logo.png";
+import logo from "assets/img/react-logo.png";
 import thankYouImg from "assets/img/thankyouicon.svg";
 
 const ThankYou = () => {
+    // ** Hooks
     const { id } = useParams();
-    const dispatch = useDispatch();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const assessmentReportId = queryParams.get("id");
+    
+    // ** Store vars
+    const dispatch = useDispatch();
     const assessmentReport = useSelector((state) => state.assessmentReport);
+    const settingStore = useSelector((state) => state.globalSetting);
+    
+    // ** Const
+    const appSettingItem = settingStore?.appSettingItem || null;
+    const appLogo = appSettingItem?.logo || defaultLogo;
+
+    const assessmentReportId = queryParams.get("id");
     // const calculationPoint = location?.state?.aseesmentCalculation
+
     const [totalPoints, setTotalPoints] = useState([])
     const [totalMaxPoints, setTotalMaxPoints] = useState([])
     const [totalPercentage, setTotalPercentage] = useState('0%')
@@ -42,6 +58,7 @@ const ThankYou = () => {
         const url = `${process.env.REACT_APP_BACKEND_REST_API_URL}/files/assessment-report/${assessmentReportId}.pdf`;
         window.open(url, "_blank", "noopener,noreferrer");
     };
+
     useLayoutEffect(() => {
         const params = {
             assessment_id: id,
@@ -120,10 +137,10 @@ const ThankYou = () => {
                 <Card className="main-progress col-md-3 mb-0">
                     <div className="main-logo-img">
                         <div className="logo">
-                            <img alt="..." src={reactLogo} />
+                            <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
                         </div>
                     </div>
-                    
+
                     <div className="mb-0">
                         <div className="steps-mains">
                             <div className="steps filled-step">
@@ -197,65 +214,57 @@ const ThankYou = () => {
                         {!assessmentReport?.loading ? (<SimpleSpinner />) : null}
 
                         <div className="pl-0 pr-0">
-                            <div className="row-row  text-center">
-                                {!assessmentReportAnswerList?.asessmentReportAnswers?.assessment_show_score_calculation ? (
-                                    <>
-                                        <div className="thank-name mt-5">
-                                            <h3 className="m-0">THANK YOU !</h3>
-                                        </div>
+                            <div className="row-row">
+                                {!assessmentReportAnswerList?.asessmentReportAnswers?.assessment_show_score_calculation ? (<>
+                                    <div className="thank-name mt-5 text-center">
+                                        <h3 className="m-0">THANK YOU !</h3>
+                                    </div>
+                                    <div className="text-center">
                                         <img alt="..." src={thankYouImg} className="mb-3" />
-                                        <p className="thanks-text">
-                                            In publishing and graphic design, Lorem ipsum is a placeholder
-                                            text commonly used to demonstrate the visual form of a
-                                            document
-                                        </p>
-                                    </>) : (
-                                    <>
-                                        <div className="thank-name">
-                                            <h3 className="m-0 p-0">{` ${assessmentReportAnswerList?.asessmentReportAnswers?.assessment_name} Results`}</h3>
+                                    </div>
+                                </>) : (<>
+                                    <div className="thank-name text-center">
+                                        <h3 className="m-0 p-0">{` ${assessmentReportAnswerList?.asessmentReportAnswers?.assessment_name} Results`}</h3>
+                                    </div>
+
+                                    <div role="alert" className="warn-progress  text-center">
+                                        <div className="main-warning">
+                                            {/* Title or description text */}
+                                            <strong className="fs-3 warning">Warning!</strong> <span className="warning-text">We recommend discussing budget allocations to strengthen your defenses. The NIST Framework can help identify weaknesses and guide where to allocate funds effectively.</span>
                                         </div>
 
-                                        <div role="alert" className="warn-progress">
-                                            <div className="main-warning">
-                                                {/* Title or description text */}
-                                                <strong className="fs-3 warning">Warning!</strong> <span className="warning-text">We recommend discussing budget allocations to strengthen your defenses. The NIST Framework can help identify weaknesses and guide where to allocate funds effectively.</span>
-                                            </div>
-
-                                            {/* Progress Bar */}
-                                            <div className="progress">
-                                                <div
-                                                    className="progress-bar"
-                                                    role="progressbar"
-                                                    style={{ width: totalPercentage }}
-                                                    aria-valuenow={totalPercentage}
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                >
-                                                    {totalPercentage} {/* Display percentage inside the progress bar */}
-                                                </div>
+                                        {/* Progress Bar */}
+                                        <div className="progress">
+                                            <div
+                                                className="progress-bar"
+                                                role="progressbar"
+                                                style={{ width: totalPercentage }}
+                                                aria-valuenow={totalPercentage}
+                                                aria-valuemin="0"
+                                                aria-valuemax="100"
+                                            >
+                                                {totalPercentage} {/* Display percentage inside the progress bar */}
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className="row h-100 thanks-card" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                            {assessmentReportAnswerList?.asessmentReportAnswers?.sections.map((section, index) => (
-                                                <div className="col-lg-4 col-md-6 mt-4">
-                                                    <div key={section._id} className="card-box">
-                                                        <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#fff', fontWeight: '600' }}>{section.name}</h3>
-                                                        <p style={{ marginBottom: '10px', color: '#fff', fontSize: '14px' }}>{section.description}</p>
-                                                        <p style={{ fontSize: '16px', fontWeight: '600' }}>
-                                                            {totalPoints[index] || 0}/{totalMaxPoints[index] || 0}
-                                                        </p>
-                                                        <p style={{ fontSize: '14px', color: '#09D66E', fontWeight: '600' }}>
-                                                            {totalMaxPoints[index] > 0
-                                                                ? `${((totalPoints[index] * 100) / totalMaxPoints[index]).toFixed(2)}%`
-                                                                : "0%"}
-                                                        </p>
-                                                    </div>
+                                    <div className="row h-100 thanks-card text-center" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                        {assessmentReportAnswerList?.asessmentReportAnswers?.sections.map((section, index) => (
+                                            <div className="col-lg-4 col-md-6 mt-4">
+                                                <div key={section._id} className="card-box">
+                                                    <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#fff', fontWeight: '600' }}>{section.name}</h3>
+                                                    <p style={{ marginBottom: '10px', color: '#fff', fontSize: '14px' }}>{section.description}</p>
+                                                    <p style={{ fontSize: '16px', fontWeight: '600' }}>
+                                                        {totalPoints[index] || 0}/{totalMaxPoints[index] || 0}
+                                                    </p>
+                                                    <p style={{ fontSize: '14px', color: '#09D66E', fontWeight: '600' }}>
+                                                        {totalMaxPoints[index] > 0 ? `${((totalPoints[index] * 100) / totalMaxPoints[index]).toFixed(2)}%` : "0%"}
+                                                    </p>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>)}
                                 <div className="buttons d-flex justify-content-center both-btn">
                                     <button
                                         className=" btnprimary mt-0"
@@ -270,6 +279,10 @@ const ThankYou = () => {
                                         Download Report
                                     </button>
                                 </div>
+
+                                {htmlToString(assessmentReport?.asessmentReportAnswers?.assessment_additional_description) ? (
+                                    setInnerHtml(assessmentReport?.asessmentReportAnswers?.assessment_additional_description, "draft-editor-content-view mt-3")
+                                ) : null}
                             </div>
                         </div>
                     </Card>

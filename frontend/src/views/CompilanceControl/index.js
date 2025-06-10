@@ -1,210 +1,139 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// ** React Imports
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useState,
-  useCallback,
-} from "react";
-
+// ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
-import { getListing } from "./store";
-import { getFrameworkList } from "views/CompilanceBuilders/store";
 import {
+  updateCompanyComplianceControl,
   getCompanyComplianceControlList,
-  cleanCompanyComplianceControlMessage,
+  cleanCompanyComplianceControlMessage
 } from "views/companyComplianceControls/store";
 
-import { Button, Card, CardBody, Col, Row } from "reactstrap";
-import {
-  GenerateRows,
-  GenerateFrameworkRows,
-} from "components/ComplinceControlComps/DataRows";
-import SubControlCard from "components/ComplinceControlComps/SubcontrolCard";
-import HistoryAndReportCard from "components/ComplinceControlComps/HistoryGraphData";
-import ReactSnackBar from "react-js-snackbar";
-import { TiMessages } from "react-icons/ti";
+// ** Reactstrap Imports
+import { Col, Row, Card, CardBody } from "reactstrap";
+
+import Select from "react-select";
+
+// ** Utils
+import { getFormatDate } from "utility/Utils";
+
+// ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
 
+// ** Third Party Components
+// import ReactSnackBar from "react-js-snackbar";
+// import { TiMessages } from "react-icons/ti";
+
+import { GenerateRows } from "components/ComplinceControlComps/DataRows";
+import SubControlCard from "components/ComplinceControlComps/SubcontrolCard";
+// import HistoryAndReportCard from "components/ComplinceControlComps/HistoryGraphData";
+
+// ** Models
+import SelectSolutionTool from "views/CompilanceBuilders/Step3/model/SelectSolutionTool";
+
 const CompilanceController = () => {
+  // ** Hooks
+  const navigate = useNavigate();
+  const rightSectionRef = useRef(null)
+
   const dispatch = useDispatch();
   const store = useSelector((state) => state.complincecontrol);
-  const frameworkStore = useSelector((state) => state.compilance);
   const loginStore = useSelector((state) => state.login);
-  const companyComplianceControlStore = useSelector(
-    (state) => state.companyComplianceControls
-  );
-  const authUserItem = loginStore?.authUserItem?._id
-    ? loginStore?.authUserItem
-    : null;
+  const companyComplianceControlStore = useSelector((state) => state.companyComplianceControls);
+  const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
 
-  const [rows, setRows] = useState([]);
-  const [directControlData, setDirecteControlData] = useState([]);
-  const [selectedControl, setSelectedControl] = useState(null);
-  const [isGoingBack, setIsGoingBack] = useState(false);
-  const [frameworkRows, setFrameworkRows] = useState([]);
-  const [showControllers, setShowControllers] = useState(false);
-  const [showSnackBar, setshowSnackbar] = useState(false);
-  const [SnackMessage, setSnackMessage] = useState("");
-  const [directDataRows, setDirectDataRows] = useState([]);
-  const [valueState, setValueState] = useState(false);
-  const [controlledBack, setControlledBack] = useState(false);
+  // ** States
+  const [showSnackBar, setshowSnackbar] = useState(false)
+  const [openSolutionModal, setSolutionModal] = useState(false);
+  const [selectedControl, setSelectedControl] = useState(null)
+  const [prioritiesOptions, setPrioritiesOptions] = useState([])
+  const [selectedPriority, setSelectedPriority] = useState(null)
+  const [complianceControlData, setComplianceControlData] = useState([])
+  const [rightSectionHeight, setRightSectionHeight] = useState(0)
 
-  // useEffect(() => {
-  //   scrollTop();
-  // });
+  const handleOpenSolutionModal = () => {
+    setSolutionModal(true);
+  }
+
+  const closeSolutionModal = () => {
+    setSolutionModal(false);
+  }
 
   useLayoutEffect(() => {
-    dispatch(
-      getCompanyComplianceControlList({
-        company_id:
-          authUserItem?.company_id?._id || authUserItem?.company_id || "",
-      })
-    );
+    dispatch(getCompanyComplianceControlList({
+      company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
+      user_id: authUserItem?._id || "",
+      compliance_priority_id: ""
+    }))
   }, [authUserItem]);
 
   const handleSelectedControlData = (item) => {
     setSelectedControl(() => item);
-    setIsGoingBack(() => false);
-    setValueState(() => true);
-    if (!controlledBack) {
-      setControlledBack(() => true);
-    }
-  };
+  }
+
+  const handleSelectPriority = (item = null) => {
+    setSelectedPriority(item)
+    dispatch(getCompanyComplianceControlList({
+      company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
+      user_id: authUserItem?._id || "",
+      compliance_priority_id: item?._id || "",
+    }))
+  }
 
   useEffect(() => {
-    let list1 = [];
-    if (companyComplianceControlStore.actionFlag === "CMPN_CONTRL_LST") {
-      if (
-        companyComplianceControlStore?.companyComplianceControlList?.length &&
-        directControlData?.length === 0
-      ) {
-        list1 = companyComplianceControlStore.companyComplianceControlList.map(
-          (item) => {
-            return item?.control_id || null;
-          }
-        );
-        setDirecteControlData(() => list1);
-        setSelectedControl(() => list1[0]);
-        const generatedRows = GenerateRows(
-          list1,
-          2,
-          handleSelectedControlData,
-          list1[0]
-        );
-        setDirectDataRows(() => generatedRows);
-        setShowControllers(() => true);
-      }
+    let height = 0;
+    if (rightSectionRef?.current) {
+      height = rightSectionRef?.current?.offsetHeight || 0;
     }
+    setRightSectionHeight(height)
+  }, [complianceControlData]);
 
-    // setFrameworkRows()
-    if (companyComplianceControlStore.actionFlag) {
+  useEffect(() => {
+    if (companyComplianceControlStore.actionFlag || companyComplianceControlStore.success || companyComplianceControlStore.error) {
       dispatch(cleanCompanyComplianceControlMessage(null));
     }
-  }, [
-    companyComplianceControlStore.actionFlag,
-    companyComplianceControlStore.companyComplianceControlList,
-    directControlData,
-    directDataRows,
-    showControllers,
-    selectedControl,
-  ]);
 
-  useEffect(() => {
-    dispatch(getFrameworkList());
-  }, [dispatch]);
+    if (companyComplianceControlStore.actionFlag === "CMPN_CONTRL_LST") {
+      const companyComplianceControlData = companyComplianceControlStore?.companyComplianceControlData || null;
 
-  const handleControllerLists = useCallback(
-    (framework_id) => {
-      const frameworkId = framework_id.join(",");
-      const params = {
-        framework_id: frameworkId,
-      };
-      dispatch(getListing(params));
-      setShowControllers(() => true);
-      setIsGoingBack(() => false);
-    },
-    [dispatch]
-  );
+      let list1 = []
+      let list2 = []
+      let compliancePriority = companyComplianceControlData?.compliancePriority || null
+      if (companyComplianceControlData.compliancePriorities) {
+        list1 = companyComplianceControlData.compliancePriorities.map((item) => {
+          let name = item?.name || "";
+          if (item?.createdAt) { name = `${name} - ${getFormatDate(item.createdAt, "DD-MM-YYYY HH:mm")}`; }
 
-  const handleBack = () => {
-    setIsGoingBack(true);
-  };
-
-  useEffect(() => {
-    if (isGoingBack) {
-      setSelectedControl(null);
-      setShowControllers(false);
-    }
-  }, [isGoingBack]);
-
-  useEffect(() => {
-    if (
-      store?.controllerItems?.length > 0 &&
-      showControllers &&
-      directControlData?.length === 0
-    ) {
-      if (selectedControl === null) {
-        setSelectedControl(() => store?.controllerItems[0]);
+          return { ...item, label: name, value: item?._id }
+        }) || []
       }
-      const generatedRows = GenerateRows(
-        store.controllerItems,
-        2,
-        handleSelectedControlData,
-        selectedControl
-      );
-      setRows(generatedRows);
-    }
 
-    if (
-      store?.controllerItems?.length === 0 &&
-      showControllers &&
-      directControlData?.length === 0
-    ) {
-      setShowControllers(() => false);
-      setshowSnackbar(true);
-      setSnackMessage(
-        () =>
-          "There are No Controllers For this framework try with different framework"
-      );
-    }
+      if (compliancePriority?._id) {
+        let name = compliancePriority?.name || "";
+        if (compliancePriority?.createdAt) { name = `${name} - ${getFormatDate(compliancePriority.createdAt, "DD-MM-YYYY HH:mm")}`; }
+        compliancePriority = { ...compliancePriority, label: name, value: compliancePriority?._id }
+      }
 
-    if (
-      frameworkStore?.frameworkItems?.length > 0 &&
-      !showControllers &&
-      directControlData?.length === 0
-    ) {
-      const generatedFrameworkRows = GenerateFrameworkRows(
-        frameworkStore?.frameworkItems,
-        2,
-        handleControllerLists
-      );
-      setFrameworkRows(generatedFrameworkRows);
-    }
-  }, [store.controllerItems, frameworkStore?.frameworkItems, selectedControl]);
+      if (companyComplianceControlData.data) {
+        list2 = companyComplianceControlData.data.map((item) => {
+          return {
+            ...item?.control_id,
+            ...item?.control_id,
+            project_id: item?.project_id || null,
+            company_compliance_control_id: item?._id || "",
+            tool_icons: item?.tool_icons || ""
+          }
+        }) || []
+      }
 
-  useEffect(() => {
-    let list1 = [];
-    if (
-      companyComplianceControlStore?.companyComplianceControlList?.length > 0 &&
-      valueState
-    ) {
-      list1 = companyComplianceControlStore.companyComplianceControlList.map(
-        (item) => {
-          return item?.control_id || null;
-        }
-      );
-      const generatedRows = GenerateRows(
-        list1,
-        2,
-        handleSelectedControlData,
-        selectedControl
-      );
-      setDirectDataRows(() => generatedRows);
-      setShowControllers(() => true);
-      setValueState(() => false);
+      setSelectedControl(list2?.length ? list2[0] : null)
+      setSelectedPriority(compliancePriority)
+      setPrioritiesOptions(list1)
+      setComplianceControlData(list2)
     }
-  }, [valueState]);
+  }, [companyComplianceControlStore.companyComplianceControlData, companyComplianceControlStore.actionFlag, companyComplianceControlStore.success, companyComplianceControlStore.error, dispatch]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -213,106 +142,95 @@ const CompilanceController = () => {
   }, [showSnackBar]);
 
   const handleBackControl = () => {
-    let list1 = companyComplianceControlStore.companyComplianceControlList.map(
-      (item) => {
-        return item?.control_id || null;
-      }
-    );
-    const generatedRows = GenerateRows(
-      list1,
-      2,
-      handleSelectedControlData,
-      null
-    );
-    setDirectDataRows(() => generatedRows);
-    setSelectedControl(() => null);
-    setControlledBack(() => true);
-    setShowControllers(() => true);
-  };
-  console.log(store?.controllerItems, "store?.controllerItems");
+    setSelectedControl(() => null)
+  }
+
+  const handleUpdateToolIcons = (item = null, icons = "") => {
+    if (icons && item?._id && item?.company_compliance_control_id) {
+      setSelectedControl({ ...item, tool_icons: icons })
+
+      dispatch(updateCompanyComplianceControl({ _id: item.company_compliance_control_id, tool_icons: icons }));
+    }
+  }
+
   return (
     <div className="content">
-      {!store?.loading ? <SimpleSpinner /> : null}
-      {!frameworkStore?.loading ? <SimpleSpinner /> : null}
-      {!companyComplianceControlStore?.loading ? <SimpleSpinner /> : null}
-
-      {showSnackBar ? (
-        <ReactSnackBar
-          Icon={
-            <span>
-              <TiMessages size={25} />
-            </span>
-          }
-          Show={showSnackBar}
-        >
-          {SnackMessage}
-        </ReactSnackBar>
-      ) : null}
+      {!store?.loading ? (<SimpleSpinner />) : null}
+      {!companyComplianceControlStore?.loading ? (<SimpleSpinner />) : null}
 
       <Row>
-        <Col
-          md="12"
-          lg="4"
-          className="pr-1 complaince-right-container compliance-pie-charts"
-        >
-          <Card className="card-chart mb-0 h-100" id="scrollTopID">
+        <Col md={4} className="complaince-right-container compliance-pie-charts pr-md-1 mb-md-0" style={{
+          overflow: "auto",
+          maxHeight: rightSectionHeight > 0 ? `${rightSectionHeight}px` : "0px"
+        }}>
+          <Card className="card-chart mb-0 h-100 p-0" id="scrollTopID">
             <CardBody className="p-0">
-              {(rows || directDataRows) && showControllers && (
-                <div className="ScrollingEffectGraph">
-                  <div className="border-bottom pb-2 btn-control-title mb-2">
-                    {directDataRows?.length === 0 && (
-                      <Button
-                        className="btn btn-primary btn-next mt-0"
-                        onClick={handleBack}
-                      >
-                        <i className="tim-icons icon-minimal-left" />
-                      </Button>
-                    )}
-                    {(!controlledBack || selectedControl !== null) &&
-                      directDataRows?.length > 0 && (
-                        <Button
-                          className="btn btn-primary btn-next mt-0"
-                          onClick={handleBackControl}
-                        >
-                          <i className="tim-icons icon-minimal-left" />
-                        </Button>
-                      )}
-                    <h4 className="text-center">
-                      {directDataRows?.length > 0
-                        ? "Priority List"
-                        : store?.controllerItems[0]?.framework_id?.label}
-                    </h4>
+              <div>
+                <div className="sub-frame-heading">
+                  {/* <h4 className="mb-0">
+                        Priority List
+                    </h4> */}
+                  <div className="d-block w-100">
+                    <Select
+                      options={prioritiesOptions}
+                      name="compliance_priority_id"
+                      classNamePrefix="react-select"
+                      placeholder="Select Priority..."
+                      value={selectedPriority || null}
+                      className="react-select col-select"
+                      onChange={(val) => handleSelectPriority(val)}
+                    />
                   </div>
-                  {directDataRows?.length > 0 ? directDataRows : rows}
                 </div>
-              )}
 
-              {frameworkRows && !showControllers && (
-                <div className="ScrollingEffectGraph">
-                  <h3 className="border-bottom text-center pb-2">Frameworks</h3>
-                  {frameworkRows}
+                <div className="ScrollingEffectGraph" style={{ maxHeight: rightSectionHeight > 0 ? `${rightSectionHeight}px` : "0px", paddingBottom: "60px" }}>
+                  <div className="sub-frame-name p-3">
+                    {GenerateRows(complianceControlData, 2, handleSelectedControlData, selectedControl)}
+                  </div>
                 </div>
-              )}
+              </div>
             </CardBody>
           </Card>
         </Col>
 
-        <Col md="12" lg="8" className="pl-1 pr-1 complaince-right-container">
-          {selectedControl !== null ||
-            (store?.controllerItems?.length > 0 && isGoingBack === false) ? (
-            <SubControlCard
-              selectedTiles={
-                selectedControl ? selectedControl : store?.controllerItems[0]
-              }
-              setIsGoingBack={setIsGoingBack}
-            />
-          ) : (
-            <HistoryAndReportCard />
-          )}
+        <Col md={8} className="complaince-right-container pl-md-1 pr-md-1">
+          <div className="h-100" ref={rightSectionRef}>
+            {selectedControl ? (
+              <SubControlCard
+                authUserItem={authUserItem}
+                selectedControl={selectedControl}
+                selectedPriority={selectedPriority}
+                handleBackControl={handleBackControl}
+                complianceControlData={complianceControlData}
+                handleOpenSolutionModal={handleOpenSolutionModal}
+              />
+            ) : (<>
+              {/* <HistoryAndReportCard /> */}
+              <Card className="h-100">
+                <CardBody>
+                  <div className="d-block text-center">
+                    <span className="text-white">Create your custom compliance control (CCF)</span>
+                    <div className="buttons mt-2">
+                      <button type="button" className="btnprimary" onClick={() => navigate(`/admin/compliance-builder`)}>
+                        Go to CCF
+                      </button>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            </>)}
+          </div>
         </Col>
       </Row>
+
+      <SelectSolutionTool
+        open={openSolutionModal}
+        controlItemData={selectedControl}
+        closeModal={closeSolutionModal}
+        handleUpdateToolIcons={handleUpdateToolIcons}
+      />
     </div>
-  );
-};
+  )
+}
 
 export default CompilanceController;

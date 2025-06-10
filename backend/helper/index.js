@@ -1,7 +1,6 @@
 var moment = require('moment');
 var path = require("path");
-
-var backendNodeUrl = process.env?.BACK_UNITY_URL || "";
+const fsPromise = require('fs').promises;
 
 var MailService = require("../services/mail.service");
 var EventLogService = require("../services/eventLog.service");
@@ -166,46 +165,6 @@ const modulesData = [
 
 // ** Checks if an object is empty (returns boolean)
 const isObjEmpty = (obj) => Object.keys(obj).length === 0
-
-// for sending emails
-const sendEmail = async (to, name, bcc, subject, temFile, data, attachment = "") => {
-  try {
-    if (data?.logo && backendNodeUrl) {
-      data.logo = `${backendNodeUrl}/${data.logo}`;
-    }
-
-    var response = await MailService.sendEmail(
-      to,
-      name,
-      bcc,
-      subject,
-      temFile,
-      data,
-      attachment
-    )
-
-    return false;
-  } catch (error) {
-    console.log("sendEmail catch >>> ", error);
-    throw Error(error)
-  }
-}
-
-const sendSimpleHtmlEmail = async (to, name, subject, html) => {
-  try {
-    var response = await MailService.sendSimpleHtmlEmail(
-      to,
-      name,
-      subject,
-      html
-    );
-
-    return true;
-  } catch (e) {
-    console.log("e", e);
-    throw Error(e);
-  }
-}
 
 const createUpdateCronEventLog = async (payload = null) => {
   try {
@@ -399,6 +358,94 @@ const removeWhiteSpaceString = (string = "") => {
   return string
 }
 
+const sendPlatformTypeEmail = async (item = null) => {
+  try {
+    var emailConfigType = await SettingService.getSettingBySlug("email_config_type") || null;
+    if (emailConfigType?.value) {
+      let configType = emailConfigType?.value;
+      if (configType === "azure-msal") {
+        let msalClientId = await SettingService.getSettingBySlug("email_azure_msal_client_id") || null;
+        let msalSecretValue = await SettingService.getSettingBySlug("email_azure_msal_secret_value") || null;
+        let msalTenantId = await SettingService.getSettingBySlug("email_azure_msal_tenant_id") || null;
+        let msalFromEmail = await SettingService.getSettingBySlug("email_azure_msal_from_email") || null;
+        let msalFromName = await SettingService.getSettingBySlug("email_azure_msal_from_name") || null;
+
+        msalClientId = msalClientId?.value || "";
+        msalSecretValue = msalSecretValue?.value || "";
+        msalTenantId = msalTenantId?.value || "";
+        msalFromEmail = msalFromEmail?.value || "";
+        msalFromName = msalFromName?.value || "";
+
+        let config = {
+          client_id: msalClientId,
+          secret_value: msalSecretValue,
+          tenant_id: msalTenantId,
+          from_email: msalFromEmail,
+          from_name: msalFromName
+        }
+
+        var response = await MailService.sendAzureM365Email(config, item);
+        return
+      } else if (configType === "smtp") {
+        let mailServerHost = await SettingService.getSettingBySlug("mail_server_host") || null;
+        let mailServerPort = await SettingService.getSettingBySlug("mail_server_port") || null;
+        let mailAuthEmail = await SettingService.getSettingBySlug("mail_auth_email") || null;
+        let mailAuthPassword = await SettingService.getSettingBySlug("mail_auth_password") || null;
+        let mailFromEmail = await SettingService.getSettingBySlug("mail_from_email") || null;
+        let mailFromName = await SettingService.getSettingBySlug("mail_from_name") || null;
+
+        mailServerHost = mailServerHost?.value || process.env?.MAIL_SERVER_HOST || "";
+        mailServerPort = mailServerPort?.value || process.env?.MAIL_SERVER_PORT || ""; mailAuthEmail = mailAuthEmail?.value || process.env?.MAIL_AUTH_EMAIL || "";
+        mailAuthPassword = mailAuthPassword?.value || process.env?.MAIL_AUTH_PASSWORD || "";
+        mailFromEmail = mailFromEmail?.value || process.env?.MAIL_FROM_EMAIL || "";
+        mailFromName = mailFromName?.value || process.env?.MAIL_FROM_NAME || "";
+
+        let config = {
+          mail_host: mailServerHost,
+          mail_port: mailServerPort,
+          mail_auth_email: mailAuthEmail,
+          mail_auth_password: mailAuthPassword,
+          mail_from_email: mailFromEmail,
+          mail_from_name: mailFromName
+        }
+
+        var response = await MailService.sendSimpleHtmlEmail(config, item);
+        return
+      } else {
+        throw Error("sendPlatformTypeEmail -> No any email configuration found.")
+      }
+    }
+
+    throw Error("No email config found.")
+  } catch (error) {
+    console.log("sendPlatformTypeEmail catch >>> ", error);
+    throw Error(error)
+  }
+}
+
+const getReplaceValue = (key = "", value = "", content = "") => {
+  var regex = new RegExp(key, 'g');
+  if (content && content?.replace(regex, value)) {
+    return content.replace(regex, value)
+  }
+
+  return content;
+}
+
+const getReadFileContent = async (filePath = "") => {
+  try {
+    if (filePath) {
+      const content = await fsPromise.readFile(filePath, 'utf8');
+      return content;
+    }
+
+    return null;
+  } catch (err) {
+    console.log('getReadFileContent >>> ', err);
+    return null;
+  }
+}
+
 module.exports = {
   wazuhKey,
   openVASKey,
@@ -410,8 +457,6 @@ module.exports = {
   modulesData,
 
   isObjEmpty,
-  sendEmail,
-  sendSimpleHtmlEmail,
   createUpdateEventLog,
   getRelativePath,
   generateCode,
@@ -421,5 +466,8 @@ module.exports = {
   splitWithPipe,
   getToolsPermissions,
   removeWhiteSpaceString,
-  createUpdateCronEventLog
+  createUpdateCronEventLog,
+  sendPlatformTypeEmail,
+  getReplaceValue,
+  getReadFileContent
 }

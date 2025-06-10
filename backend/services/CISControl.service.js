@@ -72,16 +72,16 @@ exports.createCISControl = async function (cisControl) {
     description: cisControl.description ? cisControl.description : "",
     tool_icon: cisControl.tool_icon ? cisControl.tool_icon : "",
     status: cisControl.status ? cisControl.status : 0,
-    deletedAt: null,
+    deletedAt: null
   });
 
   try {
     // Saving the CISControl
     var savedCISControl = await newCISControl.save();
     return savedCISControl;
-  } catch (e) {
+  } catch (error) {
     // return a Error message describing the reason
-    throw Error(e.message);
+    throw Error(error.message);
   }
 }
 
@@ -94,9 +94,7 @@ exports.updateCISControl = async function (cisControl) {
     throw Error("Compliance Control not found");
   }
 
-  if (!oldCISControl) {
-    return false;
-  }
+  if (!oldCISControl) { return false; }
 
   if (cisControl.framework_id) {
     oldCISControl.framework_id = cisControl.framework_id;
@@ -157,8 +155,8 @@ exports.updateCISControl = async function (cisControl) {
   try {
     var savedCISControl = await oldCISControl.save();
     return savedCISControl;
-  } catch (e) {
-    throw Error(e.message);
+  } catch (error) {
+    throw Error(error.message);
   }
 }
 

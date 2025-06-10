@@ -2,7 +2,7 @@ var UserService = require('../services/user.service');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 
-const { sendSimpleHtmlEmail } = require('../helper');
+const { sendPlatformTypeEmail } = require('../helper');
 
 // Saving the context of this module inside the _the variable
 _this = this;
@@ -304,7 +304,14 @@ exports.forgotPassword = async function (req, res, next) {
             });
 
             if (user && user._id) {
-                await sendSimpleHtmlEmail(user?.email, user?.first_name, "Reset Password Instruction", `<strong>Welcome to securli</strong><p>Click below to reset your password. Note: Your link will be expired in 15 minutes. </p> <a href="${frontWebUrl}/resetpassword/${token1}">CLICK HERE</a>`);
+                let mailItem = {
+                    to: user?.email,
+                    name: user?.first_name,
+                    subject: "Reset Password request",
+                    content: `<strong>Welcome to Unity</strong><p>Click below to reset your password. Note: Your link will be expired in 15 minutes. </p> <a href="${frontWebUrl}/resetpassword/${token1}">CLICK HERE</a>`
+                }
+
+                await sendPlatformTypeEmail(mailItem);
             }
 
             return res.status(200).json({

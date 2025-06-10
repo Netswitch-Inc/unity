@@ -4,13 +4,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** Axios Imports
 import instance from "utility/AxiosConfig";
 
+import { getLocalAppSetting, setLocalAppSetting } from "utility/Utils";
+
 // ** Constant
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
+import { hostRestApiUrl } from "utility/reduxConstant";
 
 async function getGlobalSettingsListRequest(params) {
-    return instance.get(`${API_ENDPOINTS.globalSettings.lists}`, { params })
-        .then((items) => items.data)
-        .catch((error) => error);
+    return instance.get(`${API_ENDPOINTS.settings.lists}`, { params })
+        .then((items) => items.data).catch((error) => error);
 }
 
 export const getGlobalSettingsList = createAsyncThunk("appGlobalSettings/getGlobalSettingsList", async (params) => {
@@ -45,9 +47,8 @@ export const getGlobalSettingsList = createAsyncThunk("appGlobalSettings/getGlob
 })
 
 async function updateGlobalSettingsRequest(payload) {
-    return instance.put(`${API_ENDPOINTS.globalSettings.update}`, payload)
-        .then((items) => items.data)
-        .catch((error) => error)
+    return instance.put(`${API_ENDPOINTS.settings.update}`, payload)
+        .then((items) => items.data).catch((error) => error)
 }
 
 export const updateGlobalSettingsList = createAsyncThunk("appGlobalSettings/updateGlobalSettings", async (payload) => {
@@ -78,11 +79,59 @@ export const updateGlobalSettingsList = createAsyncThunk("appGlobalSettings/upda
     }
 })
 
+async function getAppSettingsRequest(params) {
+    return instance.get(`${API_ENDPOINTS.settings.appSetting}`, { params })
+        .then((items) => items.data).catch((error) => error);
+}
+
+export const getAppSettings = createAsyncThunk("appGlobalSettings/getAppSettings", async (params) => {
+    try {
+        const response = await getAppSettingsRequest(params);
+        if (response && response.flag) {
+            if (response?.data?.logo) {
+                response.data.logo = `${hostRestApiUrl}/${response.data.logo}`;
+            }
+
+            if (response?.data?.favicon) {
+                response.data.favicon = `${hostRestApiUrl}/${response.data.favicon}`;
+            }
+
+            setLocalAppSetting(response?.data)
+            return {
+                params,
+                appSettingItem: response?.data || null,
+                actionFlag: "APP_STING_SCS",
+                success: "",
+                error: ""
+            }
+        } else {
+            setLocalAppSetting(null)
+            return {
+                params,
+                appSettingItem: [],
+                actionFlag: "APP_STING_ERR",
+                success: "",
+                error: response.message
+            }
+        }
+    } catch (error) {
+        setLocalAppSetting(null)
+        return {
+            params,
+            appSettingItem: [],
+            actionFlag: "APP_STING_ERR",
+            success: "",
+            error: error
+        }
+    }
+})
+
 // Create a slice
 const appAuthSlice = createSlice({
     name: 'appGlobalSettings',
     initialState: {
-        globalSettingsList: [],
+        globalSettingsList: null,
+        appSettingItem: getLocalAppSetting() || [],
         settingItem: null,
         pagination: null,
         actionFlag: "",
@@ -130,6 +179,23 @@ const appAuthSlice = createSlice({
                 state.error = action.payload?.error;
             })
             .addCase(updateGlobalSettingsList.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getAppSettings.pending, (state) => {
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(getAppSettings.fulfilled, (state, action) => {
+                state.appSettingItem = action.payload?.appSettingItem || null;
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag;
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(getAppSettings.rejected, (state) => {
                 state.loading = true;
                 state.success = "";
                 state.error = "";

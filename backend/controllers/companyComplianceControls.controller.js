@@ -1,8 +1,11 @@
 var CompanyComplianceControlService = require("../services/companyComplianceControl.service");
+var CompliancePriorityService = require("../services/compliancePriority.service");
 var FrameworkService = require('../services/framework.service');
 
 // Saving the context of this module inside the _the variable
 _this = this;
+
+var superAdminRole = process.env?.SUPER_ADMIN_ROLE || "";
 
 exports.getCompanyComplianceControls = async function (req, res, next) {
   try {
@@ -16,6 +19,13 @@ exports.getCompanyComplianceControls = async function (req, res, next) {
     var endIndex = 0;
 
     var query = { deletedAt: null };
+    if (req.query?.user_id) {
+      query.user_id = req.query.user_id;
+    }
+
+    if (req.query?.compliance_priority_id) {
+      query.compliance_priority_id = req.query.compliance_priority_id;
+    }
 
     var count = await CompanyComplianceControlService.getCompanyComplianceControlCount(query);
     var companyComplianceControls = await CompanyComplianceControlService.getCompanyComplianceControls(query, page, limit, sortColumn, sort);
@@ -56,17 +66,42 @@ exports.getCompanyComplianceControls = async function (req, res, next) {
 
 exports.getCompanyComplianceControlList = async function (req, res, next) {
   try {
-    var companyId = req.body?.company_id || req?.companyId || "";
-    if (!companyId) {
-      return res.status(200).json({ status: 200, flag: false, message: "Company Id must be present" });
+    var companyId = req.query?.company_id || req?.companyId || "";
+    var userId = req.query?.user_id || req?.userId || "";
+    var roleId = req?.roleId || "";
+    var compliancePriorityId = req.query?.compliance_priority_id || "";
+    if (!companyId && !userId) {
+      return res.status(200).json({ status: 200, flag: false, message: "Company or User Id must be present." });
     }
 
-    var query = { company_id: companyId };
+    var query = { deletedAt: null };
+    if (companyId) { query.company_id = companyId; }
+    if (userId) { query.user_id = userId; }
+
+    var compliancePriority = null;
+    if (compliancePriorityId) {
+      compliancePriority = await CompliancePriorityService.getCompliancePriorityOne({ _id: compliancePriorityId, deletedAt: null }) || null;
+    } else {
+      var lastCompliancePriority = await CompliancePriorityService.getCompliancePriorityOne(query, "_id", -1);
+      if (lastCompliancePriority?._id) {
+        compliancePriority = lastCompliancePriority;
+      }
+    }
+
+    var compliancePriorities = [];
+    var compliancePriorityIds = await CompanyComplianceControlService.getCompanyComplianceControlsDistinct("compliance_priority_id", query);
+    if (compliancePriorityIds && compliancePriorityIds?.length) {
+      compliancePriorities = await CompliancePriorityService.getCompliancePriorities({ _id: { $in: compliancePriorityIds }, deletedAt: null });
+    }
 
     var frameworks = [];
     var frameworkIds = await CompanyComplianceControlService.getCompanyComplianceControlsDistinct("framework_id", query);
     if (frameworkIds && frameworkIds?.length) {
       frameworks = await FrameworkService.getFrameworks({ _id: { $in: frameworkIds }, deletedAt: null });
+    }
+
+    if (compliancePriority?._id) {
+      query.compliance_priority_id = compliancePriority._id;
     }
 
     var companyComplianceControls = await CompanyComplianceControlService.getCompanyComplianceControls(query);
@@ -76,9 +111,11 @@ exports.getCompanyComplianceControlList = async function (req, res, next) {
       status: 200,
       flag: true,
       frameworks,
+      compliancePriority,
+      compliancePriorities,
       data: companyComplianceControls,
-      message: "Company Compliance Controls received successfully.",
-    });
+      message: "Company Compliance Controls received successfully."
+    })
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
     return res.status(200).json({ status: 200, flag: false, message: e.message });
