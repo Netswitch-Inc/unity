@@ -1,3 +1,4 @@
+
 export const API_ENDPOINTS = {
   auth: {
     login: `/users/login`,
@@ -10,21 +11,21 @@ export const API_ENDPOINTS = {
     verifyotp: `/users/verifyotp`,
     resetpassword: `/users/resetpassword`,
     emailExist: `users/email-exist`,
-    usernamExist: `users/username-exist`
+    usernamExist: `users/username-exist`,
   },
   users: {
     list: `/users`,
     get: `/users`,
     create: `/users`,
     update: `/users`,
-    delete: `/users`
+    delete: `/users`,
   },
   roles: {
     list: `/roles`,
     get: `/roles`,
     create: `/roles`,
     update: `/roles`,
-    delete: `/roles`
+    delete: `/roles`,
   },
   permissions: {
     create: `/permissions`,
@@ -36,14 +37,14 @@ export const API_ENDPOINTS = {
     get: `/company`,
     create: `/company`,
     update: `/company`,
-    delete: `/company`
+    delete: `/company`,
   },
   connections: {
     list: `/connections`,
     get: `/connection`,
     create: `/connection`,
     update: `/connection`,
-    delete: `/connection`
+    delete: `/connection`,
   },
   Framework: {
     listing: `/compilance/frameworks`,
@@ -60,6 +61,7 @@ export const API_ENDPOINTS = {
     listingAll: `/compliance-controls`,
   },
   Cis: {
+    update: "/cis-controls",
     listingAll: "/cis",
     download: "/downloadfromstorage",
     listingSubcontrols: "/cis-controls-with-frameworkIds",
@@ -72,12 +74,18 @@ export const API_ENDPOINTS = {
     delete: `/event-logs`,
   },
   companyComplianceControls: {
+    list: `/company-compliance-controls`,
+    get: `/company-compliance-controls`,
+    create: `/company-compliance-controls`,
+    update: `/company-compliance-controls`,
+    delete: `/company-compliance-controls`,
     lists: `/company-compliance-controls-list`,
     creates: `/company-multiple-compliance-controls`,
   },
-  globalSettings: {
+  settings: {
     lists: `/settings`,
     update: `/settings`,
+    appSetting: `/app-settings`,
   },
   sections: {
     list: `/sections`,
@@ -85,7 +93,7 @@ export const API_ENDPOINTS = {
     create: `/sections`,
     update: `/sections`,
     delete: `/sections`,
-    byAssessment: `/section/byassessment`
+    byAssessment: `/section/byassessment`,
   },
   questions: {
     list: `/questions`,
@@ -103,35 +111,35 @@ export const API_ENDPOINTS = {
     get: `/assessments`,
     create: `/assessments`,
     update: `/assessments`,
-    delete: `/assessments`
+    delete: `/assessments`,
   },
   projects: {
     list: `/projects`,
     get: `/projects`,
     create: `/projects`,
     update: `/projects`,
-    delete: `/projects`
+    delete: `/projects`,
   },
   attachments: {
     list: `/attachments`,
     get: `/attachments`,
     create: `/upload`,
     update: `/attachments`,
-    delete: `/attachments`
+    delete: `/attachments`,
   },
   comments: {
     list: `/comments`,
     get: `/comments`,
     create: `/comments`,
     update: `/comments`,
-    delete: `/comments`
+    delete: `/comments`,
   },
   histories: {
     list: `/project_histories`,
     get: `/project_histories`,
     create: `/project_histories`,
     update: `/project_histories`,
-    delete: `/project_histories`
+    delete: `/project_histories`,
   },
   assessmentReports: {
     list: `/assessment-reports`,
@@ -142,14 +150,14 @@ export const API_ENDPOINTS = {
     verify: `/assessment-code-verification`,
     assessmentAnswers: `/assessment-reports-questions`,
     pdfcreate: `/assessment-report-pdf`,
-    sendpdfemail: `/assessment-report-email`
+    sendpdfemail: `/assessment-report-email`,
   },
   answers: {
     list: `/question-answers`,
     get: `/question-answers`,
     create: `/question-answers`,
     update: `/question-answers`,
-    delete: `/question-answers`
+    delete: `/question-answers`,
   },
   dashboard: {
     widgetsOrder: `/dashboard-widgets-order`,
@@ -161,8 +169,7 @@ export const API_ENDPOINTS = {
     incidentTrendStats: `incident-trend-wazuh-stats-graph/filter`,
     configureAssesmntStats: `configuration-assessment-stats-graph/filter`,
     openVASScnReportStats: `/openvas-scan-report-stats-graph/filter`,
-    zendeskTicket: `/zendesk-graph-data`,
-    netSwitchThreatIntelCount: `/netswitch-threat-intels-stats-count/filter`
+    netSwitchThreatIntelCount: `/netswitch-threat-intels-stats-count/filter`,
   },
   cronSchedulers: {
     list: `/cron-schedulers`,
@@ -170,21 +177,21 @@ export const API_ENDPOINTS = {
     create: `/cron-schedulers`,
     update: `/cron-schedulers`,
     delete: `/cron-schedulers`,
-    alertWarning: `/cron-schedulers/alert-warning`
+    alertWarning: `/cron-schedulers/alert-warning`,
   },
   agents: {
     list: `/agents`,
     get: `/agents`,
     create: `/agents`,
     update: `/agents`,
-    delete: `/agents`
+    delete: `/agents`,
   },
   configurationAssessments: {
     list: `/configuration-assessments`,
     get: `/configuration-assessments`,
     create: `/configuration-assessments`,
     update: `/configuration-assessments`,
-    delete: `/configuration-assessments`
+    delete: `/configuration-assessments`,
   },
   openVASScanReports: {
     list: `/openvas-scan-reports`,
@@ -192,13 +199,24 @@ export const API_ENDPOINTS = {
     create: `/openvas-scan-reports`,
     update: `/openvas-scan-reports`,
     delete: `/openvas-scan-reports`,
-    insert: `openvas-scan-reports/insert-multipal`
+    insert: `openvas-scan-reports/insert-multipal`,
   },
   netswitchThreatIntels: {
     list: `/netswitch-threat-intels`,
     get: `/netswitch-threat-intels`,
     create: `/netswitch-threat-intels`,
     update: `/netswitch-threat-intels`,
-    delete: `/netswitch-threat-intels`
-  }
+    delete: `/netswitch-threat-intels`,
+  },
+  compliancePriorities: {
+    list: `/compliance-priorities`,
+    get: `/compliance-priorities`,
+    create: `/compliance-priorities`,
+    update: `/compliance-priorities`,
+    delete: `/compliance-priorities`,
+    companyComplianceCreates: `/company-compliance-priorities`
+  },
+  contacts: {
+    toolSolution: `/tool-solution-contact`,
+  },
 }

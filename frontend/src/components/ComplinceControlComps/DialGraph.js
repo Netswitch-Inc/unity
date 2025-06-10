@@ -43,7 +43,7 @@ function DialBar(props) {
     const type = "radialBar";
 
     return (
-        <div>
+        <div className='d-none'>
             <ReactApexChart
                 series={series}
                 type={type}

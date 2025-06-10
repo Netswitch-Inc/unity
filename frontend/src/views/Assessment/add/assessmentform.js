@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 // ** React Imports
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
@@ -15,12 +15,21 @@ import { Card, CardBody, FormFeedback, Label } from "reactstrap";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
+// ** Utils
+import { htmlToString } from "utility/Utils";
+
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
+import { Editor } from "react-draft-wysiwyg";
+import draftToHtml from "draftjs-to-html";
+import { convertToRaw } from "draft-js";
 
 // ** Constant
-import { initAssessmentItem } from "utility/reduxConstant";
+import { initAssessmentItem, draftEditorToolbarConfig } from "utility/reduxConstant";
+
+// ** Styles
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const AssessmentForm = () => {
   const dispatch = useDispatch();
@@ -28,11 +37,24 @@ const AssessmentForm = () => {
   const store = useSelector((state) => state.assessment);
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [snakebarMessage, setSnakbarMessage] = useState("");
+  const [editorHtmlContent, setEditorHtmlContent] = useState("");
+  const [editorStateContent, setEditorStateContent] = useState(null);
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required."),
     description: Yup.string().required("Description is required.")
   });
+
+  const handleEditorStateChange = (state) => {
+    // console.log("handleEditorStateChange >>> ", state)
+    setEditorStateContent(state);
+    setEditorHtmlContent(draftToHtml(convertToRaw(state.getCurrentContent())));
+  }
+
+  useLayoutEffect(() => {
+    setEditorHtmlContent("")
+    setEditorStateContent(null)
+  }, [])
 
   useEffect(() => {
     if (store.actionFlag === "ASESMNT_CRTD_SCS" && store.success) {
@@ -65,7 +87,11 @@ const AssessmentForm = () => {
         show_score_calculation: values?.show_score_calculation || ""
       }
 
-      // console.log(payload, "payload");
+      if (editorHtmlContent) {
+        payload.additional_description = editorHtmlContent;
+      }
+
+      // console.log("handleSubmit >>> ", payload);
       dispatch(createAssessment(payload));
     }
   }
@@ -167,6 +193,27 @@ const AssessmentForm = () => {
                         />
                         {errors.description && touched.description && (
                           <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                        )}
+                      </Col>
+
+                      <Col xl={12} lg={12} md={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
+                        <BootstrapForm.Label className="col-label">Additional Description</BootstrapForm.Label>
+                        <Editor
+                          id="additional_description"
+                          name="additional_description"
+                          wrapperClassName="col-draft-wrapper"
+                          toolbar={draftEditorToolbarConfig}
+                          placeholder=""
+                          editorState={editorStateContent}
+                          onEditorStateChange={handleEditorStateChange}
+                        // onBlur={() => setFieldTouched("additional_description", true)}
+                        />
+                        {touched.additional_description && (
+                          !htmlToString(editorHtmlContent.trim()) ? (
+                            <FormFeedback className="d-block">Additional Description is required.</FormFeedback>
+                          ) : errors.additional_description ? (
+                            <FormFeedback className="d-block">{errors?.additional_description}</FormFeedback>
+                          ) : null
                         )}
                       </Col>
                     </Row>

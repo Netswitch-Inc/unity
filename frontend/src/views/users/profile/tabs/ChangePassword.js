@@ -81,8 +81,7 @@ const ChangePassword = () => {
       setshowSnackbar(true);
       setSnakbarMessage(loginStore.error);
     }
-  }, [dispatch, loginStore.success, loginStore.error, loginStore?.actionFlag]);
-  console.log("loginStore?.actionFlag >>> ", loginStore?.actionFlag)
+  }, [dispatch, loginStore.success, loginStore.error, loginStore?.actionFlag])
 
   useEffect(() => {
     setTimeout(() => { setshowSnackbar(false); }, 6000);

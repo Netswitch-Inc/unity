@@ -9,6 +9,33 @@ import Nexpose from '../../assets/img/toollogo/Nexpose.png'
 import Pentera from '../../assets/img/toollogo/Pentera.png'
 import Invicti from '../../assets/img/toollogo/Invicti.png'
 import wazuh from '../../assets/img/toollogo/wazuh.png'
+// import Rectangle from '../../assets/img/toolIcons/Rectangle.png'
+// import Rectangle1 from '../../assets/img/toolIcons/Rectangle-1.png'
+// import Rectangle2 from '../../assets/img/toolIcons/Rectangle-2.png'
+// import Rectangle3 from '../../assets/img/toolIcons/Rectangle-3.png'
+// import Rectangle4 from '../../assets/img/toolIcons/Rectangle-4.png'
+// import Rectangle5 from '../../assets/img/toolIcons/Rectangle-5.png'
+// import Rectangle6 from '../../assets/img/toolIcons/Rectangle-6.png'
+// import Rectangle7 from '../../assets/img/toolIcons/Rectangle-7.png'
+// import Rectangle8 from '../../assets/img/toolIcons/Rectangle-8.png'
+// import Rectangle9 from '../../assets/img/toolIcons/Rectangle-9.png'
+// import Rectangle10 from '../../assets/img/toolIcons/Rectangle-10.png'
+// import VA from '../../assets/img/toolIcons/Rectangle-11.png'
+// import Rectangle12 from '../../assets/img/toolIcons/Rectangle-12.png'
+// import Rectangle13 from '../../assets/img/toolIcons/Rectangle-13.png'
+// import Rectangle14 from '../../assets/img/toolIcons/Rectangle-14.png'
+// import Rectangle15 from '../../assets/img/toolIcons/Rectangle-15.png'
+// import Rectangle16 from '../../assets/img/toolIcons/Rectangle-16.png'
+// import Rectangle17 from '../../assets/img/toolIcons/Rectangle-17.png'
+// import Rectangle18 from '../../assets/img/toolIcons/Rectangle-18.png'
+// import Rectangle19 from '../../assets/img/toolIcons/Rectangle-19.png'
+// import Rectangle20 from '../../assets/img/toolIcons/Rectangle-20.png'
+// import Rectangle21 from '../../assets/img/toolIcons/Rectangle-21.png'
+// import Rectangle22 from '../../assets/img/toolIcons/Rectangle-22.png'
+// import Rectangle23 from '../../assets/img/toolIcons/Rectangle-23.png'
+// import Rectangle24 from '../../assets/img/toolIcons/Rectangle-24.png'
+// import Rectangle25 from '../../assets/img/toolIcons/Rectangle-25.png'
+// import Rectangle26 from '../../assets/img/toolIcons/Rectangle-26.png'
 
 export const CriticalSecurityControlsData = {
   CMMCdata: [
@@ -8563,3 +8590,33 @@ export const complianceTools = [
     ],
   },
 ];
+
+// export const iconTools = [
+//   {key:"email-spam-sheild",value:"Email Spam Sheild",path:Rectangle26 ,icon: "ESS"},
+//   {key:"domain-reputation-monitoring",value:"Domain Reputation Monitoring",path:Rectangle25,icon: "DRM"},
+//   {key:"data-loss-prevention",value:"Data Loss Prevention",path:Rectangle24,icon: "DLP"},
+//   {key:"cyber-risk-indicator",value:"Cyber Risk Indicator",path:Rectangle23,icon: "CRI"},
+//   {key:"critical-security-controls",value:"Critical Security Controls",path:Rectangle22,icon: "CSC"},
+//   {key:"configuration-assessment",value:"Configuration Assessment",path:Rectangle21,icon: "CA"},
+//   {key:"compliance-tethering",value:"Compliance Tethering",path:Rectangle20,icon: "CT"},
+//   {key:"compliance-internal-audit",value:"Compliance Internal Audit",path:Rectangle19,icon: "CIA"},
+//   {key:"compliance ",value:"Compliance",path:Rectangle18,icon: "COM"},
+//   {key:"business-continuity ",value:"Business Continuity",path:Rectangle17,icon: "BC"},
+//   {key:"business-impace-analysis",value:"Business Impace Analysis",path:Rectangle16,icon: "BIA"},
+//   {key:"behavorial-analytics",value:"Behavorial Analytics",path:Rectangle15,icon: "BA"},
+//   {key:"asset-inventory-management",value:"Asset Inventory Management",path:Rectangle14,icon: "AIM"},
+//   {key:"application-security-assessment",value:"Application Security Assesment",path:Rectangle13,icon: "ASA"},
+//   {key:"xtended-detection-&-response",value:"Xtended Detection & Response",path:Rectangle12,icon: "XDR"},
+//   {key:"vulnerability-assessment",value:"Vulnerability Assessment",path:Rectangle1,icon:"VA"},
+//   {key:"threat-hunting-analytics",value:"Threat Hunting Analytics",path:Rectangle10,icon: "THA"},
+//   {key:"security-information-event-management",value:"Security Information Event Management",path:Rectangle9},
+//   {key:"security-operation-center",value:"Security Operation Center",path:Rectangle8,icon: "SOC"},
+//   {key:"security-awareness-education",value:"Security Awareness Education",path:Rectangle7,icon: "SAE"},
+//   {key:"policy-enforcement",value:"Policy Enforcement",path:Rectangle,icon: "PE"},
+//   {key:"penetration-testing",value:"Penetration Testing",path:Rectangle4,icon: "PENTEST"},
+//   {key:"network-infrastructure-montioring",value:"Network Infrastructure Montioring",path:Rectangle5,icon: "NIM"},
+//   {key:"network-behavorial-analytics",value:"Network Behavorial Analytics",path:Rectangle6,icon: "NBA"},
+//   {key:"log-collector",value:"Log Collector",path:Rectangle1,icon: "LOC"},
+//   {key:"firewall-automation",value:"Firewall Automation",path:Rectangle2,icon: "FA"},
+//   {key:"ransom-bloc",value:"RansomBloc",path:Rectangle3,icon: "RB"},
+// ]

@@ -1,5 +1,8 @@
 var SettingService = require('../services/setting.service');
 
+var fs = require("fs");
+var publicPath = require("path").resolve("public");
+
 // Saving the context of this module inside the _the variable
 _this = this;
 
@@ -123,5 +126,36 @@ exports.removeSetting = async function (req, res, next) {
         return res.status(200).send({ status: 200, flag: true, message: "Setting deleted successfully." });
     } catch (e) {
         return res.status(200).json({ status: 200, flag: false, message: e.message })
+    }
+}
+
+exports.getAppSettings = async function (req, res, next) {
+    // Check the existence of the query parameters, If doesn't exists assign a default value
+    try {
+        var appName = await SettingService.getSettingBySlug("app_setting_name") || null;
+        var appURL = await SettingService.getSettingBySlug("app_setting_url") || null;
+        var appFavicon = await SettingService.getSettingBySlug("app_setting_favicon") || null;
+        var appLogo = await SettingService.getSettingBySlug("app_setting_logo") || null;
+
+        appName = appName?.value || "";
+        appURL = appURL?.value || "";
+        appFavicon = appFavicon?.value || "";
+        appLogo = appLogo?.value || "";
+
+        if (appFavicon && !fs.existsSync(`${publicPath}/${appFavicon}`)) { appFavicon = ""; }
+        if (appLogo && !fs.existsSync(`${publicPath}/${appLogo}`)) { appLogo = ""; }
+
+        let appSettingItems = {
+            name: appName,
+            url: appURL,
+            favicon: appFavicon,
+            logo: appLogo
+        }
+
+        // Return the Settings list with the appropriate HTTP password Code and Message.
+        return res.status(200).json({ status: 200, flag: true, data: appSettingItems, message: "App Settings received successfully." });
+    } catch (e) {
+        //Return an Error Response Message with Code and the Error Message.
+        return res.status(200).json({ status: 200, flag: false, message: e.message });
     }
 }

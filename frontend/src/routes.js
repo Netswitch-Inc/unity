@@ -1,5 +1,10 @@
 // ** Tool Config
-import { openVASKey,wazuhKey, helpdeskSupportTicketKey, zendeskSupportTicketKey, netswitchThreatIntelKey} from "configs/toolConfig";
+import {
+  wazuhKey,
+  openVASKey,
+  helpdeskSupportTicketKey,
+  netswitchThreatIntelKey
+} from "configs/toolConfig";
 
 // ** PNG Icons
 import dashboardIcon from "assets/img/icons/dashboard.png";
@@ -75,7 +80,6 @@ import ConfigurationAssessmentChart from "views/configurationAssessments/configu
 import OpenVASScanReportList from "views/openVASScanReports";
 import AddOpenVASScanReport from "views/openVASScanReports/add";
 import EditOpenVASScanReport from "views/openVASScanReports/edit";
-import ZendeskGraphs from "views/zendesks";
 
 import NetswitchThreatIntelList from "views/netswitchThreatIntels";
 
@@ -97,7 +101,6 @@ import {
   complianceBuilderPermissionId,
   resilienceIndexPermissionId,
   helpdeskTicketPermissionId,
-  zendeskTicketPermissionId,
 
   toolsGroupPermissionId,
   cveLookupPermissionId,
@@ -113,8 +116,7 @@ import {
 } from "utility/reduxConstant";
 
 
-
-var routes = [
+const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
@@ -139,7 +141,7 @@ var routes = [
       {
         path: "/sections/add",
         name: "Add Sections",
-        mini: "SEC",
+        mini: "SE",
         layout: "/admin",
         component: (<AddSection />),
         permissionId: sectionsPermissionId,
@@ -148,7 +150,7 @@ var routes = [
       {
         path: "/sections/edit/:id",
         name: "Edit Sections",
-        mini: "SEC",
+        mini: "SE",
         layout: "/admin",
         component: (<EditSection />),
         permissionId: sectionsPermissionId,
@@ -157,7 +159,7 @@ var routes = [
       {
         path: "/sections",
         name: "Sections",
-        mini: "SEC",
+        mini: "SE",
         layout: "/admin",
         customClass: "d-none",
         component: (<SectionsList />),
@@ -166,7 +168,7 @@ var routes = [
       {
         path: "/questions/add",
         name: "Add Questions",
-        mini: "QUE",
+        mini: "QE",
         layout: "/admin",
         component: (<AddQuestion />),
         permissionId: questionsPermissionId,
@@ -175,7 +177,7 @@ var routes = [
       {
         path: "/questions/edit/:id",
         name: "Edit Question",
-        mini: "QUE",
+        mini: "QE",
         layout: "/admin",
         component: (<EditQuestion />),
         permissionId: questionsPermissionId,
@@ -184,7 +186,7 @@ var routes = [
       {
         path: "/questions",
         name: "Questions",
-        mini: "QUE",
+        mini: "QE",
         layout: "/admin",
         customClass: "d-none",
         component: (<QuestionsList />),
@@ -193,7 +195,7 @@ var routes = [
       {
         path: "/assessment-forms/detail/:id",
         name: "Assessment Form Detail",
-        mini: "AFP",
+        mini: "AF",
         layout: "/admin",
         component: (<AssessmentFormDetail />),
         permissionId: assessmentFormsPermissionId,
@@ -202,7 +204,7 @@ var routes = [
       {
         path: "/assessment-forms/add",
         name: "Add Assessment Form",
-        mini: "A",
+        mini: "AF",
         layout: "/admin",
         component: (<AddAssessmentForm />),
         permissionId: assessmentFormsPermissionId,
@@ -211,7 +213,7 @@ var routes = [
       {
         path: "/assessment-forms/edit/:id",
         name: "Edit Assessment Form",
-        mini: "A",
+        mini: "AF",
         layout: "/admin",
         component: (<EditAssessmentForm />),
         permissionId: assessmentFormsPermissionId,
@@ -220,7 +222,7 @@ var routes = [
       {
         path: "/assessment-forms",
         name: "Assessment Forms",
-        mini: "A",
+        mini: "AF",
         layout: "/admin",
         component: (<AssessmentList />),
         permissionId: assessmentFormsPermissionId
@@ -228,7 +230,7 @@ var routes = [
       {
         path: "/assessment-reports/detail/:id",
         name: "Assessment Report Detail",
-        mini: "A",
+        mini: "AR",
         layout: "/admin",
         component: (<AssessmentReportDetail />),
         permissionId: assessmentFormsPermissionId,
@@ -237,7 +239,7 @@ var routes = [
       {
         path: "/assessment-reports/:id",
         name: "Assessment Reports",
-        mini: "A",
+        mini: "AR",
         layout: "/admin",
         component: (<AssessmentReportList />),
         permissionId: assessmentFormsPermissionId,
@@ -248,7 +250,7 @@ var routes = [
   {
     collapse: true,
     name: "Governance",
-    mini: "Governance",
+    mini: "GV",
     state: "GovernanceCollapse",
     // icon: "tim-icons icon-bank",
     icon: "",
@@ -267,7 +269,7 @@ var routes = [
       {
         path: "/resilience-index",
         name: "Resilience Index",
-        mini: "CC",
+        mini: "RI",
         layout: "/admin",
         customClass: "",
         component: (<CompilanceController />),
@@ -276,7 +278,7 @@ var routes = [
       {
         path: "/risk-assessment",
         name: "Risk Assessment",
-        mini: "RAM",
+        mini: "RA",
         layout: "/admin",
         customClass: "",
         component: (<RiskAssessmentMethod />),
@@ -285,7 +287,7 @@ var routes = [
       {
         path: "/project/add",
         name: "Add Project",
-        mini: "PRO",
+        mini: "PR",
         layout: "/admin",
         customClass: "",
         component: (<AddProject />),
@@ -295,7 +297,7 @@ var routes = [
       {
         path: "/project/edit/:id",
         name: "Edit Project",
-        mini: "PRO",
+        mini: "PR",
         layout: "/admin",
         customClass: "",
         component: (<EditProject />),
@@ -305,7 +307,7 @@ var routes = [
       {
         path: "/project-details/:id",
         name: "Project Details",
-        mini: "PD",
+        mini: "PR",
         layout: "/admin",
         component: (<ProjectDetails />),
         permissionId: riskAssessmentPermissionId,
@@ -320,23 +322,13 @@ var routes = [
         component: (<HelpdeskGraphs />),
         toolId: helpdeskSupportTicketKey,
         permissionId: helpdeskTicketPermissionId
-      },
-      {
-        path: "/zendesk-graph-data",
-        name: "Zendesk Ticket",
-        mini: "HT",
-        layout: "/admin",
-        customClass: "",
-        component: (<ZendeskGraphs />),
-        toolId: zendeskSupportTicketKey,
-        permissionId: zendeskTicketPermissionId
       }
     ]
   },
   {
     collapse: true,
     name: "TOOLS",
-    mini: "T",
+    mini: "TL",
     state: "ToolsCollapse",
     // icon: "tim-icons icon-settings",
     icon: "",
@@ -346,7 +338,7 @@ var routes = [
       {
         path: "/cve-lookup",
         name: "CVE Lookup",
-        mini: "CVE",
+        mini: "CV",
         layout: "/admin",
         customClass: "",
         component: (<CVELookupTool />),
@@ -355,7 +347,7 @@ var routes = [
       {
         path: "/compliance-lookup",
         name: "Compliance Lookup",
-        mini: "CLT",
+        mini: "CL",
         layout: "/admin",
         customClass: "",
         component: (<ComplianceLookupTool />),
@@ -364,7 +356,7 @@ var routes = [
       {
         path: "/vulnerability-scanner",
         name: "Vulnerability Scanner",
-        mini: "Vs",
+        mini: "VS",
         layout: "/admin",
         customClass: "",
         component: (<VulnerabilityScanner />),
@@ -373,7 +365,7 @@ var routes = [
       {
         path: "/siem",
         name: "SIEM",
-        mini: "SIEM",
+        mini: "SM",
         layout: "/admin",
         customClass: "",
         component: (<SIEM />),
@@ -393,7 +385,7 @@ var routes = [
   {
     collapse: true,
     name: "Master",
-    mini: "Master",
+    mini: "MS",
     state: "MasterCollapse",
     // icon: "tim-icons icon-settings-gear-63",
     icon: "",
@@ -403,7 +395,7 @@ var routes = [
       {
         path: "/roles/permission/:id",
         name: "Role Module Permissions",
-        mini: "RM",
+        mini: "RL",
         layout: "/admin",
         customClass: "d-none",
         component: (<ModulePermission />),
@@ -412,7 +404,7 @@ var routes = [
       {
         path: "/roles",
         name: "Roles",
-        mini: "RM",
+        mini: "RL",
         layout: "/admin",
         customClass: "",
         component: (<RoleManagement />),
@@ -421,7 +413,7 @@ var routes = [
       {
         path: "/users/add",
         name: "Add User",
-        mini: "UM",
+        mini: "UR",
         layout: "/admin",
         customClass: "",
         component: (<AddUser />),
@@ -431,7 +423,7 @@ var routes = [
       {
         path: "/users/edit/:id",
         name: "Edit User",
-        mini: "UM",
+        mini: "UR",
         layout: "/admin",
         customClass: "",
         component: (<EditUser />),
@@ -441,7 +433,7 @@ var routes = [
       {
         path: "/users",
         name: "Users",
-        mini: "UM",
+        mini: "UR",
         layout: "/admin",
         customClass: "",
         component: (<UserManagement />),
@@ -450,7 +442,7 @@ var routes = [
       {
         path: "/companies/add",
         name: "Add Location",
-        mini: "CM",
+        mini: "LN",
         layout: "/admin",
         customClass: "",
         component: (<AddCompany />),
@@ -460,7 +452,7 @@ var routes = [
       {
         path: "/companies/edit/:id",
         name: "Edit Location",
-        mini: "CM",
+        mini: "LN",
         layout: "/admin",
         component: (<EditCompany />),
         permissionId: companiesPermissionId,
@@ -470,7 +462,7 @@ var routes = [
       {
         path: "/companies",
         name: "Locations",
-        mini: "CM",
+        mini: "LN",
         layout: "/admin",
         component: (<CompanyList />),
         permissionId: companiesPermissionId
@@ -478,7 +470,7 @@ var routes = [
       {
         path: "/event-logs/detail/:id",
         name: "Event Log Detail",
-        mini: "ELGD",
+        mini: "EL",
         layout: "/admin",
         component: (<EventLogDetail />),
         permissionId: eventLogPermissionId,
@@ -487,7 +479,7 @@ var routes = [
       {
         path: "/event-logs",
         name: "Event Logs",
-        mini: "ELGD",
+        mini: "EL",
         layout: "/admin",
         component: (<EventLogList />),
         permissionId: eventLogPermissionId
@@ -497,7 +489,7 @@ var routes = [
   {
     collapse: true,
     name: "SETTING",
-    mini: "SETTING",
+    mini: "ST",
     state: "SETTINGSCollapse",
     // icon: "tim-icons icon-settings-gear-63",
     icon: "",
@@ -507,7 +499,7 @@ var routes = [
       {
         path: "/connections/add",
         name: "Add Connections",
-        mini: "CON",
+        mini: "CN",
         layout: "/admin",
         customClass: "",
         component: (<AddConnection />),
@@ -517,7 +509,7 @@ var routes = [
       {
         path: "/connections/edit/:id",
         name: "Edit Connections",
-        mini: "CON",
+        mini: "CN",
         layout: "/admin",
         customClass: "",
         component: (<EditConnection />),
@@ -527,7 +519,7 @@ var routes = [
       {
         path: "/connections",
         name: "Connections",
-        mini: "CON",
+        mini: "CN",
         layout: "/admin",
         component: (<ConnectionManagement />),
         permissionId: connectionPermissionId
@@ -573,7 +565,7 @@ var routes = [
       {
         path: "/openvas-scan-reports/add",
         name: "Add OpenVAS Scan Report",
-        mini: "CS",
+        mini: "OS",
         layout: "/admin",
         customClass: "",
         component: (<AddOpenVASScanReport />),
@@ -584,7 +576,7 @@ var routes = [
       {
         path: "/openvas-scan-reports/edit/:id",
         name: "Edit OpenVAS Scan Report",
-        mini: "CS",
+        mini: "OS",
         layout: "/admin",
         customClass: "",
         component: (<EditOpenVASScanReport />),
@@ -595,7 +587,7 @@ var routes = [
       {
         path: "/openvas-scan-reports",
         name: "OpenVAS Scan Reports",
-        mini: "A",
+        mini: "OS",
         layout: "/admin",
         component: (<OpenVASScanReportList />),
         toolId: openVASKey,
@@ -615,8 +607,8 @@ var routes = [
   },
   {
     path: "/company-profile",
-    name: "Company Profile",
-    mini: "CP",
+    name: "Location Profile",
+    mini: "LP",
     icon: "tim-icons icon-single-02",
     layout: "/admin",
     customClass: "",
@@ -635,7 +627,7 @@ var routes = [
   {
     path: "/level-severity-graph",
     name: "Level Severity Graph",
-    mini: "MSG",
+    mini: "LS",
     icon: "tim-icons icon-chart-pie-36",
     layout: "/admin",
     toolId: wazuhKey,
@@ -645,7 +637,7 @@ var routes = [
   {
     path: "/configuration-assessment-chart",
     name: "Configuration Assessment Chart",
-    mini: "CAC",
+    mini: "CA",
     icon: "tim-icons icon-chart-pie-36",
     layout: "/admin",
     toolId: wazuhKey,
@@ -655,7 +647,7 @@ var routes = [
   {
     path: "/netswitch-threat-intels",
     name: "Netswitch Threat Intels",
-    mini: "NTI",
+    mini: "TI",
     icon: "tim-icons icon-chart-pie-36",
     layout: "/admin",
     toolId: netswitchThreatIntelKey,

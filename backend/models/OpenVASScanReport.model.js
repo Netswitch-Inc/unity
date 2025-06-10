@@ -29,7 +29,7 @@ const OpenVASScanReportSchema = new mongoose.Schema({
   certs: { type: String, default: "" },
   other_references: { type: String, default: "" },
   deletedAt: Date,
-}, { timestamps: true })
+}, { timestamps: true, versionKey: false })
 
 OpenVASScanReportSchema.plugin(mongoosePaginate);
 const OpenVASScanReport = mongoose.model("openvas_scan_reports", OpenVASScanReportSchema);

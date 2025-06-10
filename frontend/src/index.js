@@ -32,4 +32,19 @@ const root = createRoot(
   document.getElementById('root')
 )
 
+const hideLogWarning = ["production", "development"]
+if (hideLogWarning.includes(process.env?.NODE_ENV)) {
+  const originalConsoleError = console.error;
+  
+  console.error = (...args) => {
+    // Suppress specific React warning
+    if (typeof args[0] === 'string' && args[0].includes('Warning:')) {
+      return;
+    }
+
+    // Pass through other errors
+    originalConsoleError(...args);
+  }
+}
+
 root.render(<AppRender />)

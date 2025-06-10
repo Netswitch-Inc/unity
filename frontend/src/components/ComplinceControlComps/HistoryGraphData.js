@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Card, CardBody, CardHeader, Row } from "reactstrap";
+import { Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import ScoreReportTable from "./CISHeader";
 import { getCisListing } from "views/CompilanceControl/cisstore";
-import UploadModal from "./model/uploadModal";
-import UploadStatus from "./model/uploadStatus";
-function HistoryAndReportCard(props) {
-  useEffect(() => {
-    console.log(props, 'propsData');
-  }, [props]);
+// import UploadModal from "./model/uploadModal";
+// import UploadStatus from "./model/uploadStatus";
 
+function HistoryAndReportCard(props) {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.cis);
   const [data, setData] = useState([]);
@@ -121,26 +118,29 @@ function HistoryAndReportCard(props) {
           height={props.height}
         />
       </div>
-    );
+    )
   }
-  return (
-    <Card className="mb-0">
-      <CardHeader>
-        <h3>Scoring History</h3>
-      </CardHeader>
-      <CardBody className="border-bottom border-light mx-2 px-0">
-        <ScoreingHistory
-          data={props?.data}
-          tagInputSelectData={props?.tagInputSelectData}
-          height="300px"
-        />
-      </CardBody>
 
-      <CardHeader>
-        <h3 className="mb-1">Program Reports</h3>
-      </CardHeader>
-      <CardBody className="pt-1">
-        <Row className="flex-row-reverse">
+  return (
+    <div>
+      <Card className="mb-3 p-0">
+        <div>
+          <h3 className="frame-heading">Scoring History</h3>
+        </div>
+        <CardBody className="border-light mx-2 px-0">
+          <ScoreingHistory
+            height="300px"
+            data={props?.data}
+            tagInputSelectData={props?.tagInputSelectData}
+          />
+        </CardBody>
+      </Card>
+      <Card className="p-0 mb-0">
+        <div>
+          <h3 className="mb-1 frame-heading">Program Reports</h3>
+        </div>
+        <CardBody className="pt-1">
+          {/* <Row className="flex-row-reverse">
           <div className="btn-group pb-4" style={{ paddingRight: "10px" }}>
             <UploadModal
               tagInputSelectData={{ label: "CIS V7.1" }}
@@ -149,13 +149,14 @@ function HistoryAndReportCard(props) {
 
             <UploadStatus tagInputSelectData={{ label: "CIS V7.1" }} />
           </div>
-        </Row>
-        <div className="scroll">
-          <ScoreReportTable data={data} />
-        </div>
-      </CardBody>
-    </Card>
-  );
+        </Row> */}
+          <div className="">
+            <ScoreReportTable data={data} />
+          </div>
+        </CardBody>
+      </Card>
+    </div>
+  )
 }
 
 export default React.memo(HistoryAndReportCard);

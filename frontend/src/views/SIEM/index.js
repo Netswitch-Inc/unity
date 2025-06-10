@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Wazuh from "../../assets/files/Deployment-Guide-Doc/Wazuh-Deployment-Guide.pdf";
 import { Col, Row, Card, CardBody, Collapse, Button, Table,UncontrolledTooltip } from "reactstrap";
 import { FaFileDownload } from "react-icons/fa";
-import siem from '../../assets/img/toollogo/SIEM.png'
+import siem from '../../assets/img/toolIcons/siem.png'
 
 const SIEM = () => {
     const [selectedAccordion, setSelectedAccordion] = useState();

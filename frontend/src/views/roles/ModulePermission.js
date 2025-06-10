@@ -179,7 +179,7 @@ const ModulePermission = () => {
                             <h3 className='card-title mb-0 mt-0'>
                                 {store?.roleItem?.name || ""} - Module Permissions
                             </h3>
-                            <div class="buttons black-btn">
+                            <div className="buttons black-btn">
                                 <button
                                     type="button"
                                     className="btnprimary"

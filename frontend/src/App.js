@@ -1,9 +1,10 @@
 // ** React Imports
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { Route, Routes, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 
 // ** Store & Actions
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAppSettings, cleanGlobalSettingMessage } from "views/global/store";
 
 // ** Custom Components
 import AdminLayout from "layouts/Admin/Admin.js";
@@ -16,11 +17,25 @@ import AsessmentReport from "views/userAssest/step3";
 import ThankYou from "views/userAssest/step4/index";
 
 const App = () => {
+    // ** Hooks
     const location = useLocation();
     const navigate = useNavigate();
     const params = useParams();
 
+    // ** Store vars
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state.globalSetting);
     const userStore = useSelector((state) => state.login);
+
+    useLayoutEffect(() => {
+        dispatch(getAppSettings());
+    }, [dispatch])
+
+    useEffect(() => {
+        if (store?.actionFlag || store.success || store.error) {
+            dispatch(cleanGlobalSettingMessage(null));
+        }
+    }, [dispatch, store?.actionFlag, store.success, store.error])
 
     const isAuthenticated = userStore?.authUserItem?._id && userStore?.accessToken;
 

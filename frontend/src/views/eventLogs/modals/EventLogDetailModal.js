@@ -23,6 +23,7 @@ const EventLogDetailModal = ({ open, closeModal, eventLogDetailItem }) => {
       "framework_id",
       "involved_parties",
       "submitted_by",
+      "company_compliance_control_id",
       "password",
       "logo",
       "image",

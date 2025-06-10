@@ -38,8 +38,8 @@ var OpenVASScanReportController = require("../controllers/openVASScanReports.con
 var CronSchedulerErrorController = require("../controllers/cronSchedulerErrors.controller");
 var NetSwitchThreatIntelController = require("../controllers/netSwitchThreatIntels.controller");
 var NetswitchThreatIntelStatsController = require("../controllers/netswitchThreatIntelsStats.controller");
-var ZendeskSupportController = require("../controllers/zendeskSupports.controller");
-
+var CompliancePriorityController = require("../controllers/compliancePriorities.controller");
+var ContactController = require("../controllers/contacts.controller");
 
 // ** Auth
 router.post("/users/login", UserController.loginUser);
@@ -205,6 +205,7 @@ router.post("/settings", Authorization, SettingController.createSetting);
 router.put("/settings", Authorization, SettingController.updateSetting);
 router.get("/settings-slug/:slug", Authorization, SettingController.getSettingSlug);
 router.delete("/settings/:id", Authorization, SettingController.removeSetting);
+router.get("/app-settings", SettingController.getAppSettings);
 
 // ** Project
 router.post("/projects", Authorization, ProjectController.createProject);
@@ -251,10 +252,6 @@ router.get("/cron-schedulers/alert-warning", Authorization, CronSchedulerControl
 router.get("/cron-schedulers/:id", Authorization, CronSchedulerController.getCronScheduler);
 router.delete("/cron-schedulers/:id", Authorization, CronSchedulerController.softDeleteCronScheduler);
 
-
-// ** Test
-
-
 // ** Dashboard
 router.get("/dashboard-widgets-order", Authorization, DashboardController.getDashboardWidgets);
 router.post("/dashboard-widgets-order-update", Authorization, DashboardController.updateDashboardData);
@@ -266,8 +263,6 @@ router.get("/incident-trend-wazuh-stats-graph/filter", Authorization, DashboardC
 router.get("/configuration-assessment-stats-graph/filter", Authorization, DashboardController.configurationAssessmentStatsGraphData);
 router.get("/openvas-scan-report-stats-graph/filter", Authorization, DashboardController.openVASScanReportStatsGraphData);
 router.get("/netswitch-threat-intels-stats-count/filter", Authorization, DashboardController.getNetswitchThreatIntelsStatsCount);
-
-// ** Test
 
 // ** wazuh-indexer
 router.post("/wazuh-indexer-statistic", Authorization, WazuhIndexerController.createWazuhIndexer);
@@ -338,12 +333,14 @@ router.delete("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThre
 router.delete("/netswitch-threat-intels-deleteAll-stats", Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-country-stats/filter", Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
 
-// ** Zendesk Supports
-router.get("/zendesk-graph-data", Authorization, ZendeskSupportController.getZendeskSupportGraphData);
-router.get("/zendesk-supports", Authorization, ZendeskSupportController.getZendeskSupports);
-router.post("/zendesk-supports", Authorization, ZendeskSupportController.createZendeskSupport);
-router.put("/zendesk-supports", Authorization, ZendeskSupportController.updateZendeskSupport);
-router.get("/zendesk-supports/:id", Authorization, ZendeskSupportController.getZendeskSupport);
-router.delete("/zendesk-supports/:id", Authorization, ZendeskSupportController.softDeleteZendeskSupport);
+// ** Compliance Priority
+router.get("/compliance-priorities", Authorization, CompliancePriorityController.getCompliancePriorities);
+router.post("/compliance-priorities", Authorization, CompliancePriorityController.createCompliancePriority);
+router.put("/compliance-priorities", Authorization, CompliancePriorityController.updateCompliancePriority);
+router.get("/compliance-priorities/:id", Authorization, CompliancePriorityController.getCompliancePriority);
+router.delete("/compliance-priorities/:id", Authorization, CompliancePriorityController.softDeleteCompliancePriority);
+router.post("/company-compliance-priorities", Authorization, CompliancePriorityController.createCompanyCompliancesPriotity);
+
+router.post("/tool-solution-contact", Authorization, ContactController.toolSolutionContact);
 
 module.exports = router;

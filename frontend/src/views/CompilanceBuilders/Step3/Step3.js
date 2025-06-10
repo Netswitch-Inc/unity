@@ -1,45 +1,58 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, { useState, useEffect, useCallback } from "react";
+
+import { useSelector } from "react-redux";
 
 import { Col, UncontrolledTooltip } from "reactstrap";
 
-import { complianceTools } from "views/sampleData/ComplianceControlData";
+import SimpleSpinner from "components/spinner/simple-spinner";
 
-import RenderToolsModal from "./model/toolsModal";
-import iIcon from "assets/img/cis-icon.png";
-import PenTsting from "../../../assets/img/toollogo/Pen-Testing.png";
-import Loc from "../../../assets/img/toollogo/image_592.png";
-import VA from "../../../assets/img/toollogo/image_593.png";
-import SIEM from "../../../assets/img/toollogo/SIEM.png";
+// ** Tool Icon JSON
+import { solutionToolIcons } from "utility/toolIcons";
+
+// ** Utils
+import { splitWithPipe } from "utility/Utils";
+
+// ** Icons
+import infoIcon from "assets/img/info.png";
+import gearIcon from "assets/img/gear.svg";
+
+import SelectSolutionTool from "./model/SelectSolutionTool";
 
 const Step3 = React.forwardRef((props, ref) => {
-  const ToolsArray = [
-    { icon: "PENTEST", path: PenTsting, fullName: "Penetration Testing" },
-    { icon: "SIEM", path: SIEM, fullName: "Security Information and Event Management" },
-    { icon: "LOC", path: Loc, fullName: "Log Collector" },
-    { icon: "VA", path: VA, fullName: "Vulnerability Assessment" }
-  ];
+  const observerRef = React.useRef();
 
-  const [openSiemModal, setOpenSiemModal] = React.useState(false);
-  const [selectedToolIndex, setSelectedToolIndex] = React.useState(null);
+  const cisStore = useSelector((state) => state.cis);
+
+  // ** States
+  const [openSolutionModal, setSolutionModal] = useState(false);
+  const [controlItemData, setControlItemData] = useState(null);
   const [controlsLimit] = useState(5);
-
-  const handleToggleModal = (i) => {
-    setOpenSiemModal(!openSiemModal);
-  };
-
-  const handleReturnIcon = (givenIcon) => {
-    return ToolsArray.find((icon) => icon.icon === givenIcon)?.path || "";
-  };
-
-  const handleReturnIconFullName = (givenIcon) => {
-    return ToolsArray.find((icon) => icon.icon === givenIcon)?.fullName || "";
-  };
 
   const [selectedControls, setSelectedControls] = useState([]);
   const [selectedFrameworks, setSelectedFrameworks] = useState([]);
-  const [visibleControls, setVisibleControls] = useState([]);  // Controls that are currently visible
+  const [visibleControls, setVisibleControls] = useState([]); // Controls that are currently visible
+
+  // ** Const
+  const observerOptions = {
+    rootMargin: "100px",
+    threshold: 1.0,
+  }
+
+  React.useImperativeHandle(ref, () => ({
+    isValidated: () => selectedControls?.length > 0 && selectedFrameworks?.length > 0 ? true : false,
+    state: { visibleControls },
+  }))
+
+  const handleOpenSolutionModal = (item = null) => {
+    setControlItemData(item);
+    setSolutionModal(true);
+  }
+
+  const closeSolutionModal = () => {
+    setSolutionModal(false);
+    setControlItemData(null);
+  }
 
   useEffect(() => {
     // scrollTop()
@@ -52,19 +65,12 @@ const Step3 = React.forwardRef((props, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.wizardData["Compliance Selection"]?.selectedTiles]);
 
-  React.useImperativeHandle(ref, () => ({
-    isValidated: () => selectedControls?.length > 0 && selectedFrameworks?.length > 0 ? true : false
-  }));
-
-  const handleToolModel = (toolIcon) => {
-    const index = complianceTools.findIndex((item) => item.logoPath === toolIcon)
-    setSelectedToolIndex(index);
-    setOpenSiemModal(true);
-  }
-
   const loadMoreControls = useCallback(() => {
     if (visibleControls.length < selectedControls.length) {
-      const newControls = selectedControls.slice(visibleControls.length, visibleControls.length + controlsLimit);
+      const newControls = selectedControls.slice(
+        visibleControls.length,
+        visibleControls.length + controlsLimit
+      );
       setVisibleControls((prev) => [...prev, ...newControls]);
     }
   }, [selectedControls, visibleControls, controlsLimit]);
@@ -79,17 +85,13 @@ const Step3 = React.forwardRef((props, ref) => {
     if (entry.isIntersecting) {
       loadMoreControls();
     }
-  }, [loadMoreControls]);
-
-  const observerOptions = {
-    rootMargin: "100px",
-    threshold: 1.0
-  }
-
-  const observerRef = React.useRef();
+  }, [loadMoreControls])
 
   useEffect(() => {
-    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    const observer = new IntersectionObserver(
+      handleIntersection,
+      observerOptions
+    );
     if (observerRef.current) {
       observer.observe(observerRef.current);
     }
@@ -99,7 +101,32 @@ const Step3 = React.forwardRef((props, ref) => {
         observer.unobserve(observerRef.current);
       }
     };
-  }, [handleIntersection, visibleControls]);
+  }, [handleIntersection, visibleControls])
+
+  const handleUpdateToolIcons = (item = null, icons = "") => {
+    const controlItems = [...visibleControls];
+    if (item?._id && icons && controlItems?.length) {
+      const ind = controlItems.findIndex((x) => x._id === item?._id)
+      if (ind >= 0 && controlItems[ind]) {
+        controlItems[ind] = { ...visibleControls[ind], tool_icons: icons }
+      }
+    }
+
+    setVisibleControls(controlItems);
+  }
+
+  const handleGetIcons = (toolIcons = "") => {
+    let icons = toolIcons;
+    if (toolIcons) {
+      icons = splitWithPipe(toolIcons);
+
+      if (icons?.length) {
+        icons = solutionToolIcons.filter((x) => icons.includes(x.key));
+      }
+    }
+
+    return icons;
+  }
 
   const renderCISComplianceControl = (items = []) => {
     if (items && items?.length) {
@@ -113,10 +140,10 @@ const Step3 = React.forwardRef((props, ref) => {
                     <div className="cis-icon">
                       <img
                         alt="icon"
-                        src={iIcon}
                         height={17}
-                        id={`tooltip-icon-${item?._id}`}
+                        src={infoIcon}
                         className="i-icon-img"
+                        id={`tooltip-icon-${item?._id}`}
                       />
                       <span id={`selected-control-${ind}`}>
                         {item?.name || ""}
@@ -133,80 +160,108 @@ const Step3 = React.forwardRef((props, ref) => {
 
                   <div className="tabletdsbtntyle text-right rows-td">
                     <span>{item?.framework_name || ""}</span>
-                    {item?.identifier && <span className="second-frame"> {item?.identifier}</span>}
+                    {item?.identifier && (
+                      <span className="second-frame"> {item?.identifier}</span>
+                    )}
                   </div>
                 </div>
               </div>
             </Col>
 
             <Col md={6} className="cis-complinance-control-content new-cis-compliance">
-              <div className="h-100">
-                {item?.cis_control_id?.length ? (
-                  item.cis_control_id.map((cisControl, sbInd) => (
-                    <div key={`${ind}-${sbInd}`} className={item?.cis_control_id?.length === 1 ? `row h-100` : `row`}>
-                      <div className="col-md-9 col-12 cis-text">
-                        <div className="content-wrap">
+              <div className="row h-100">
+                <div className="col-md-9 col-12 cis-text">
+                  <div className="content-wrap">
+                    {item?.cis_control_id?.length ? (
+                      item.cis_control_id.map((cisControl, sbInd) => (
+                        <div
+                          key={`${ind}-${sbInd}`}
+                          className="text-content d-flex justify-content-between w-100"
+                        >
                           <div
-                            key={`${ind}-${sbInd}`}
-                            className="text-content d-flex justify-content-between w-100"
+                            className="icon-number-img pr-1"
+                            id={`complience-sub-control-${item?._id}-${sbInd}`}
                           >
-                            <div className="icon-number-img pr-1" id={`complience-sub-control-${item?._id}-${sbInd}`}>
-                              <div className="cis-icon" >
-                                <img
-                                  alt="icon"
-                                  src={iIcon} height={17}
-                                  className="cursor-pointer"
-                                  id={`tooltip-icons-${item?._id}-${sbInd}`}
-                                />
-                                <p>{cisControl?.name || ""}</p>
-                              </div>
-                            </div>
-                            <UncontrolledTooltip
-                              placement="auto"
-                              target={`tooltip-icons-${item?._id}-${sbInd}`}
-                              container={`complience-sub-control-${item?._id}-${sbInd}`}
-                            >
-                              <div className="inner-desc">{cisControl.description}</div>
-                            </UncontrolledTooltip>
-                            <div className="number-img">
-                              {cisControl?.cis_sub_control && <span className="tabletdsbtntyle text-right">
-                                {cisControl?.cis_sub_control}
-                              </span>}
+                            <div className="cis-icon">
+                              <img
+                                alt="icon"
+                                height={17}
+                                src={infoIcon}
+                                className="cursor-pointer"
+                                id={`tooltip-icons-${item?._id}-${sbInd}`}
+                              />
+                              <p>{cisControl?.name || ""}</p>
                             </div>
                           </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-3 col-12 only-tool-content cis-text">
-                        <div className="content-wrap h-100">
-                          <div
-                            key={`${ind}-${sbInd}`}
-                            className="text-content d-flex justify-content-between w-100"
-                            onClick={() => handleToolModel(cisControl.tool_icon)}
+                          <UncontrolledTooltip
+                            placement="auto"
+                            target={`tooltip-icons-${item?._id}-${sbInd}`}
+                            container={`complience-sub-control-${item?._id}-${sbInd}`}
                           >
-                            <div className="number-img only-tool">
+                            <div className="inner-desc">
+                              {cisControl.description}
+                            </div>
+                          </UncontrolledTooltip>
+                          <div className="number-img">
+                            {cisControl?.cis_sub_control && (
+                              <span className="tabletdsbtntyle text-right">
+                                {cisControl?.cis_sub_control}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-12 only-tool-content cis-text">
+                  <div className="content-wrap h-100 d-block">
+                    <div className="text-center" onClick={() => handleOpenSolutionModal(item)}>
+                      <div className="main-only-tool">
+                        {handleGetIcons(item?.tool_icons)?.length ? (
+                          handleGetIcons(item.tool_icons).map((toolItem, tInd) => (
+                            <div key={`tool-icons-${item?._id}-${ind}-${tInd}`} className="only-tool">
                               <img
                                 width={30}
                                 height={30}
-                                className="cursor-pointer"
-                                alt={cisControl?.tool_icon}
-                                src={handleReturnIcon(cisControl?.tool_icon)}
-                                id={`complience-sub-control-${cisControl?._id}-image`}
+                                alt={toolItem?.value}
+                                src={toolItem?.source}
+                                className="cursor-pointer mb-md-2"
+                                id={`tool-icon-${item?._id}-${ind}-${tInd}`}
                               />
                               <UncontrolledTooltip
                                 placement="top"
-                                target={`complience-sub-control-${cisControl?._id}-image`}
-                              // container={`complience-sub-control-${cisControl?.tool_icon}`}
+                                target={`tool-icon-${item?._id}-${ind}-${tInd}`}
+                              // container={`complience-sub-control-${item?.tool_icons}`}
                               >
-                                {handleReturnIconFullName(cisControl?.tool_icon)}
+                                {toolItem?.value}
                               </UncontrolledTooltip>
                             </div>
+                          ))
+                        ) : (
+                          <div className="only-tool">
+                            <img
+                              width={30}
+                              height={30}
+                              alt={"Tool"}
+                              src={gearIcon}
+                              className="cursor-pointer mb-md-2"
+                              id={`gear-icon-${item?._id}-${ind}`}
+                            />
+                            <UncontrolledTooltip
+                              placement="top"
+                              target={`gear-icon-${item?._id}-${ind}`}
+                            // container={`complience-sub-control-${item?.tool_icons}`}
+                            >
+                              Select Solution
+                            </UncontrolledTooltip>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
-                  ))
-                ) : null}
+                  </div>
+                </div>
               </div>
             </Col>
           </div>
@@ -218,18 +273,22 @@ const Step3 = React.forwardRef((props, ref) => {
   }
 
   return (<>
+    {!cisStore?.loading ? (<SimpleSpinner />) : null}
+
     <div className="compliance-builder ps">
       <div className="row compliance-builder-row">
         <Col md={6} className="compliance-builder-col">
-          <div className="complaince-tab">Custom Compliance Framework</div>
+          <div className="complaince-tab">Custom Compliance Framework (CCF)</div>
         </Col>
+
         <Col md={6} className="compliance-builder-col">
           <div className="row">
             <Col md={9}>
-              <div className="complaince-tab">CIS Benchmark</div>
+              <div className="complaince-tab">CIS Benchmark: Sub-Controls</div>
             </Col>
+
             <Col md={3}>
-              <div className="complaince-tab">Tools</div>
+              <div className="complaince-tab">Solution</div>
             </Col>
           </div>
         </Col>
@@ -237,17 +296,19 @@ const Step3 = React.forwardRef((props, ref) => {
 
       <div className="compliance-builder-content">
         {renderCISComplianceControl(visibleControls)}
-        <div ref={observerRef} style={{ height: "20px", backgroundColor: "transparent" }} />
+        <div
+          ref={observerRef}
+          style={{ height: "20px", backgroundColor: "transparent" }}
+        />
       </div>
     </div>
 
-    {selectedToolIndex !== null ? (
-      <RenderToolsModal
-        isOpen={openSiemModal}
-        toggle={handleToggleModal}
-        data={complianceTools[selectedToolIndex]}
-      />
-    ) : null}
+    <SelectSolutionTool
+      open={openSolutionModal}
+      controlItemData={controlItemData}
+      closeModal={closeSolutionModal}
+      handleUpdateToolIcons={handleUpdateToolIcons}
+    />
   </>)
 })
 
