@@ -169,7 +169,8 @@ export const API_ENDPOINTS = {
     incidentTrendStats: `incident-trend-wazuh-stats-graph/filter`,
     configureAssesmntStats: `configuration-assessment-stats-graph/filter`,
     openVASScnReportStats: `/openvas-scan-report-stats-graph/filter`,
-    netSwitchThreatIntelCount: `/netswitch-threat-intels-stats-count/filter`,
+    zendeskTicket: `/zendesk-graph-data`,
+    netSwitchThreatIntelCount: `/netswitch-threat-intels-stats-count/filter`
   },
   cronSchedulers: {
     list: `/cron-schedulers`,

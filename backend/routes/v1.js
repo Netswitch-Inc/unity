@@ -38,6 +38,7 @@ var OpenVASScanReportController = require("../controllers/openVASScanReports.con
 var CronSchedulerErrorController = require("../controllers/cronSchedulerErrors.controller");
 var NetSwitchThreatIntelController = require("../controllers/netSwitchThreatIntels.controller");
 var NetswitchThreatIntelStatsController = require("../controllers/netswitchThreatIntelsStats.controller");
+var ZendeskSupportController = require("../controllers/zendeskSupports.controller");
 var CompliancePriorityController = require("../controllers/compliancePriorities.controller");
 var ContactController = require("../controllers/contacts.controller");
 
@@ -332,6 +333,14 @@ router.post("/netswitch-threat-intels-createBulk-stats", Authorization, Netswitc
 router.delete("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-deleteAll-stats", Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-country-stats/filter", Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
+
+// ** Zendesk Supports
+router.get("/zendesk-graph-data", Authorization, ZendeskSupportController.getZendeskSupportGraphData);
+router.get("/zendesk-supports", Authorization, ZendeskSupportController.getZendeskSupports);
+router.post("/zendesk-supports", Authorization, ZendeskSupportController.createZendeskSupport);
+router.put("/zendesk-supports", Authorization, ZendeskSupportController.updateZendeskSupport);
+router.get("/zendesk-supports/:id", Authorization, ZendeskSupportController.getZendeskSupport);
+router.delete("/zendesk-supports/:id", Authorization, ZendeskSupportController.softDeleteZendeskSupport);
 
 // ** Compliance Priority
 router.get("/compliance-priorities", Authorization, CompliancePriorityController.getCompliancePriorities);

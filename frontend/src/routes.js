@@ -1,10 +1,5 @@
 // ** Tool Config
-import {
-  wazuhKey,
-  openVASKey,
-  helpdeskSupportTicketKey,
-  netswitchThreatIntelKey
-} from "configs/toolConfig";
+import { openVASKey,wazuhKey, helpdeskSupportTicketKey, zendeskSupportTicketKey, netswitchThreatIntelKey} from "configs/toolConfig";
 
 // ** PNG Icons
 import dashboardIcon from "assets/img/icons/dashboard.png";
@@ -80,6 +75,7 @@ import ConfigurationAssessmentChart from "views/configurationAssessments/configu
 import OpenVASScanReportList from "views/openVASScanReports";
 import AddOpenVASScanReport from "views/openVASScanReports/add";
 import EditOpenVASScanReport from "views/openVASScanReports/edit";
+import ZendeskGraphs from "views/zendesks";
 
 import NetswitchThreatIntelList from "views/netswitchThreatIntels";
 
@@ -101,6 +97,7 @@ import {
   complianceBuilderPermissionId,
   resilienceIndexPermissionId,
   helpdeskTicketPermissionId,
+  zendeskTicketPermissionId,
 
   toolsGroupPermissionId,
   cveLookupPermissionId,
@@ -114,7 +111,6 @@ import {
   cronSchedulerPermissionId,
   openVasScanReportPermissionId
 } from "utility/reduxConstant";
-
 
 const routes = [
   {
@@ -322,6 +318,16 @@ const routes = [
         component: (<HelpdeskGraphs />),
         toolId: helpdeskSupportTicketKey,
         permissionId: helpdeskTicketPermissionId
+      },
+      {
+        path: "/zendesk-graph-data",
+        name: "Zendesk Ticket",
+        mini: "HT",
+        layout: "/admin",
+        customClass: "",
+        component: (<ZendeskGraphs />),
+        toolId: zendeskSupportTicketKey,
+        permissionId: zendeskTicketPermissionId
       }
     ]
   },
