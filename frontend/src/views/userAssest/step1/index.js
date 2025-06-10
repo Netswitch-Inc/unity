@@ -19,27 +19,36 @@ import * as Yup from "yup";
 
 import Select from "react-select";
 
+// ** Utils
+import { onImageSrcError } from 'utility/Utils';
+
 // ** Third Party Components
 import PhoneInput from 'react-phone-input-2';
 
 // ** Constant
-import { businessType, AssessmentReport } from "utility/reduxConstant";
+import { defaultLogo, businessType, AssessmentReport } from "utility/reduxConstant";
 
 // ** Logo
-import reactLogo from "assets/img/react-logo.png";
+import logo from "assets/img/react-logo.png";
 
 // ** Styles
 import 'react-phone-input-2/lib/style.css';
 
 const CompanyInfoStep = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    // ** Hooks
     const { id } = useParams();
-
-    const assessmentReport = useSelector((state) => state.assessmentReport);
-
+    const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
+    
+    // ** Store vars
+    const dispatch = useDispatch();
+    const assessmentReport = useSelector((state) => state.assessmentReport);
+    const settingStore = useSelector((state) => state.globalSetting);
+    
+    // ** Const
+    const appSettingItem = settingStore?.appSettingItem || null;
+    const appLogo = appSettingItem?.logo || defaultLogo;
     const assessmentId = queryParams.get("id");
 
     const [asessmentReportValue, setAsessmentReportValue] = useState(AssessmentReport);
@@ -117,7 +126,7 @@ const CompanyInfoStep = () => {
                 <Card className="main-progress col-md-3 mb-0">
                     <div className="main-logo-img">
                         <div className="logo">
-                            <img alt="..." src={reactLogo} />
+                            <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
                         </div>
                     </div>
 

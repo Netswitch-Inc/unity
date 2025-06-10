@@ -38,7 +38,8 @@ var OpenVASScanReportController = require("../controllers/openVASScanReports.con
 var CronSchedulerErrorController = require("../controllers/cronSchedulerErrors.controller");
 var NetSwitchThreatIntelController = require("../controllers/netSwitchThreatIntels.controller");
 var NetswitchThreatIntelStatsController = require("../controllers/netswitchThreatIntelsStats.controller");
-
+var CompliancePriorityController = require("../controllers/compliancePriorities.controller");
+var ContactController = require("../controllers/contacts.controller");
 
 // ** Auth
 router.post("/users/login", UserController.loginUser);
@@ -204,6 +205,7 @@ router.post("/settings", Authorization, SettingController.createSetting);
 router.put("/settings", Authorization, SettingController.updateSetting);
 router.get("/settings-slug/:slug", Authorization, SettingController.getSettingSlug);
 router.delete("/settings/:id", Authorization, SettingController.removeSetting);
+router.get("/app-settings", SettingController.getAppSettings);
 
 // ** Project
 router.post("/projects", Authorization, ProjectController.createProject);
@@ -250,10 +252,6 @@ router.get("/cron-schedulers/alert-warning", Authorization, CronSchedulerControl
 router.get("/cron-schedulers/:id", Authorization, CronSchedulerController.getCronScheduler);
 router.delete("/cron-schedulers/:id", Authorization, CronSchedulerController.softDeleteCronScheduler);
 
-
-// ** Test
-
-
 // ** Dashboard
 router.get("/dashboard-widgets-order", Authorization, DashboardController.getDashboardWidgets);
 router.post("/dashboard-widgets-order-update", Authorization, DashboardController.updateDashboardData);
@@ -265,8 +263,6 @@ router.get("/incident-trend-wazuh-stats-graph/filter", Authorization, DashboardC
 router.get("/configuration-assessment-stats-graph/filter", Authorization, DashboardController.configurationAssessmentStatsGraphData);
 router.get("/openvas-scan-report-stats-graph/filter", Authorization, DashboardController.openVASScanReportStatsGraphData);
 router.get("/netswitch-threat-intels-stats-count/filter", Authorization, DashboardController.getNetswitchThreatIntelsStatsCount);
-
-// ** Test
 
 // ** wazuh-indexer
 router.post("/wazuh-indexer-statistic", Authorization, WazuhIndexerController.createWazuhIndexer);
@@ -327,6 +323,7 @@ router.post("/netswitch-threat-intels-createBulk",Authorization, NetSwitchThreat
 router.delete("/netswitch-threat-intels/:id",Authorization, NetSwitchThreatIntelController.softDeleteNetSwitchThreatIntel);
 router.delete("/netswitch-threat-intels-deleteAll",Authorization, NetSwitchThreatIntelController.deleteManyNetSwitchThreatIntel);
 
+// ** NetSwitch Threat Intels Stats
 router.get("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.getNetswitchThreatIntelsStats);
 router.post("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.createNetswitchThreatIntelStats);
 router.put("/netswitch-threat-intels-stats", Authorization, NetswitchThreatIntelStatsController.updateNetSwitchThreatIntelStats);
@@ -335,5 +332,15 @@ router.post("/netswitch-threat-intels-createBulk-stats", Authorization, Netswitc
 router.delete("/netswitch-threat-intels-stats/:id", Authorization, NetswitchThreatIntelStatsController.softDeleteNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-deleteAll-stats", Authorization, NetswitchThreatIntelStatsController.deleteManyNetSwitchThreatIntelStats);
 router.delete("/netswitch-threat-intels-country-stats/filter", Authorization, NetswitchThreatIntelStatsController.getCountBasedOnCountryStats);
+
+// ** Compliance Priority
+router.get("/compliance-priorities", Authorization, CompliancePriorityController.getCompliancePriorities);
+router.post("/compliance-priorities", Authorization, CompliancePriorityController.createCompliancePriority);
+router.put("/compliance-priorities", Authorization, CompliancePriorityController.updateCompliancePriority);
+router.get("/compliance-priorities/:id", Authorization, CompliancePriorityController.getCompliancePriority);
+router.delete("/compliance-priorities/:id", Authorization, CompliancePriorityController.softDeleteCompliancePriority);
+router.post("/company-compliance-priorities", Authorization, CompliancePriorityController.createCompanyCompliancesPriotity);
+
+router.post("/tool-solution-contact", Authorization, ContactController.toolSolutionContact);
 
 module.exports = router;

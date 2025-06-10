@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Zeek from "../../assets/files/Deployment-Guide-Doc/Zeek_Log_Collector_Deployment_Guide.pdf";
 import { Col, Row, Card, CardBody, Collapse, Button, Table, UncontrolledTooltip } from "reactstrap";
 import { FaFileDownload } from 'react-icons/fa';
-import LogcollectorImange from '../../assets/img/toollogo/image_592.png'
+import LogcollectorImange from '../../assets/img/toolIcons/lc.png'
 const LogCollector = () => {
   const [selectedAccordion, setSelectedAccordion] = useState();
 

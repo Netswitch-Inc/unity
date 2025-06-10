@@ -254,7 +254,7 @@ const ConnectionList = () => {
                         <Row className="userManagement mt-3 connection-table">
                             <Col className="pb-2" md="12">
                                 <DatatablePagination
-                                    data={store.ConnectionItems}
+                                    data={store.connectionItems}
                                     columns={columns}
                                     pagination={store?.pagination}
                                     handleSort={handleSort}

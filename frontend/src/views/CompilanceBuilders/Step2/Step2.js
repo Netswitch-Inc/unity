@@ -7,7 +7,8 @@ import { Col, UncontrolledTooltip } from "reactstrap";
 import { scrollTop } from "utility/Utils";
 
 import SimpleSpinner from "components/spinner/simple-spinner";
-import iIcon from "assets/img/cis-icon.png";
+import infoIcon from "assets/img/info.png";
+
 const Step2 = React.forwardRef((props, ref) => {
   const [selectedControls, setSelectedControls] = useState([]);
   const [selectedFrameworks, setSelectedFrameworks] = useState([]);
@@ -26,10 +27,8 @@ const Step2 = React.forwardRef((props, ref) => {
 
   // Expose validation to parent component
   React.useImperativeHandle(ref, () => ({
-    isValidated: () => {
-      return selectedControls.length > 0 && selectedFrameworks.length > 0;
-    },
-  }));
+    isValidated: () => { return selectedControls.length > 0 && selectedFrameworks.length > 0 }
+  }))
 
   // Load visible controls based on scroll position
   useEffect(() => {
@@ -99,7 +98,7 @@ const Step2 = React.forwardRef((props, ref) => {
                     <div className="cis-icon">
                       <img
                         alt="icon"
-                        src={iIcon}
+                        src={infoIcon}
                         height={17}
                         id={`tooltip-icon-${item?._id}`}
                         className="i-icon-img cursor-pointer"
@@ -133,7 +132,7 @@ const Step2 = React.forwardRef((props, ref) => {
                       <div className="cis-icon">
                         <img
                           alt="icon"
-                          src={iIcon}
+                          src={infoIcon}
                           height={17}
                           className="cursor-pointer"
                           id={`tooltip-icon-${cisControl?._id}`}
@@ -173,11 +172,11 @@ const Step2 = React.forwardRef((props, ref) => {
     <div className="compliance-builder ps">
       <div className="row compliance-builder-row">
         <Col md={6} className="compliance-builder-col">
-          <div className="complaince-tab">Custom Compliance Framework</div>
+          <div className="complaince-tab">Custom Compliance Framework (CCF)</div>
         </Col>
 
         <Col md={6} className="compliance-builder-col">
-          <div className="complaince-tab">CIS Benchmark</div>
+          <div className="complaince-tab">CIS Benchmark: Sub-Controls</div>
         </Col>
       </div>
 

@@ -6,6 +6,7 @@ var AssessmentSchema = new mongoose.Schema({
     description: String,
     order: Number,
     show_score_calculation: Boolean,
+    additional_description: String,
     status: Number,
     deletedAt: Date
 }, { timestamps: true })

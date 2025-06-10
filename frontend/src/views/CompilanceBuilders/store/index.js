@@ -9,82 +9,73 @@ import { API_ENDPOINTS } from "utility/ApiEndPoints";
 
 async function getFrameworkListRequest(params) {
   return instance.get(`${API_ENDPOINTS.Framework.dropdown}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getFrameworkList = createAsyncThunk(
-  "appFrameworks/getFrameworkList",
-  async (params) => {
-    try {
-      const response = await getFrameworkListRequest(params);
-      if (response && response.flag) {
-        return {
-          frameworkItems: response?.data || [],
-          actionFlag: "Framework_LISTING",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          frameworkItems: [],
-          actionFlag: "Framework_LISTING_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const getFrameworkList = createAsyncThunk("appFrameworks/getFrameworkList", async (params) => {
+  try {
+    const response = await getFrameworkListRequest(params);
+    if (response && response.flag) {
       return {
-        params,
+        frameworkItems: response?.data || [],
+        actionFlag: "Framework_LISTING",
+        success: "",
+        error: ""
+      }
+    } else {
+      return {
         frameworkItems: [],
         actionFlag: "Framework_LISTING_ERROR",
         success: "",
-        error: error,
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      frameworkItems: [],
+      actionFlag: "Framework_LISTING_ERROR",
+      success: "",
+      error: error
     }
   }
-);
+})
 
 async function getControllerByFrameworkRequest(params) {
-  return instance
-    .get(`${API_ENDPOINTS.controls.listing}`, { params })
-    .then((items) => items.data)
-    .catch((error) => error);
+  return instance.get(`${API_ENDPOINTS.controls.listing}`, { params })
+    .then((items) => items.data).catch((error) => error)
 }
 
-export const getControllerListByFrameworkId = createAsyncThunk(
-  "appCompanys/getCompanyList",
-  async (params) => {
-    try {
-      const response = await getControllerByFrameworkRequest(params);
-      if (response && response.flag) {
-        return {
-          controllerItem: response.data || [],
-          complianceControlItems: response.data || [],
-          pagination: response?.pagination || null,
-          actionFlag: "CONTROL_VIA_FRAMEWORK_ID",
-          success: "",
-          error: "",
-        };
-      } else {
-        return {
-          controllerItem: [],
-          actionFlag: "CONTROL_VIA_FRAMEWORK_ID_ERROR",
-          success: "",
-          error: response.message,
-        };
-      }
-    } catch (error) {
+export const getControllerListByFrameworkId = createAsyncThunk("appFrameworks/getControllerListByFrameworkId", async (params) => {
+  try {
+    const response = await getControllerByFrameworkRequest(params);
+    if (response && response.flag) {
       return {
-        params,
+        controllerItem: response.data || [],
+        complianceControlItems: response.data || [],
+        pagination: response?.pagination || null,
+        actionFlag: "CONTROL_VIA_FRAMEWORK_ID",
+        success: "",
+        error: ""
+      }
+    } else {
+      return {
         controllerItem: [],
         actionFlag: "CONTROL_VIA_FRAMEWORK_ID_ERROR",
         success: "",
-        error: error.message, // Ensure error message is string
-      };
+        error: response.message
+      }
+    }
+  } catch (error) {
+    return {
+      params,
+      controllerItem: [],
+      actionFlag: "CONTROL_VIA_FRAMEWORK_ID_ERROR",
+      success: "",
+      error: error.message // Ensure error message is string
     }
   }
-);
+})
 
 // Create a slice
 const appAuthSlice = createSlice({
@@ -134,7 +125,8 @@ const appAuthSlice = createSlice({
       })
       .addCase(getControllerListByFrameworkId.fulfilled, (state, action) => {
         state.controllerItem = action.payload?.controllerItem;
-        state.complianceControlItems = action.payload?.complianceControlItems || [];
+        state.complianceControlItems =
+          action.payload?.complianceControlItems || [];
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
@@ -144,7 +136,7 @@ const appAuthSlice = createSlice({
         state.loading = true;
         state.success = "";
         state.error = "";
-      });
+      })
   }
 });
 

@@ -1259,7 +1259,7 @@ td.expanded-table > svg {
 }
 
 .ScrollingEffectGraph {
-  height: 750px;
+  /* height: 750px; */
   overflow-y: auto;
 }
 

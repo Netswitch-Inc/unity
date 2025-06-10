@@ -35,7 +35,7 @@ import moment from "moment";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 // ** Constant
-import { priviledgesObjectPermission } from "utility/reduxConstant.js";
+import { dashboardTopWidgetDefault, priviledgesObjectPermission } from "utility/reduxConstant.js";
 
 // ** Config
 import { wazuhKey, openVASKey, netswitchThreatIntelKey } from "configs/toolConfig.js";
@@ -87,7 +87,8 @@ const Dashboard = () => {
   const EnhancedSixLayers = ToggleComp(Sixlayers);
   const EnhancedCritcalIncident = ToggleComp(CritcalIncident);
   const EnhancedNetSwitchThreatIntel = ToggleComp(NetSwitchThreatIntelChart);
-  
+
+  // ** Const
   const enableWazuhGraph = toolsPermissions?.includes(wazuhKey) || false;
   const enableOpenVASGraph = toolsPermissions?.includes(openVASKey) || false;
   const enableNetswitchThreatIntel = toolsPermissions?.includes(netswitchThreatIntelKey) || false;
@@ -209,7 +210,7 @@ const Dashboard = () => {
     handleGetWazuhIndexerCountData();
     handleGetDashboardWidgets();
     handleGetNetSwitchThreatIntelCountData();
-  }, [handleGetWazuhIndexerCountData, handleGetDashboardWidgets,handleGetNetSwitchThreatIntelCountData]);
+  }, [handleGetWazuhIndexerCountData, handleGetDashboardWidgets, handleGetNetSwitchThreatIntelCountData]);
 
   const handleToggleFunc = async (setDatafunc, name, show) => {
     setDatafunc(() => show);
@@ -270,7 +271,7 @@ const Dashboard = () => {
           toggleIncidentByType: setToggleIncidentByType,
           toggleAgentChart: setToggleAgentChart,
           toggleCritcalIncident: setToggleCritcalIncident,
-          toggleNetSwitchIntelChart : setToggleNetSwitchIntelChart
+          toggleNetSwitchIntelChart: setToggleNetSwitchIntelChart
         }
 
         if (widgetStateMap[widget.name]) {
@@ -467,7 +468,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Log Processed</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        178GB
+                        {dashboardTopWidgetDefault ? ("178GB") : ("0")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -497,7 +498,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Traffic Monitored</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        1.82TB
+                        {dashboardTopWidgetDefault ? ("1.82TB") : ("0")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -527,7 +528,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Protected Devices</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        265
+                        {dashboardTopWidgetDefault ? ("265") : ("0")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -557,7 +558,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Last Threat Intel</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {lastIntelDate}
+                        {dashboardTopWidgetDefault ? (lastIntelDate) : ("None")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -587,7 +588,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Blocked Traffic</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        98k
+                        {dashboardTopWidgetDefault ? ("98k") : ("0")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -617,7 +618,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Incidents</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        2
+                        {dashboardTopWidgetDefault ? ("2") : ("0")}
                       </CardTitle>
                     </div>
                   </Col>

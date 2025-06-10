@@ -7,6 +7,8 @@ var ProjectSchema = new mongoose.Schema({
     framework_id: [{ type: mongoose.Schema.Types.ObjectId, ref: "frameworks" }],
     involved_parties: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
     submitted_by: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+    company_compliance_control_id: { type: mongoose.Schema.Types.ObjectId, ref: "company_compliance_controls" },
+    cis_control_id: { type: mongoose.Schema.Types.ObjectId, ref: 'cis_controls' },
     name: String,
     description: String,
     cost_of_risk: Number,

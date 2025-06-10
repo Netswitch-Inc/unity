@@ -21,7 +21,7 @@ const SelectFramewroksModal = ({
         setSelectFramework([]);
     }, [closeModal])
 
-    const handleOpen = () => {
+    const handleModalOpen = () => {
         setSelectFramework(compliance || []);
     }
 
@@ -62,16 +62,16 @@ const SelectFramewroksModal = ({
     return (
         <Modal
             centered
-            size="lg"
+            size="xl"
             show={open}
             backdrop="static"
-            onShow={handleOpen}
+            onShow={handleModalOpen}
             className="UpdateUserPopup modal-design"
             aria-labelledby="example-modal-sizes-title-lg"
         >
             <Modal.Header>
                 <span className='modal-title col-sm-12' id="example-modal-sizes-title-lg">
-                    <h3 className='border-bottom mb-0 mt-0'>Select Framework</h3>
+                    <h3 className='mb-0 mt-0'>Select Framework</h3>
                 </span>
 
                 <button type="button" className='Close-button' onClick={handleReset}>×</button>

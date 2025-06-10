@@ -191,7 +191,7 @@ function AdminNavbar(props) {
                         className="nav-item"
                         onClick={() => navigate("/admin/company-profile")}
                       >
-                        Company Profile
+                        Location Profile
                       </DropdownItem>
                     </NavLink>
                   ) : null}

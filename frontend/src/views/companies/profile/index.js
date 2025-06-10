@@ -35,7 +35,7 @@ import { cleanCompanyMessage } from "../store";
 
 // Validation schema using Yup
 const validationSchema = Yup.object({
-  name: Yup.string().required("Company name is required"),
+  name: Yup.string().required("Location name is required"),
   country_code: Yup.object().nullable(),
   contact_no: Yup.string()
     .min(8, "Invalid contact number (Minimum 8 Digits Are Required)")
@@ -197,7 +197,7 @@ const CompanyProfile = () => {
                     <a href="#pablo" onClick={(e) => e.preventDefault()}>
                       {initialCompanyItem?.logo ? (
                         <img
-                          alt="Company Profile"
+                          alt="Location Profile"
                           className="avatar"
                           src={imagePreviewUrl}
                         />
@@ -246,13 +246,13 @@ const CompanyProfile = () => {
                         >
                           <BootstrapForm.Group controlId="formGridCompanyName">
                             <BootstrapForm.Label className="col-label">
-                              Company Name
+                              Location Name
                             </BootstrapForm.Label>
                             <Field
                               type="text"
                               name="name"
                               className="col-input w-100"
-                              placeholder="Enter Company Name"
+                              placeholder="Enter location name"
                             />
                             <ErrorMessage
                               name="name"

@@ -11,7 +11,7 @@ const isObjEmpty = (obj) => Object.keys(obj).length === 0;
 const kFormatter = (num) => (num > 999 ? `${(num / 1000).toFixed(1)}k` : num);
 
 // ** Converts HTML to string
-const htmlToString = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
+const htmlToString = (html) => html?.replace(/<\/?[^>]+(>|$)/g, "");
 
 // ** Checks if the passed date is today
 const isToday = (date) => {
@@ -32,10 +32,7 @@ const isToday = (date) => {
  * @param {String} value date to format
  * @param {Object} formatting Intl object to format with
  */
-const formatDate = (
-  value,
-  formatting = { month: "short", day: "numeric", year: "numeric" }
-) => {
+const formatDate = (value, formatting = { month: "short", day: "numeric", year: "numeric" }) => {
   if (!value) return value;
   return new Intl.DateTimeFormat("en-US", formatting).format(new Date(value));
 }
@@ -119,6 +116,32 @@ const setAccessToken = (token) => {
     }
   } catch (error) {
     console.log(">>>>: src/utility/Utils.js : setAccessToken -> error", error);
+  }
+}
+
+/* Get app setting from local storage */
+const getLocalAppSetting = () => {
+  let appSetting = null;
+  try {
+    appSetting = localStorage.getItem("lcl_app_setting") !== null ? JSON.parse(localStorage.getItem("lcl_app_setting")) : null;
+  } catch (error) {
+    console.log(">>>>: src/utility/Utils.js  : getLocalAppSetting -> error", error);
+    appSetting = null;
+  }
+
+  return appSetting
+}
+
+/* Set app setting on local storage */
+const setLocalAppSetting = (item = null) => {
+  try {
+    if (item) {
+      localStorage.setItem("lcl_app_setting", JSON.stringify(item));
+    } else {
+      localStorage.removeItem("lcl_app_setting");
+    }
+  } catch (error) {
+    console.log(">>>>: src/utility/Utils.js : setLocalAppSetting -> error", error);
   }
 }
 
@@ -276,6 +299,12 @@ const getLastWeekTimestamp = () => {
   }
 }
 
+/* Return html value inside inner html */
+const setInnerHtml = (value = "", classValue = "m-0") => {
+  return (
+    <div className={classValue} dangerouslySetInnerHTML={{ __html: value }} />
+  )
+}
 
 /* Export functions */
 export {
@@ -292,6 +321,8 @@ export {
   logoutCurrentUser,
   getAccessToken,
   setAccessToken,
+  getLocalAppSetting,
+  setLocalAppSetting,
   onImageSrcError,
   getModulePermissionData,
   scrollTop,
@@ -302,5 +333,6 @@ export {
   formatFileSize,
   getDomailUrl,
   getLastWeekTimestamp,
-  arrayJoinWithPipe
+  arrayJoinWithPipe,
+  setInnerHtml
 }

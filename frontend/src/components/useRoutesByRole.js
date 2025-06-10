@@ -25,9 +25,17 @@ const useRoutesByRole = () => {
         }
     }, [getUserRole, loginStore.authUserItem])
 
-    function getFilteredRoutes(permission, routes) {
+    const getFilteredRoutes = useCallback((permission, routes) => {
+        const routesCopy = routes.map(route => ({
+            // copy all top‑level keys (including component)
+            ...route,
+            // shallow‑clone the views array so our filter won't mutate the original
+            views: route.views ? [...route.views] : undefined
+        }));
+        // const routesCopy = [...routes];
+
         const toolsPermission = permission?.toolsPermission || [];
-        const filterRoutes = routes.reduce((acc, route) => {
+        const filterRoutes = routesCopy.reduce((acc, route) => {
             if (route?.toolId && !toolsPermission.includes(route?.toolId)) {
                 return acc
             }
@@ -38,23 +46,25 @@ const useRoutesByRole = () => {
                 }
 
                 const viewPermissions = permission[route.permissionId];
-                route.views = route.views.filter((view) => {
-                    const permission = viewPermissions.find((x) => x.slug === view.permissionId);
-                    let flag = false;
-                    if (permission?.can_read) { flag = true; }
+                if (route.views) {
+                    route.views = route.views.filter((view) => {
+                        const permission = viewPermissions.find((x) => x.slug === view.permissionId);
+                        let flag = false;
+                        if (permission?.can_read) { flag = true; }
 
-                    if (view?.toolId) {
-                        flag = toolsPermission.includes(view.toolId) || false;
-                    }
+                        if (view?.toolId) {
+                            flag = toolsPermission.includes(view.toolId) || false;
+                        }
 
-                    if (view?.toolId && !permission?.can_read) {
-                        flag = false;
-                    }
+                        if (view?.toolId && !permission?.can_read) {
+                            flag = false;
+                        }
 
-                    return flag || false;
-                })
+                        return flag || false;
+                    })
 
-                if (route?.views?.length) { acc.push(route) }
+                    if (route?.views?.length) { acc.push(route) }
+                }
 
                 return acc
             }
@@ -64,7 +74,7 @@ const useRoutesByRole = () => {
         }, [])
 
         setFilteredRoutes(filterRoutes)
-    }
+    }, [])
 
     useEffect(() => {
         if (loginStore?.actionFlag || loginStore?.success || loginStore?.error) {
@@ -79,7 +89,7 @@ const useRoutesByRole = () => {
         if (loginStore?.error && loginStore?.actionFlag === "AUTH_ROLE_PERMISSION_ERR") {
             setError(true);
         }
-    }, [loginStore.actionFlag, loginStore.success, loginStore.error, loginStore.authRolePermission, dispatch])  
+    }, [getFilteredRoutes, loginStore.actionFlag, loginStore.success, loginStore.error, loginStore.authRolePermission, dispatch])
 
     return (
         { error, menuRoutes: filteredRoutes }

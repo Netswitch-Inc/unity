@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** Axios Imports
 import instance from "../../../utility/AxiosConfig";
 
+// ** Constant
 import { API_ENDPOINTS } from "utility/ApiEndPoints";
 import { initialConnectionItem } from "utility/reduxConstant";
 
@@ -18,7 +19,7 @@ export const getConnectionList = createAsyncThunk("appConnections/getConnectionL
     if (response && response.flag) {
       return {
         params,
-        ConnectionItems: response?.data || [],
+        connectionItems: response?.data || [],
         pagination: response?.pagination || null,
         actionFlag: "CONN_LSTN",
         success: "",
@@ -27,7 +28,7 @@ export const getConnectionList = createAsyncThunk("appConnections/getConnectionL
     } else {
       return {
         params,
-        ConnectionItems: [],
+        connectionItems: [],
         actionFlag: "",
         success: "",
         error: response.message
@@ -36,7 +37,7 @@ export const getConnectionList = createAsyncThunk("appConnections/getConnectionL
   } catch (error) {
     return {
       params,
-      ConnectionItems: [],
+      connectionItems: [],
       actionFlag: "",
       success: "",
       error: error
@@ -182,7 +183,7 @@ export const deleteConnection = createAsyncThunk("appConnections/deleteConnectio
 const appAuthSlice = createSlice({
   name: "appConnections",
   initialState: {
-    ConnectionItems: [],
+    connectionItems: [],
     connectionItem: initialConnectionItem,
     pagination: null,
     actionFlag: "",
@@ -200,13 +201,13 @@ const appAuthSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getConnectionList.pending, (state) => {
-        state.ConnectionItems = [];
+        state.connectionItems = [];
         state.loading = false;
         state.success = "";
         state.error = "";
       })
       .addCase(getConnectionList.fulfilled, (state, action) => {
-        state.ConnectionItems = action.payload?.ConnectionItems || [];
+        state.connectionItems = action.payload?.connectionItems || [];
         state.pagination = action.payload?.pagination || null;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag || "";

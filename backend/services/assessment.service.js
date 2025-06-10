@@ -79,6 +79,7 @@ exports.createAssessment = async function (assessment) {
     description: assessment.description ? assessment.description : "",
     order: assessment.order ? assessment.order : 0,
     show_score_calculation: assessment.show_score_calculation ? assessment.show_score_calculation : false,
+    additional_description: assessment.additional_description ? assessment.additional_description : "",
     status: assessment.status ? assessment.status : 0,
     deletedAt: null
   })
@@ -124,6 +125,10 @@ exports.updateAssessment = async function (assessment) {
 
   if (assessment?.status || assessment.status == 0) {
     oldAssessment.status = assessment?.status || 0;
+  }
+
+  if (assessment?.additional_description) {
+    oldAssessment.additional_description = assessment.additional_description;
   }
 
   if (assessment?.deletedAt) {
