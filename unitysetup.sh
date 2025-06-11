@@ -179,6 +179,7 @@ update_environment_file "$BACKEND_ENV_FILE" "BACK_UNITY_URL" "$BACKEND_API_URL"
 
 # Update frontend .env
 print_yellow "Updating frontend .env file..."
+update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_BASENAME" "$COMPANY_NAME"
 update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_BACKEND_REST_API_URL" "$BACKEND_API_URL"
 update_environment_file "$FRONTEND_ENV_FILE" "PORT" "$FRONTEND_PORT"
 update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_COMPANY_NAME" "$COMPANY_NAME"
