@@ -39,6 +39,7 @@
         appSetting = null
       }
 
+      if (appSetting?.name) { document.title = appSetting.name; }
       if (appSetting?.favicon) {
         // Get the existing favicon link tag
         const existFavicon = document.querySelector("link[rel~='icon']");
