@@ -67,19 +67,58 @@ until mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.runComm
 done
 echo "✅ MongoDB is up and running."
 
-MONGO_DB_COLLECTION=modules
+MONGO_DB_COLLECTIONS="modules,settings"
 
-# Check and drop the collection if it exists before import
-if [ -n "$MONGO_DB_COLLECTION" ]; then
-  COLLECTION_EXISTS=$(mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.getSiblingDB('$MONGO_DB_NAME').getCollectionNames().includes('$MONGO_DB_COLLECTION')" --quiet)
-  
-  if [ "$COLLECTION_EXISTS" = "true" ]; then
-    echo "⚠️ Dropping existing collection: $MONGO_DB_COLLECTION"
-    mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.getSiblingDB('$MONGO_DB_NAME').$MONGO_DB_COLLECTION.drop()"
-  else
-    echo "✅ Collection $MONGO_DB_COLLECTION does not exist, skipping drop step."
-  fi
+# Validate required env vars
+if [ -z "$MONGO_DB_NAME" ] || [ -z "$MONGO_DB_HOST" ] || [ -z "$MONGO_DB_PORT" ]; then
+  echo "❌ Missing required MongoDB environment variables (MONGO_DB_NAME, MONGO_DB_HOST, MONGO_DB_PORT)."
+  exit 1
 fi
+
+# Split the comma-separated list into an array
+IFS=',' read -ra COLLECTION_ARRAY <<< "$MONGO_DB_COLLECTIONS"
+
+for COLLECTION in "${COLLECTION_ARRAY[@]}"; do
+  COLLECTION=$(echo "$COLLECTION" | xargs) # Trim whitespace
+
+  if [ -z "$COLLECTION" ]; then
+    echo "⚠️ Skipping empty collection name."
+    continue
+  fi
+
+  echo "🔍 Checking if collection '$COLLECTION' exists..."
+
+  COLLECTION_EXISTS=$(mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "
+    try {
+      db.getSiblingDB('$MONGO_DB_NAME').getCollectionNames().includes('$COLLECTION');
+    } catch (e) {
+      print('ERROR: ' + e.message);
+      false;
+    }
+  " --quiet 2>/dev/null)
+
+  if [[ "$COLLECTION_EXISTS" == "true" ]]; then
+    echo "⚠️ Dropping existing collection: $COLLECTION"
+
+    DROP_RESULT=$(mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "
+      try {
+        db.getSiblingDB('$MONGO_DB_NAME').$COLLECTION.drop();
+      } catch (e) {
+        print('ERROR: Failed to drop $COLLECTION - ' + e.message);
+      }
+    " --quiet 2>/dev/null)
+
+    if echo "$DROP_RESULT" | grep -qi "ERROR"; then
+      echo "❌ Error while dropping '$COLLECTION': $DROP_RESULT"
+    else
+      echo "✅ Collection '$COLLECTION' dropped successfully."
+    fi
+  elif [[ "$COLLECTION_EXISTS" == "false" ]]; then
+    echo "✅ Collection '$COLLECTION' does not exist. Skipping."
+  else
+    echo "❌ Failed to determine if collection '$COLLECTION' exists. Output: $COLLECTION_EXISTS"
+  fi
+done
 
 # Import the database dump
 if [ -d "$MONGO_DB_DUMP_DIR" ]; then
