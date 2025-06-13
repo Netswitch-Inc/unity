@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
+// ** React Imports
 import React, { useEffect, useState, useMemo, useRef, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
 import { getHistoryList } from "./projectHistoryStore";
 import { updateProject, cleanProjectMessage } from "../projects/store/index";
@@ -43,6 +44,7 @@ const ProjectDetailsCard = (props) => {
   const navigate = useNavigate();
   let id = props.displayID;
   let riskData = props.data;
+  
   const allowed = riskData?.status === 'created';
 
   const historyStore = useSelector((state) => state.history);
@@ -513,7 +515,9 @@ const ProjectDetailsCard = (props) => {
             maxHeight: leftSectionRef?.current?.offsetHeight > 0 ? `${leftSectionRef.current.offsetHeight}px` : "0px",
             overflow: "auto",
           }}>
-            <div className="description time-history">Project History</div>
+            <div className="description time-history">
+              Project History
+            </div>
 
             <CardBody>{timelineItems}</CardBody>
           </Card>

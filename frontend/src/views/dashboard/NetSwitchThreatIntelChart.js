@@ -1,11 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+// ** React Imports
 import React, { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { netSwitchThreatIntelCountryCount } from "./store/index";
 
-import { Chart } from "react-google-charts";
-
+// ** Reactstrap Imports
 import {
   CardBody,
   Dropdown,
@@ -16,6 +18,10 @@ import {
   DropdownToggle
 } from "reactstrap";
 
+// ** Third Party Components
+import { Chart } from "react-google-charts";
+
+// ** Constant
 import { OptionsForNetSwitchThreatIntelGraph } from "utility/reduxConstant";
 
 // ** SVG Icons
@@ -30,9 +36,11 @@ const NetSwitchThreatIntelChart = () => {
   const store = useSelector((state) => state.dashboard);
   const link = store?.netSwitchThreatIntelCount?.link || "";
 
+  const defaultChartData = [["Country", "Threat Count"]]
+
   // ** States
   const [timeInterval, setTimeInterval] = useState({ label: "Day", value: "day" });
-  const [chartData, setChartData] = useState(["Country", "Threat Count"]);
+  const [chartData, setChartData] = useState(defaultChartData);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = useCallback(() => setDropdownOpen((prevState) => !prevState), [])
@@ -54,12 +62,8 @@ const NetSwitchThreatIntelChart = () => {
   }
 
   useEffect(() => {
-    if (
-      store?.actionFlag === "NSTI_CNT_SCS" ||
-      store?.actionFlag === "NSTI_CNT_ERR"
-    ) {
-      let newChartData = [["Country", "Threat Count"]];
-
+    if (store?.actionFlag === "NSTI_CNT_SCS" || store?.actionFlag === "NSTI_CNT_ERR") {
+      let newChartData = defaultChartData;
       const threatData = store?.netSwitchThreatIntelCount?.data;
 
       if (Array.isArray(threatData) && threatData.length > 1) {
@@ -69,7 +73,7 @@ const NetSwitchThreatIntelChart = () => {
         ];
         setChartData(newChartData);
       } else {
-        setChartData(null);
+        setChartData(defaultChartData);
       }
     }
   }, [store?.actionFlag, store?.netSwitchThreatIntelCount?.data]);

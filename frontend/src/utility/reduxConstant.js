@@ -220,7 +220,7 @@ const initCompanyComplianceControlItem = { _id: "", company_id: null, user_id: n
 const initCompliancePriorityItem = { _id: "", company_id: null, user_id: null, name: "", description: "", status: true }
 
 const draftEditorToolbarConfig = {
-  options: ["blockType", "inline", "list", "textAlign", "history", "remove"],
+  options: ["blockType", "inline", "list", "textAlign", "link", "image", "history", "remove"],
   blockType: {
     inDropdown: true,
     options: ["Normal", "H1", "H2", "H3", "H4", "H5", "H6"]
@@ -231,6 +231,18 @@ const draftEditorToolbarConfig = {
   },
   textAlign: {
     options: ["left", "center", "right"],
+  },
+  link: {
+    options: ["link"],
+    defaultTargetOption: "_blank",
+    showOpenOptionOnHover: true,
+    showRemoveOption: true,
+  },
+  image: {
+    uploadEnabled: false, // change to true if you want uploads
+    urlEnabled: true,
+    previewImage: true,
+    alt: { present: true, mandatory: false },
   },
   history: {
     options: ["undo", "redo"],

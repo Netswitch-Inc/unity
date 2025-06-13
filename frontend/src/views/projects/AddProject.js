@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // ** React Imports
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // ** Store & Actions
@@ -48,6 +48,7 @@ const AddProject = () => {
   const store = useSelector((state) => state.projects);
   const userStore = useSelector((state) => state.user);
 
+  const from = location?.state?.from || "";
   const controlItemData = location?.state?.control_data || null;
   // const queryParams = new URLSearchParams(location?.search);
   // const controlId = queryParams.get("control_id");
@@ -105,6 +106,14 @@ const AddProject = () => {
       .required("Fix projected cost is required.")
   });
 
+  const handleBack = useCallback(() => {
+    if(from === "resilience" && controlItemData) {
+      navigate(`/admin/resilience-index`, { state: { control_data: controlItemData } })
+    } else {
+      navigate("/admin/risk-assessment")
+    }
+  }, [navigate, controlItemData, from])
+
   useLayoutEffect(() => {
     dispatch(getFrameworkList());
     if (authUser?.role_id?._id === superAdminRole) {
@@ -154,7 +163,7 @@ const AddProject = () => {
 
   useEffect(() => {
     if (store?.actionFlag === "PRJCT_CRTD_SCS") {
-      setTimeout(() => { navigate("/admin/risk-assessment") }, 2000);
+      setTimeout(() => { handleBack() }, 2000);
     }
 
     if (store.success) {
@@ -166,7 +175,7 @@ const AddProject = () => {
       setshowSnackbar(true);
       setSnakbarMessage(store.error);
     }
-  }, [store?.actionFlag, store.success, store.error]);
+  }, [handleBack, store?.actionFlag, store.success, store.error]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -472,7 +481,7 @@ const AddProject = () => {
                       <button
                         type="button"
                         className="btnsecondary ml-3"
-                        onClick={() => navigate("/admin/risk-assessment")}
+                        onClick={() => handleBack()}
                       >
                         Back
                       </button>

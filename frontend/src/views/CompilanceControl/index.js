@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // ** React Imports
 import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
@@ -36,22 +36,27 @@ import SelectSolutionTool from "views/CompilanceBuilders/Step3/model/SelectSolut
 const CompilanceController = () => {
   // ** Hooks
   const navigate = useNavigate();
-  const rightSectionRef = useRef(null)
+  const location = useLocation();
+  const rightSectionRef = useRef(null);
 
   const dispatch = useDispatch();
   const store = useSelector((state) => state.complincecontrol);
   const loginStore = useSelector((state) => state.login);
   const companyComplianceControlStore = useSelector((state) => state.companyComplianceControls);
+
+  // ** Const
   const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
+  const routeStateData = location?.state || null;
 
   // ** States
-  const [showSnackBar, setshowSnackbar] = useState(false)
+  const [showSnackBar, setshowSnackbar] = useState(false);
   const [openSolutionModal, setSolutionModal] = useState(false);
-  const [selectedControl, setSelectedControl] = useState(null)
-  const [prioritiesOptions, setPrioritiesOptions] = useState([])
-  const [selectedPriority, setSelectedPriority] = useState(null)
-  const [complianceControlData, setComplianceControlData] = useState([])
-  const [rightSectionHeight, setRightSectionHeight] = useState(0)
+  const [selectedControl, setSelectedControl] = useState(null);
+  const [prioritiesOptions, setPrioritiesOptions] = useState([]);
+  const [selectedPriority, setSelectedPriority] = useState(null);
+  const [complianceControlData, setComplianceControlData] = useState([]);
+  const [rightSectionHeight, setRightSectionHeight] = useState(0);
+  const [controlItemData, setControlItemData] = useState(routeStateData?.control_data || null);
 
   const handleOpenSolutionModal = () => {
     setSolutionModal(true);
@@ -62,12 +67,18 @@ const CompilanceController = () => {
   }
 
   useLayoutEffect(() => {
-    dispatch(getCompanyComplianceControlList({
+    const query = {
       company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
       user_id: authUserItem?._id || "",
       compliance_priority_id: ""
-    }))
-  }, [authUserItem]);
+    }
+
+    if (controlItemData?.compliance_priority_id) {
+      query.compliance_priority_id = controlItemData?.compliance_priority_id?._id || controlItemData?.compliance_priority_id;
+    }
+
+    dispatch(getCompanyComplianceControlList(query))
+  }, [authUserItem, routeStateData]);
 
   const handleSelectedControlData = (item) => {
     setSelectedControl(() => item);
@@ -78,7 +89,7 @@ const CompilanceController = () => {
     dispatch(getCompanyComplianceControlList({
       company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
       user_id: authUserItem?._id || "",
-      compliance_priority_id: item?._id || "",
+      compliance_priority_id: item?._id || ""
     }))
   }
 
@@ -100,6 +111,7 @@ const CompilanceController = () => {
 
       let list1 = []
       let list2 = []
+      let defaultControl = null;
       let compliancePriority = companyComplianceControlData?.compliancePriority || null
       if (companyComplianceControlData.compliancePriorities) {
         list1 = companyComplianceControlData.compliancePriorities.map((item) => {
@@ -123,17 +135,25 @@ const CompilanceController = () => {
             ...item?.control_id,
             project_id: item?.project_id || null,
             company_compliance_control_id: item?._id || "",
-            tool_icons: item?.tool_icons || ""
+            tool_icons: item?.tool_icons || "",
+            compliance_priority_id: compliancePriority?._id || ""
           }
         }) || []
+
+        defaultControl = list2?.length ? list2[0] : null;
+        if(controlItemData?._id) {
+          const control = list2.find((x) => x._id === controlItemData._id) || null;
+          defaultControl = control?._id ? control : defaultControl;
+          setControlItemData(null);
+        }
       }
 
-      setSelectedControl(list2?.length ? list2[0] : null)
+      setSelectedControl(defaultControl)
       setSelectedPriority(compliancePriority)
       setPrioritiesOptions(list1)
       setComplianceControlData(list2)
     }
-  }, [companyComplianceControlStore.companyComplianceControlData, companyComplianceControlStore.actionFlag, companyComplianceControlStore.success, companyComplianceControlStore.error, dispatch]);
+  }, [dispatch, companyComplianceControlStore.companyComplianceControlData, companyComplianceControlStore.actionFlag, companyComplianceControlStore.success, companyComplianceControlStore.error, controlItemData]);
 
   useEffect(() => {
     setTimeout(() => {

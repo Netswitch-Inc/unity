@@ -7802,6 +7802,18 @@ pre {
     .rdw-option-wrapper.rdw-option-disabled {
       opacity: 0.8;
     }
+
+    .rdw-link-wrapper {
+      .rdw-link-modal {
+        background: $bg-color !important;
+      }
+    }
+
+    .rdw-image-wrapper {
+      .rdw-image-modal {
+        background: $bg-color !important;
+      }
+    }
   }
 
   .rdw-option-wrapper {

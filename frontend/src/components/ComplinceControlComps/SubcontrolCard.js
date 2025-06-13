@@ -46,6 +46,7 @@ function SubControlCard(props) {
   const { authUserItem, selectedControl, handleOpenSolutionModal } = props;
   const projectItemData = selectedControl?.project_id || null;
   const projectStatus = ["cancelled", "completed"];
+  const cisControlId = projectItemData?.cis_control_id?._id || projectItemData?.cis_control_id || null;
 
   // ** States
   const [toolModalOpen, setToolModalOpen] = useState("");
@@ -291,11 +292,20 @@ function SubControlCard(props) {
         {
           Header: "Project",
           Cell: ({ row }) => (<>
-            {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+            {projectItemData?._id && cisControlId === row?.original?._id ? (
               <div className="buttons">
                 <button
                   className="btnprimary mt-0"
-                  onClick={() => navigate(`/admin/project/add`, { state: { control_data: { ...selectedControl, cis_control_id: row?.original?._id || "" } } })}
+                  onClick={() => navigate(`/admin/project-details/${projectItemData._id}`, { state: { displayID: projectItemData._id, from: 'resilience', control_data: { ...selectedControl, cis_control_id: cisControlId } } })}
+                >
+                  View Project
+                </button>
+              </div>
+            ) : (!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status))) ? (
+              <div className="buttons">
+                <button
+                  className="btnprimary mt-0"
+                  onClick={() => navigate(`/admin/project/add`, { state: { from: 'resilience', control_data: { ...selectedControl, cis_control_id: row?.original?._id || "" } } })}
                 >
                   Add Project
                 </button>
@@ -477,6 +487,7 @@ function SubControlCard(props) {
             <Row>
               <Col>
                 <SubControlTable
+                  cisControlId={cisControlId}
                   data={selectedControl?.cis_control_id || []}
                   columns={subControlColumns}
                 />
