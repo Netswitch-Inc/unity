@@ -111,7 +111,7 @@ exports.updateAssessment = async function (assessment) {
     oldAssessment.name = assessment.name;
   }
 
-  if (assessment.description) {
+  if (assessment?.description || assessment.description == "") {
     oldAssessment.description = assessment.description;
   }
 
@@ -127,7 +127,7 @@ exports.updateAssessment = async function (assessment) {
     oldAssessment.status = assessment?.status || 0;
   }
 
-  if (assessment?.additional_description) {
+  if (assessment?.additional_description || assessment.additional_description == "") {
     oldAssessment.additional_description = assessment.additional_description;
   }
 
