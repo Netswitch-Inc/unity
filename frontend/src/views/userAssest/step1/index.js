@@ -13,7 +13,7 @@ import {
 
 // ** Reactstrap Imports
 import { Row, Col } from "react-bootstrap";
-import { Card, CardBody, FormGroup } from "reactstrap";
+import { Card, CardBody, FormGroup, FormFeedback } from "reactstrap";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
@@ -55,6 +55,7 @@ const CompanyInfoStep = () => {
 
     // Define the validation schema
     const validationSchema = Yup.object().shape({
+        name: Yup.string().required("Name number is required."),
         email: Yup.string().email("Invalid email format.")
             .required("Email is required."),
         mobile: Yup.string().required("Mobile number is required.")
@@ -191,15 +192,14 @@ const CompanyInfoStep = () => {
                                 validationSchema={validationSchema}
                                 onSubmit={onSubmit}
                             >
-                                {({ setFieldValue, values, errors, isSubmitting, touched }) => (
+                                {({ values, errors, touched, isSubmitting, setFieldValue, setFieldTouched }) => (
                                     <Form>
-                                        <Row className="mb-3">
-                                            <Col xl={6} className="mb-3 mb-xl-0">
+                                        <Row>
+                                            {/* <Col xl={6} className="mb-3 mb-xl-0">
                                                 <FormGroup
                                                     controlId="formGridCompanyName"
                                                     className="mb-0"
                                                 >
-                                                    {/* <BootstrapForm.Label>Company Name</BootstrapForm.Label> */}
                                                     <label className="col-label form-label">Company Name</label>
                                                     <Field
                                                         type="text"
@@ -208,19 +208,13 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter Company Name"
                                                     />
                                                     {errors.company_name && touched.company_name && (
-                                                        <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.company_name}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.company_name}</FormFeedback>
                                                     )}
                                                 </FormGroup>
-                                            </Col>
+                                            </Col> */}
 
-                                            <Col xl={6}>
-                                                <FormGroup
-                                                    controlId="formGridCompanyName"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Contact Name</BootstrapForm.Label> */}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridCompanyName" className="mb-0">
                                                     <label className="col-label form-label">Contact Name</label>
                                                     <Field
                                                         type="text"
@@ -229,21 +223,13 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter Contact Name"
                                                     />
                                                     {errors.name && touched.name && (
-                                                        <div style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.name}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.name}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
 
-                                        <Row className="mb-3">
-                                            <Col xl={6} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridEmailAddress"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Email Address</BootstrapForm.Label>\ */}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridEmailAddress" className="mb-0">
                                                     <label className="col-label form-label">Email Address <span style={{ color: 'red' }}>*</span> </label>
                                                     <Field
                                                         type="email"
@@ -252,19 +238,13 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter Your Email Address"
                                                     />
                                                     {errors.email && touched.email && (
-                                                        <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.email}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.email}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
 
-                                            <Col xl={6}>
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0 mobile-no country-drpdwn"
-                                                >
-                                                    {/* <BootstrapForm.Label>Mobile Number</BootstrapForm.Label> */}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0 mobile-no country-drpdwn">
                                                     <label className="col-label form-label">Mobile Number <span style={{ color: 'red' }}>*</span> </label>
                                                     {/*  <Field type="text" name="mobile" className="col-input w-100" placeholder="Enter Contact Number" /> */}
                                                     <PhoneInput
@@ -275,55 +255,37 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter mobile number"
                                                         disableDropdown={false}
                                                         countryCodeEditable={false}
-                                                        onChange={(val, data) =>
-                                                            changeMobileValue(
-                                                                "mobile",
-                                                                val,
-                                                                data,
-                                                                setFieldValue
-                                                            )
-                                                        }
-                                                    // onBlur={() => setFieldTouched('mobile', true)}
+                                                        onChange={(val, data) => changeMobileValue("mobile", val, data, setFieldValue)}
+                                                        onBlur={() => setFieldTouched('mobile', true)}
                                                     />
                                                     {errors.mobile && touched.mobile && (
-                                                        <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.mobile}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.mobile}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
 
-                                        <Row className="mb-3">
-                                            <Col xl={6}>
-                                                {/* <BootstrapForm.Label>Business Type</BootstrapForm.Label> */}
-                                                <label className="col-label form-label">Business Type</label>
-                                                {businessType && (
-                                                    <Select
-                                                        name="business_type"
-                                                        className="react-select col-select w-100"
-                                                        classNamePrefix="react-select"
-                                                        placeholder="Select Business Type..."
-                                                        value={values?.business_type}
-                                                        options={businessType}
-                                                        onChange={(type) => {
-                                                            setFieldValue("business_type", type);
-                                                        }}
-                                                    />
-                                                )}
-                                                {errors.business_type && touched.business_type && (
-                                                    <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                        {errors.business_type}
-                                                    </div>
-                                                )}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
+                                                    <label className="col-label form-label">Business Type</label>
+                                                    {businessType && (
+                                                        <Select
+                                                            name="business_type"
+                                                            className="react-select col-select w-100"
+                                                            classNamePrefix="react-select"
+                                                            placeholder="Select Business Type..."
+                                                            value={values?.business_type}
+                                                            options={businessType}
+                                                            onChange={(type) => setFieldValue("business_type", type) }
+                                                        />
+                                                    )}
+                                                    {errors.business_type && touched.business_type && (
+                                                        <FormFeedback className="d-block">{errors?.business_type}</FormFeedback>
+                                                    )}
+                                                </FormGroup>
                                             </Col>
 
-                                            <Col xl={6} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Number of Employees</BootstrapForm.Label> */}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Number of Employees</label>
                                                     <Field
                                                         type="number"
@@ -332,45 +294,29 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter Number of Employees"
                                                     />
                                                     {errors.team_size && touched.team_size && (
-                                                        <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.team_size}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.team_size}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
 
-                                        <Row className="mb-3">
-                                            <Col xl={12}>
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label> Description of Operations</BootstrapForm.Label> */}
+                                            <Col xl={12} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Description of Operations</label>
                                                     <Field
+                                                        as="textarea"
                                                         type="textarea"
                                                         name="operation_description"
                                                         className="col-input w-100"
                                                         placeholder="Enter Description of Operations"
                                                     />
-                                                    {errors.operation_description &&
-                                                        touched.operation_description && (
-                                                            <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                                {errors.operation_description}
-                                                            </div>
-                                                        )}
+                                                    {errors.operation_description && touched.operation_description && (
+                                                        <FormFeedback className="d-block">{errors?.operation_description}</FormFeedback>
+                                                    )}
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
 
-                                        <Row className="mb-3">
-                                            <Col xl={6} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Address 1</BootstrapForm.Label> */}
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Address 1</label>
                                                     <Field
                                                         type="text"
@@ -379,18 +325,13 @@ const CompanyInfoStep = () => {
                                                         placeholder="Enter Address Line 1"
                                                     />
                                                     {errors.address1 && touched.address1 && (
-                                                        <div className="error" style={{ color: "red", marginTop: "3px" }}>
-                                                            {errors.address1}
-                                                        </div>
+                                                        <FormFeedback className="d-block">{errors?.address1}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
-                                            <Col xl={6}>
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Address 2</BootstrapForm.Label> */}
+
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Address 2</label>
                                                     <Field
                                                         type="text"
@@ -400,14 +341,9 @@ const CompanyInfoStep = () => {
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
-                                        <Row className="mb-3">
-                                            <Col lg={6} xl={3} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>City</BootstrapForm.Label> */}
+
+                                            <Col lg={6} xl={3} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">City</label>
                                                     <Field
                                                         type="text"
@@ -417,12 +353,9 @@ const CompanyInfoStep = () => {
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                            <Col lg={6} xl={3} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>State</BootstrapForm.Label> */}
+
+                                            <Col lg={6} xl={3} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">State</label>
                                                     <Field
                                                         type="text"
@@ -432,12 +365,9 @@ const CompanyInfoStep = () => {
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                            <Col lg={6} xl={3} className="mb-3 mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Country</BootstrapForm.Label> */}
+
+                                            <Col lg={6} xl={3} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Country</label>
                                                     <Field
                                                         type="text"
@@ -447,12 +377,9 @@ const CompanyInfoStep = () => {
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                            <Col lg={6} xl={3} className="mb-xl-0">
-                                                <FormGroup
-                                                    controlId="formGridContactNumber"
-                                                    className="mb-0"
-                                                >
-                                                    {/* <BootstrapForm.Label>Zipcode</BootstrapForm.Label> */}
+
+                                            <Col lg={6} xl={3} className="mb-3">
+                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
                                                     <label className="col-label form-label">Zipcode</label>
                                                     <Field
                                                         type="text"
@@ -463,6 +390,7 @@ const CompanyInfoStep = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
                                         <div className="buttons d-flex justify-content-end">
                                             <button
                                                 type="submit"

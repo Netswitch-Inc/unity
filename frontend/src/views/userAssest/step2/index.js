@@ -5,8 +5,8 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import {
-    verifyCodeAssessmentReport,
-    getAssessmentReport
+    getAssessmentReport,
+    verifyCodeAssessmentReport
 } from "../store";
 
 // ** Reactstrap Imports
@@ -46,7 +46,7 @@ const VarificationCode = () => {
     
     // ** States
     const [emailCode, setEmailCode] = useState("");
-    const [smsCode, setSmsCode] = useState("");
+    const [smsCode /* , setSmsCode */] = useState("");
     const [errorMessage, setErrorMessage] = useState({ email: false }, { smsCode: false })
     const [showSnackBar, setshowSnackbar] = useState(false);
     const [snakebarMessage, setSnakbarMessage] = useState("");
@@ -87,12 +87,7 @@ const VarificationCode = () => {
             setshowSnackbar(true);
             setSnakbarMessage(assessmentReport.error);
         }
-    }, [
-        assessmentReport.actionFlag,
-        assessmentReport.success,
-        assessmentReport.error,
-        dispatch,
-    ]);
+    }, [assessmentReport.actionFlag, assessmentReport.success, assessmentReport.error, dispatch]);
 
     useEffect(() => {
         if (assessmentReport.actionFlag === "CD_VRFYD_SCS" && showSnackBar) {
@@ -102,6 +97,7 @@ const VarificationCode = () => {
                 navigate(`/asessment-report/${id}?id=${assessmentId}`);
             }, 3000);
         }
+
         if (assessmentReport.actionFlag === "CD_VRFYD_ERR" && showSnackBar) {
             setTimeout(() => {
                 setshowSnackbar(false);
@@ -117,35 +113,34 @@ const VarificationCode = () => {
     }, [showSnackBar]);
 
     const handleSubmit = () => {
-        if (emailCode?.length !== 6 && smsCode?.length !== 6) {
-            setErrorMessage({ email: true, smsCode: true });
-            return;
-        }
+        // if (emailCode?.length !== 6 && smsCode?.length !== 6) {
+        //     setErrorMessage({ email: true, smsCode: true });
+        //     return;
+        // }
 
         if (emailCode?.length !== 6) {
             setErrorMessage({ ...errorMessage, email: true });
             return;
         }
 
-        if (smsCode?.length !== 6) {
-            setErrorMessage({ ...errorMessage, smsCode: true });
-            return;
-        }
+        // if (smsCode?.length !== 6) {
+        //     setErrorMessage({ ...errorMessage, smsCode: true });
+        //     return;
+        // }
 
-        if (
-            emailCode?.length === 6 &&
-            smsCode?.length === 6 &&
-            (!assessmentReport?.assessmentReportItem?.email_verified ||
-                !assessmentReport.assessmentReportItem?.mobile_verified)
-        ) {
+        // if (
+        //     emailCode?.length === 6 &&
+        //     smsCode?.length === 6 &&
+        //     (!assessmentReport?.assessmentReportItem?.email_verified ||
+        //         !assessmentReport.assessmentReportItem?.mobile_verified)
+        // ) {
+        if (emailCode?.length === 6 && (!assessmentReport?.assessmentReportItem?.email_verified || !assessmentReport.assessmentReportItem?.mobile_verified)) {
             setErrorMessage({ email: false, smsCode: false });
-            dispatch(
-                verifyCodeAssessmentReport({
-                    _id: assessmentId,
-                    email_code: emailCode,
-                    mobile_code: smsCode,
-                })
-            );
+            dispatch(verifyCodeAssessmentReport({
+                _id: assessmentId,
+                email_code: emailCode,
+                mobile_code: smsCode
+            }));
         }
     }
 
@@ -209,18 +204,14 @@ const VarificationCode = () => {
                 </Card>
 
                 <Col className="right-side email-verifcation-or-mobile">
-                    <ReactSnackBar
-                        Icon={
-                            <span>
-                                <TiMessages size={25} />
-                            </span>
-                        }
-                        Show={showSnackBar}
-                    >
+                    <ReactSnackBar Icon={(
+                        <span><TiMessages size={25} /></span>
+                    )} Show={showSnackBar}>
                         {snakebarMessage}
                     </ReactSnackBar>
                     <div className="card-header">
-                        <h3 className="m-0">Verification(Email & Mobile)</h3>
+                        <h3 className="m-0">Verification Email</h3>
+                        {/* <h3 className="m-0">Verification(Email & Mobile)</h3> */}
                     </div>
                     
                     <Card className="pl-0 pr-0 varification-card">
@@ -242,7 +233,7 @@ const VarificationCode = () => {
                                     )}
                                 </FormGroup>
                             </div>
-                            <div className="col-12 text-center mt-3">
+                            {/* <div className="col-12 text-center mt-3">
                                 <label className="mb-3 varification-label">Mobile Verification Code</label>
                                 <FormGroup>
                                     <OtpInput
@@ -258,19 +249,18 @@ const VarificationCode = () => {
                                         </div>
                                     )}
                                 </FormGroup>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="buttons justify-content-between d-flex btn-position">
                             <button
                                 type="button"
                                 className="btnprimary ml-3"
-                                onClick={() =>
-                                    navigate(`/assessment-form/${id}?id=${assessmentId}`)
-                                }
+                                onClick={() => navigate(`/assessment-form/${id}?id=${assessmentId}`)}
                             >
                                 Previous
                             </button>
+
                             <button
                                 className="btnprimary mr-3"
                                 onClick={handleSubmit}
