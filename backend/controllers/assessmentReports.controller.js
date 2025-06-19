@@ -269,7 +269,7 @@ exports.createAssessmentReport = async function (req, res, next) {
       });
     }
     const query = { assessment_id: assessment_id, status: 1 };
-    let mobileCode = generateCode();
+    // let mobileCode = generateCode();
     let emailCode = generateCode();
     let section_data = await sectionService.getSectionsByAssessmentId(query);
     let assessmentData = await AssessmentService.getAssessmentOne(
@@ -280,7 +280,7 @@ exports.createAssessmentReport = async function (req, res, next) {
       await AssessmentReportService.createAssessmentReport({
         ...req.body,
         email_code: emailCode,
-        mobile_code: mobileCode,
+        // mobile_code: mobileCode,
         group_data: section_data,
         assessment_data: assessmentData,
       });
@@ -289,8 +289,8 @@ exports.createAssessmentReport = async function (req, res, next) {
         to: createdAssessmentReport?.email,
         name: createdAssessmentReport?.name,
         subject: "Verification Code",
-        content: `Your email verification code is: <strong>${emailCode}</strong><br>
-        Your mobile verification code is: <strong>${mobileCode}</strong>`
+        // content: `Your email verification code is: <strong>${emailCode}</strong><br>Your mobile verification code is: <strong>${mobileCode}</strong>`
+        content: `Your email verification code is: <strong>${emailCode}</strong>`
       }
 
       await sendPlatformTypeEmail(mailItem)
@@ -318,7 +318,7 @@ exports.updateAssessmentReport = async function (req, res, next) {
       await AssessmentReportService.getAssessmentReport(req.body._id);
     if (req.body?.email !== getAssessmentReport?.email) {
       req.body.email_code = generateCode();
-      req.body.mobile_code = generateCode();
+      // req.body.mobile_code = generateCode();
       req.body.email_verified = false;
       req.body.mobile_verified = false;
 
@@ -326,8 +326,8 @@ exports.updateAssessmentReport = async function (req, res, next) {
         to: getAssessmentReport?.email,
         name: getAssessmentReport?.name,
         subject: "Verification Code",
-        content: `Your email verification code is: <strong>${req.body.email_code}</strong><br>
-        Your mobile verification code is: <strong>${req.body.mobile_code}</strong>`
+        // content: `Your email verification code is: <strong>${req.body.email_code}</strong><br>Your mobile verification code is: <strong>${req.body.mobile_code}</strong>`
+        content: `Your email verification code is: <strong>${req.body.email_code}</strong>`
       }
 
       await sendPlatformTypeEmail(mailItem)
@@ -360,17 +360,13 @@ exports.updateAssessmentReport = async function (req, res, next) {
 exports.removeAssessmentReport = async function (req, res, next) {
   var id = req.params.id;
   if (!id) {
-    return res
-      .status(200)
-      .json({ status: 200, flag: true, message: "Id must be present!" });
+    return res.status(200).json({ status: 200, flag: true, message: "Id must be present!" });
   }
 
   try {
     var deleted = await AssessmentReportService.deleteAssessmentReport(id);
 
-    return res
-      .status(200)
-      .json({ status: 200, flag: true, message: "Successfully Deleted... " });
+    return res.status(200).json({ status: 200, flag: true, message: "Successfully Deleted... " });
   } catch (e) {
     // Return an Error Response Message with Code and the Error Message.
     return res.status(200).json({ status: 200, flag: false, message: e.message });
@@ -384,38 +380,32 @@ exports.verifyAssessmentReport = async function (req, res, next) {
     let mobile_verified = false;
     // Validate input
     if (!_id) {
-      return res
-        .status(200)
-        .json({ status: 200, flag: false, message: "Id is required." });
+      return res.status(200).json({ status: 200, flag: false, message: "Id is required." });
     }
-    const email_verification = await AssessmentReportService.getDataOfReport({
-      _id,
-      email_code,
-    });
-    const mobile_verification = await AssessmentReportService.getDataOfReport({
-      _id,
-      mobile_code,
-    });
-    if (mobile_verification) {
-      mobile_verified = true;
-    }
+
+    const email_verification = await AssessmentReportService.getDataOfReport({ _id, email_code });
+    // const mobile_verification = await AssessmentReportService.getDataOfReport({ _id, mobile_code });
+    // if (mobile_verification) {
+    //   mobile_verified = true;
+    // }
+
     if (email_verification) {
       email_verified = true;
     }
-    if (!mobile_verified && !email_verified) {
-      return res.status(200).json({
-        status: 200,
-        flag: false,
-        message: "Email verification and Mobile verification code not matched.",
-      });
-    }
-    if (!mobile_verified) {
-      return res.status(200).json({
-        status: 200,
-        flag: false,
-        message: "Mobile verification code not matched.",
-      });
-    }
+    // if (!mobile_verified && !email_verified) {
+    //   return res.status(200).json({
+    //     status: 200,
+    //     flag: false,
+    //     message: "Email verification and Mobile verification code not matched.",
+    //   });
+    // }
+    // if (!mobile_verified) {
+    //   return res.status(200).json({
+    //     status: 200,
+    //     flag: false,
+    //     message: "Mobile verification code not matched.",
+    //   });
+    // }
 
     if (!email_verified) {
       return res.status(200).json({
@@ -425,12 +415,12 @@ exports.verifyAssessmentReport = async function (req, res, next) {
       });
     }
 
-    if (mobile_verification && email_verification) {
-      const payload = { _id: _id, email_verified: true, mobile_verified: true };
+    // if (mobile_verification && email_verification) {
+    if (email_verification) {
+      // const payload = { _id: _id, email_verified: true, mobile_verified: true };
+      const payload = { _id: _id, email_verified: true };
       await AssessmentReportService.updateAssessmentReport(payload);
-      return res
-        .status(200)
-        .json({ status: 200, flag: true, message: "Verification successful." });
+      return res.status(200).json({ status: 200, flag: true, message: "Verification successful." });
     } else {
       return res.status(200).json({
         status: 200,
