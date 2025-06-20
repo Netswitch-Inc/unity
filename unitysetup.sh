@@ -95,8 +95,10 @@ fi
 
 # Fetching the latest repository changes
 print_yellow "Fetching the latest repository changes"
+git checkout . || handle_error "❌ Failed to restore tracked files"
 git fetch --depth=1 origin ${GIT_BRANCH_NAME} || handle_error "Failed to fetch from remote repository."
-git reset --hard origin/${GIT_BRANCH_NAME} || handle_error "Failed to reset to origin/${GIT_BRANCH_NAME}."
+# git reset --hard origin/${GIT_BRANCH_NAME} || handle_error "Failed to reset to origin/${GIT_BRANCH_NAME}."
+git checkout ${GIT_BRANCH_NAME} || git checkout -b ${GIT_BRANCH_NAME} origin/${GIT_BRANCH_NAME} || handle_error "Failed to checkout ${GIT_BRANCH_NAME}"
 
 # Set 777 permission for Unity package root path
 print_yellow "Setting 0777 permissions for Unity package directory..."
