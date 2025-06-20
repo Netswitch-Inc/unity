@@ -1,1 +1,19 @@
 setup.sh
+
+#ignore node modules
+frontend/.vscode
+frontend/.eslintcache
+frontend/build
+frontend/node_modules
+backend/node_modules
+
+#ignore public images
+backend/public/*
+
+# Lock files
+frontend/*-lock.json
+backend/*-lock.json
+
+# cache
+frontend/.cache
+backend/.cache
