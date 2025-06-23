@@ -55,7 +55,7 @@ const CompanyInfoStep = () => {
 
     // Define the validation schema
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required("Name number is required."),
+        name: Yup.string().required("Contact Name number is required."),
         email: Yup.string().email("Invalid email format.")
             .required("Email is required."),
         mobile: Yup.string().required("Mobile number is required.")
@@ -215,7 +215,7 @@ const CompanyInfoStep = () => {
 
                                             <Col xl={6} className="mb-3">
                                                 <FormGroup controlId="formGridCompanyName" className="mb-0">
-                                                    <label className="col-label form-label">Contact Name</label>
+                                                    <label className="col-label form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>
                                                     <Field
                                                         type="text"
                                                         name="name"
