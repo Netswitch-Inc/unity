@@ -1,34 +1,41 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
+// ** React Imports
 import React, { useRef, useEffect, useLayoutEffect, useState } from "react";
-import { RAMData } from "views/sampleData/mockData";
+import { useNavigate } from "react-router-dom";
+
+// ** Store & Actions
+import { useDispatch, useSelector } from "react-redux";
+import { getProjectList } from "views/projects/store";
+
+// ** Reactstrap Imports
 import {
   Col,
-  Row,
   Nav,
-  NavItem,
+  Row,
   NavLink,
-  TabContent,
+  NavItem,
   TabPane,
+  TabContent,
 } from "reactstrap";
+
+// ** Third Party Components
+import classnames from "classnames";
+
+// ** Constant
+import { isEmptyBlankDataDisplay, defaultPerPageRow } from "utility/reduxConstant";
+
 import OuterCard from "./OuterCard";
 import GeneralCard from "./GeneralCard";
-import { useNavigate } from "react-router-dom";
-import { getProjectList } from "views/projects/store";
-import { useDispatch, useSelector } from "react-redux";
-import classnames from "classnames";
-import { defaultPerPageRow } from "utility/reduxConstant";
 import AllprojectsTab from "./Allprojectslist";
 
 const RiskAssessmentMethod = () => {
   const dispatch = useDispatch();
   const scrollref = useRef();
-  const data = RAMData.RAMTableData;
   const [activeTab, setActiveTab] = useState("created");
 
-  const loginStore = useSelector((state) => state.login);
-  // const authUserItem = loginStore?.authUserItem;
   const navigate = useNavigate();
+  const loginStore = useSelector((state) => state.login);
 
   useEffect(() => {
     if (scrollref?.current) {
@@ -81,7 +88,6 @@ const RiskAssessmentMethod = () => {
   const handleProductClick = function (id) {
     navigate(`/admin/project-details/${id}`, {
       state: {
-        // data: RAMData.RAMTableData,
         displayID: id,
       },
     });
@@ -91,7 +97,7 @@ const RiskAssessmentMethod = () => {
     <div className="content" ref={scrollref}>
       <Row>
         <Col lg="12">
-          <OuterCard data={data} />
+          <OuterCard isEmptyBlankDataDisplay={isEmptyBlankDataDisplay} />
         </Col>
         <Col md="12" lg="12">
           <div className="content project-management">

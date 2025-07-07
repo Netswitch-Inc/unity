@@ -5,8 +5,8 @@ import roles from "../views/roles/store/index.js";
 import company from "../views/companies/store/index.js";
 import connection from "../views/connections/store/index.js";
 import compilance from "../views/CompilanceBuilders/store/index.js";
-import complincecontrol from "../views/CompilanceControl/store/index.js";
-import cis from "../views/CompilanceControl/cisstore/index.js";
+import complincecontrol from "../views/resilienceIndex/store/index.js";
+import cis from "../views/resilienceIndex/cisstore/index.js";
 import eventLogs from "views/eventLogs/store";
 import companyComplianceControls from "views/companyComplianceControls/store";
 import globalSetting from "../views/global/store/index.js";
@@ -28,6 +28,7 @@ import openVASScanReport from "../views/openVASScanReports/store";
 import netswitchThreatIntel from "views/netswitchThreatIntels/store";
 import compliancePriority from "views/compliancePriority/store";
 import contact from "views/contacts/store";
+import aiPrompt from "views/aiPrompts/store";
 
 const rootReducer = {
   login,
@@ -58,7 +59,8 @@ const rootReducer = {
   openVASScanReport,
   netswitchThreatIntel,
   compliancePriority,
-  contact
+  contact,
+  aiPrompt
 };
 
 export default rootReducer;

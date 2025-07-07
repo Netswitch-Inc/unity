@@ -96,16 +96,15 @@ exports.createSetting = async function (setting) {
         }
     }
 
-    // console.log("createSetting ",setting)
     var newSetting = new Setting({
-        options: setting.options ? setting.options : null,
-        group_name: setting.group_name ? setting.group_name : "",
-        name: setting.name ? setting.name : "",
-        slug: setting.slug ? setting.slug : "",
-        type: setting.type ? setting.type : "",
-        note: setting.note ? setting.note : "",
-        value: setting.value ? setting.value : "",
-        disabled: setting.disabled ? setting.disabled : false,
+        options: setting?.options?.length ? setting.options : null,
+        group_name: setting?.group_name ? setting.group_name : "",
+        name: setting?.name ? setting.name : "",
+        slug: setting?.slug ? setting.slug : "",
+        type: setting?.type ? setting.type : "",
+        note: setting?.note ? setting.note : "",
+        value: setting?.value ? setting.value : "",
+        disabled: setting?.disabled ? setting.disabled : false,
         deletedAt: null
     })
 
@@ -132,19 +131,19 @@ exports.updateSetting = async function (setting) {
     if (!oldSetting) { return false; }
 
     // Edit the Setting Object
-    if (setting.options) {
+    if (setting?.options) {
         oldSetting.options = setting.options?.length ? setting.options : null;
     }
 
-    if (setting.group_name) {
+    if (setting?.group_name) {
         oldSetting.group_name = setting.group_name;
     }
 
-    if (setting.name) {
+    if (setting?.name) {
         oldSetting.name = setting.name;
     }
 
-    if (setting.slug) {
+    if (setting?.slug) {
         oldSetting.slug = setting.slug;
     }
 
@@ -178,7 +177,7 @@ exports.updateSetting = async function (setting) {
         oldSetting.disabled = setting?.disabled || false;
     }
 
-    if (setting.deletedAt) {
+    if (setting?.deletedAt) {
         oldSetting.deletedAt = setting.deletedAt;
     }
 

@@ -3,7 +3,7 @@ import ReactApexChart from "react-apexcharts";
 import { Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import ScoreReportTable from "./CISHeader";
-import { getCisListing } from "views/CompilanceControl/cisstore";
+import { getCisListing } from "views/resilienceIndex/cisstore";
 // import UploadModal from "./model/uploadModal";
 // import UploadStatus from "./model/uploadStatus";
 

@@ -69,6 +69,8 @@ exports.createManyCompanyComplianceControl = async function (controls) {
                 item.control_id = item.control_id ? item.control_id : null
                 item.project_id = item.project_id ? item.project_id : null
                 item.tool_icons = item.tool_icons ? item.tool_icons : ""
+                item.control_description = item.control_description ? item.control_description : ""
+                item.cis_control_descriptions = item.cis_control_descriptions?.length ? item.cis_control_descriptions : null
 
                 item.status = true
                 item.deletedAt = null
@@ -93,6 +95,8 @@ exports.createCompanyComplianceControl = async function (companyComplianceContro
         control_id: companyComplianceControl.control_id ? companyComplianceControl.control_id : null,
         project_id: companyComplianceControl.project_id ? companyComplianceControl.project_id : null,
         tool_icons: companyComplianceControl.tool_icons ? companyComplianceControl.tool_icons : "",
+        control_description: companyComplianceControl.control_description ? companyComplianceControl.control_description : "",
+        cis_control_descriptions: companyComplianceControl.cis_control_descriptions?.length ? companyComplianceControl.cis_control_descriptions : null,
         status: true,
         deletedAt: null
     })
@@ -142,8 +146,16 @@ exports.updateCompanyComplianceControl = async function (companyComplianceContro
         oldCompanyComplianceControl.tool_icons = companyComplianceControl.tool_icons;
     }
 
+    if (companyComplianceControl.control_description) {
+        oldCompanyComplianceControl.control_description = companyComplianceControl.control_description;
+    }
+
+    if (companyComplianceControl?.cis_control_descriptions) {
+        oldCompanyComplianceControl.cis_control_descriptions = companyComplianceControl.cis_control_descriptions?.length ? companyComplianceControl.cis_control_descriptions : null;
+    }
+
     try {
-        var savedCompanyComplianceControl = await oldCompanyComplianceControl.save()
+        var savedCompanyComplianceControl = await oldCompanyComplianceControl.save();
         return savedCompanyComplianceControl;
     } catch (error) {
         throw Error(error.message);

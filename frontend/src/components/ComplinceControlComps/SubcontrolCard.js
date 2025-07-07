@@ -12,7 +12,7 @@ import {
   FormGroup,
   CardTitle,
   CardHeader,
-  UncontrolledTooltip
+  UncontrolledTooltip,
 } from "reactstrap";
 
 // ** Utils
@@ -28,7 +28,7 @@ import ScoreHistoryLineChartComp from "./model/HistoryChartLine";
 // ** Third Party Components
 import { TiArrowLeft } from "react-icons/ti";
 
-import ToolDetailModal from "views/CompilanceControl/models/ToolDetailModal";
+import ToolDetailModal from "views/resilienceIndex/models/ToolDetailModal";
 
 import { solutionToolIcons } from "utility/toolIcons";
 
@@ -36,6 +36,7 @@ import { solutionToolIcons } from "utility/toolIcons";
 import openedIcon from "../../assets/img/openedPolygon.svg";
 import closedIcon from "../../assets/img/closedPolygon.svg";
 import gearIcon from "assets/img/gear.svg";
+import editIcon from "assets/img/edit.svg";
 
 function SubControlCard(props) {
   const navigate = useNavigate();
@@ -43,7 +44,13 @@ function SubControlCard(props) {
   let values = [2, 2, 5, 4, 3, 5, 3, 6, 2, 7];
 
   // ** Const
-  const { authUserItem, selectedControl, handleOpenSolutionModal } = props;
+  const {
+    authUserItem,
+    selectedControl,
+    aiServiceEnabled,
+    handleOpenAIWriteModal,
+    handleOpenSolutionModal
+  } = props;
   const projectItemData = selectedControl?.project_id || null;
   const projectStatus = ["cancelled", "completed"];
   const cisControlId = projectItemData?.cis_control_id?._id || projectItemData?.cis_control_id || null;
@@ -92,18 +99,33 @@ function SubControlCard(props) {
 
   const SubControlTable = (props) => {
     const SubRows = ({ row, rowProps, visibleColumns, data, loading }) => {
-      const [description] = useState(row.original.description);
       return (<>
         <tr>
           <td />
           <td colSpan={visibleColumns.length - 1}>
             <FormGroup>
-              <label className="text-info">Description</label>
-              <p>{description}</p>
+              <label className="text-info">
+                Description
+                {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+                  <img
+                    width={18}
+                    height={18}
+                    alt="Edit"
+                    title="Edit"
+                    src={editIcon}
+                    className="cursor-pointer mx-2"
+                    onClick={() => handleOpenAIWriteModal(`sub-edit-dec@${row.original?._id}`)}
+                  />
+                ) : null}
+              </label>
+              <p>{row.original?.description}</p>
               <br />
-              <div className="buttons">
-                <button className="btnprimary mt-0">Rewrite with AI</button>
-              </div>
+
+              {aiServiceEnabled && (!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status))) ? (
+                <div className="buttons">
+                  <button type="button" className="btnprimary mt-0">Rewrite with Sara</button>
+                </div>
+              ) : null}
             </FormGroup>
           </td>
         </tr>
@@ -172,7 +194,11 @@ function SubControlCard(props) {
         <ReactTable
           columns={columns}
           data={data}
+          projectStatus={projectStatus}
+          projectItemData={projectItemData}
+          aiServiceEnabled={aiServiceEnabled}
           renderRowSubComponent={renderRowSubComponent}
+          handleOpenAIWriteModal={handleOpenAIWriteModal}
         />
       </div>
     )
@@ -402,15 +428,28 @@ function SubControlCard(props) {
 
               <Col>
                 <FormGroup className="element-description">
-                  <label className="text-info">Description</label>
+                  <label className="text-info">
+                    Description
+                    {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+                      <img
+                        width={18}
+                        height={18}
+                        alt="Edit"
+                        title="Edit"
+                        src={editIcon}
+                        className="cursor-pointer mx-2"
+                        onClick={() => handleOpenAIWriteModal("edit-dec@")}
+                      />
+                    ) : null}
+                  </label>
                   <p>{selectedControl?.description}</p>
                 </FormGroup>
               </Col>
             </Row>
 
-            {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+            {aiServiceEnabled && (!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status))) ? (
               <div className="buttons">
-                <button className="btnprimary mt-0">Rewrite with AI</button>
+                <button type="button" className="btnprimary mt-0" onClick={() => handleOpenAIWriteModal("self")}>Rewrite with Sara</button>
               </div>
             ) : null}
           </Card>

@@ -51,11 +51,11 @@ const ContactUsModal = ({
     }
 
     useEffect(() => {
-        if(store.actionFlag === "TOOL_SOL_CONT") {
+        if (store.actionFlag === "TOOL_SOL_CONT") {
             setTimeout(() => { handleReset(); }, 1000)
         }
 
-        if(store.actionFlag || store.success || store.error) {
+        if (store.actionFlag || store.success || store.error) {
             dispatch(cleanContactMessage(null));
         }
 
@@ -78,9 +78,7 @@ const ContactUsModal = ({
 
     const handleSubmit = (values) => {
         if (values) {
-            const payload = {
-                ...values
-            }
+            const payload = { ...values }
 
             if (selectedControl?.framework_id?.label) {
                 payload.framework_name = selectedControl.framework_id.label;
@@ -134,13 +132,13 @@ const ContactUsModal = ({
                     {({ errors, touched }) => (
                         <Form className="my-2">
                             <Row>
-                                <Col xl={6} lg={6} as={BootstrapForm.Group} controlId="formGridLastName" className="full-width">
+                                <Col xl={6} lg={6} as={BootstrapForm.Group} controlId="formGridName" className="full-width">
                                     <BootstrapForm.Label className="col-label">Name</BootstrapForm.Label>
                                     <Field
-                                    type="text"
-                                    name="name"
-                                    placeholder="Name"
-                                    className="col-input w-100"
+                                        type="text"
+                                        name="name"
+                                        placeholder="Name"
+                                        className="col-input w-100"
                                     />
                                     {errors.name && touched.name && (
                                         <FormFeedback className="d-block">{errors?.name}</FormFeedback>
@@ -160,7 +158,7 @@ const ContactUsModal = ({
                                     )}
                                 </Col>
 
-                                <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridName" className="full-width">
+                                <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridMessage" className="full-width">
                                     <BootstrapForm.Label className="col-label">Message</BootstrapForm.Label>
                                     <Field
                                         as="textarea"

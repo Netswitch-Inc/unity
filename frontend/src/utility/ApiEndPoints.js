@@ -219,4 +219,7 @@ export const API_ENDPOINTS = {
   contacts: {
     toolSolution: `/tool-solution-contact`,
   },
+  aiPrompts: {
+    writeDescription: `/ai-description-write`,
+  }
 }
