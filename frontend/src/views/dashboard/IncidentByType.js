@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+// ** React Imports
+import React from "react";
+
+// ** Reactstrap Imports
 import { CardBody, CardHeader, CardTitle } from "reactstrap";
+
+// ** Third Party Components
 import { Bar } from "react-chartjs-2";
 
-const IncidentByType = () => {
+const IncidentByType = ({
+  isEmptyBlankDataDisplay
+}) => {
   //getting data for Critical Incident table and Major Incident table
-  const [majorBarchartData] = useState([12, 19, 3, 5, 2, 3]);
-  const [majorBarchartLabel] = useState(["Critical", "High", "Medium", "Low", "Info", "Other"]);
+  const majorBarchartData = isEmptyBlankDataDisplay ? [] : [12, 19, 3, 5, 2, 3];
+  const majorBarchartLabel = isEmptyBlankDataDisplay ? [] : ["Critical", "High", "Medium", "Low", "Info", "Other"];
 
-  return (
-    <>
-      <CardHeader>
-        <CardTitle tag="h3">
-          <i className="tim-icons icon-alert-circle-exc text-primary" />{" "}
-          Major Incident By Type
-        </CardTitle>
-      </CardHeader>
+  return (<>
+    <CardHeader>
+      <CardTitle tag="h3">
+        <i className="tim-icons icon-alert-circle-exc text-primary" />{" "}
+        Major Incident By Type
+      </CardTitle>
+    </CardHeader>
 
-      <CardBody>
+    <CardBody>
+      {isEmptyBlankDataDisplay ? (
+        <p className="text-center align-middle">N/A</p>
+      ) : null}
+
+      {!isEmptyBlankDataDisplay ? (
         <div className="chart-area">
           <Bar
             data={(canvas) => {
@@ -95,9 +106,9 @@ const IncidentByType = () => {
             }}
           />
         </div>
-      </CardBody>
-    </>
-  )
+      ) : null}
+    </CardBody>
+  </>)
 }
 
 export default IncidentByType;

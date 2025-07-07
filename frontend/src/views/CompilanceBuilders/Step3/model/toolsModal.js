@@ -7,7 +7,6 @@ function RenderToolsModal(props) {
   const { data, isOpen, toggle } = props
 
   const [alert, setAlert] = useState(null);
-  // console.log(data, 'data')
 
   const successAlert = () => {
     setAlert(
@@ -29,9 +28,7 @@ function RenderToolsModal(props) {
   };
 
   const closeModal = () => {
-    // setAlert(null);
     toggle(false);
-    // setToolListData([])
   }
 
   function handleContactUS() {
@@ -39,93 +36,84 @@ function RenderToolsModal(props) {
   }
 
   return (
-    <>
-      {/* <div className="bg-white"> */}
-      <Modal
-        // size="lg"
-        // show={isOpen}
-        // aria-labelledby="example-modal-sizes-title-lg"
-        // centered
-        isOpen={isOpen}
-        // className="assigntask-modal assigntask-modalssss bg-white"
-        className="assigntask-modal assigntask-modalssss bg-white assessment-modal"
-        toggle={closeModal}
-        size="lg"
-      >
-        <div className="modal-header justify-content-center bg-white">
-          <button
-            aria-hidden={true}
-            className="close"
-            data-dismiss="modal"
-            type="button"
-            onClick={closeModal}
-          >
-            <i className="tim-icons icon-simple-remove" />
-          </button>
-          <h4 className="title title-up">{data.toolType}</h4>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      className="assigntask-modal assigntask-modalssss bg-white assessment-modal"
+      toggle={closeModal}
+      size="lg"
+    >
+      <div className="modal-header justify-content-center bg-white">
+        <button
+          aria-hidden={true}
+          className="close"
+          data-dismiss="modal"
+          type="button"
+          onClick={closeModal}
+        >
+          <i className="tim-icons icon-simple-remove" />
+        </button>
+        <h4 className="title title-up">{data.toolType}</h4>
+      </div>
 
-        <ModalBody className="bg-white">
-          <div>
-            {/* recommendation text */}
-            {alert}
-            <Row>
-              <Col className="pr-md-1" md="12">
-                <Row>
-                  <Col className="center" md="11">
-                    <div className="">
-                      <p>{data?.toolTypeDescription}</p>
-                    </div>
-                  </Col>
-                </Row>
-                <hr />
+      <ModalBody className="bg-white">
+        <div>
+          {/* recommendation text */}
+          {alert}
+          <Row>
+            <Col className="pr-md-1" md="12">
+              <Row>
+                <Col className="center" md="11">
+                  <div className="">
+                    <p>{data?.toolTypeDescription}</p>
+                  </div>
+                </Col>
+              </Row>
+              <hr />
 
-                <Row>
-                  {data?.data?.map((tool) => (
-                    <Media key={tool?.id} className="tools-media">
-                      <Media>
-                        <Media
-                          src={tool.logoPath}
-                          alt="Generic placeholder image"
-                          width={100}
-                        // height={100}
-                        />
-                      </Media>
-                      <Media body>
-                        <Media heading style={{ color: "black" }}>
-                          {tool.name}
-                        </Media>
-                        <StarRatings
-                          rating={tool.rating}
-                          starDimension="15px"
-                          starSpacing="1px"
-                        />
-                        <br />
-                        <p > {tool.desc}</p>
-
-                      </Media>
+              <Row>
+                {data?.data?.map((tool) => (
+                  <Media key={tool?.id} className="tools-media">
+                    <Media>
+                      <Media
+                        src={tool.logoPath}
+                        alt="Generic placeholder image"
+                        width={100}
+                      // height={100}
+                      />
                     </Media>
-                  ))}
-                </Row>
-              </Col>
-            </Row>
-          </div>
-        </ModalBody>
-        <div className="modal-footer justify-content-end bg-white">
-          <Button
-            color="btn-wd"
-            data-dismiss="modal"
-            type="button"
-            onClick={handleContactUS}
-          >
-            Contact us
-          </Button>
+                    <Media body>
+                      <Media heading style={{ color: "black" }}>
+                        {tool.name}
+                      </Media>
+                      <StarRatings
+                        rating={tool.rating}
+                        starDimension="15px"
+                        starSpacing="1px"
+                      />
+                      <br />
+                      <p > {tool.desc}</p>
+
+                    </Media>
+                  </Media>
+                ))}
+              </Row>
+            </Col>
+          </Row>
         </div>
-        {alert}
-      </Modal>
-      {/* </div> */}
-    </>
-  );
+      </ModalBody>
+      <div className="modal-footer justify-content-end bg-white">
+        <Button
+          color="btn-wd"
+          data-dismiss="modal"
+          type="button"
+          onClick={handleContactUS}
+        >
+          Contact us
+        </Button>
+      </div>
+      {alert}
+    </Modal>
+  )
 }
 
 export default RenderToolsModal;

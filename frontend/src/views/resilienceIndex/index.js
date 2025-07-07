@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // ** React Imports
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // ** Store & Actions
@@ -31,9 +31,10 @@ import SubControlCard from "components/ComplinceControlComps/SubcontrolCard";
 // import HistoryAndReportCard from "components/ComplinceControlComps/HistoryGraphData";
 
 // ** Models
+import AIPromptWriteModal from "./models/AIPromptWriteModal";
 import SelectSolutionTool from "views/CompilanceBuilders/Step3/model/SelectSolutionTool";
 
-const CompilanceController = () => {
+const ResilienceIndex = () => {
   // ** Hooks
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,15 +43,19 @@ const CompilanceController = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state.complincecontrol);
   const loginStore = useSelector((state) => state.login);
+  const settingStore = useSelector((state) => state.globalSetting);
   const companyComplianceControlStore = useSelector((state) => state.companyComplianceControls);
 
   // ** Const
+  const appSettingItem = settingStore?.appSettingItem || null;
   const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
   const routeStateData = location?.state || null;
+  const aiServiceEnabled = appSettingItem?.ai_service_enabled || false;
 
   // ** States
   const [showSnackBar, setshowSnackbar] = useState(false);
   const [openSolutionModal, setSolutionModal] = useState(false);
+  const [openAIWriteModal, setAIWriteModal] = useState("");
   const [selectedControl, setSelectedControl] = useState(null);
   const [prioritiesOptions, setPrioritiesOptions] = useState([]);
   const [selectedPriority, setSelectedPriority] = useState(null);
@@ -66,7 +71,19 @@ const CompilanceController = () => {
     setSolutionModal(false);
   }
 
+  const handleOpenAIWriteModal = (value) => {
+    setAIWriteModal(value);
+  }
+
+  const closeAiWriteModal = () => {
+    setAIWriteModal("");
+  }
+
+  const handleResetStatesData = useCallback(() => {
+  }, [])
+
   useLayoutEffect(() => {
+    handleResetStatesData();
     const query = {
       company_id: authUserItem?.company_id?._id || authUserItem?.company_id || "",
       user_id: authUserItem?._id || "",
@@ -78,9 +95,10 @@ const CompilanceController = () => {
     }
 
     dispatch(getCompanyComplianceControlList(query))
-  }, [authUserItem, routeStateData]);
+  }, [dispatch, handleResetStatesData, authUserItem, routeStateData]);
 
   const handleSelectedControlData = (item) => {
+    handleResetStatesData();
     setSelectedControl(() => item);
   }
 
@@ -130,30 +148,49 @@ const CompilanceController = () => {
 
       if (companyComplianceControlData.data) {
         list2 = companyComplianceControlData.data.map((item) => {
+          const comItem = { ...item?.control_id }
+          if (item?.control_description) {
+            comItem.description = item.control_description;
+          }
+
+          if (item?.cis_control_descriptions?.length && comItem?.cis_control_id?.length) {
+            const cisControls = comItem.cis_control_id.map((cisItem) => {
+              const cisItm = { ...cisItem };
+              const decItm = item.cis_control_descriptions.find((x) => x.cis_control_id === cisItm._id);
+              if (decItm?.description) { cisItm.description = decItm.description; }
+
+              return cisItm;
+            })
+
+            comItem.cis_control_id = cisControls;
+          }
+
           return {
-            ...item?.control_id,
-            ...item?.control_id,
+            ...comItem,
             project_id: item?.project_id || null,
             company_compliance_control_id: item?._id || "",
             tool_icons: item?.tool_icons || "",
+            control_description: item?.control_description || "",
+            cis_control_descriptions: item?.cis_control_descriptions || null,
             compliance_priority_id: compliancePriority?._id || ""
           }
         }) || []
 
         defaultControl = list2?.length ? list2[0] : null;
-        if(controlItemData?._id) {
+        if (controlItemData?._id) {
           const control = list2.find((x) => x._id === controlItemData._id) || null;
           defaultControl = control?._id ? control : defaultControl;
           setControlItemData(null);
         }
       }
 
+      handleResetStatesData();
       setSelectedControl(defaultControl)
       setSelectedPriority(compliancePriority)
       setPrioritiesOptions(list1)
       setComplianceControlData(list2)
     }
-  }, [dispatch, companyComplianceControlStore.companyComplianceControlData, companyComplianceControlStore.actionFlag, companyComplianceControlStore.success, companyComplianceControlStore.error, controlItemData]);
+  }, [dispatch, handleResetStatesData, companyComplianceControlStore.companyComplianceControlData, companyComplianceControlStore.actionFlag, companyComplianceControlStore.success, companyComplianceControlStore.error, controlItemData]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -162,6 +199,7 @@ const CompilanceController = () => {
   }, [showSnackBar]);
 
   const handleBackControl = () => {
+    handleResetStatesData();
     setSelectedControl(() => null)
   }
 
@@ -170,6 +208,37 @@ const CompilanceController = () => {
       setSelectedControl({ ...item, tool_icons: icons })
 
       dispatch(updateCompanyComplianceControl({ _id: item.company_compliance_control_id, tool_icons: icons }));
+    }
+  }
+
+  const handleUpdateDescription = (type = "", value = "") => {
+    if (selectedControl && type && value) {
+      const comControlData = [...complianceControlData]
+      const types = type?.split("@");
+      const descTypes = ["cis", "sub-edit-dec"];
+      if (types?.length > 1 && descTypes.includes(types[0])) {
+        const id = selectedControl?._id || "";
+        const cisId = types[1] || "";
+        const ind = comControlData.findIndex((x) => x._id === id);
+        if (ind >= 0) {
+          const cisControls = [...comControlData?.[ind]?.cis_control_id];
+          const subInd = cisControls.findIndex((x) => x._id === cisId);
+          if (subInd >= 0) {
+            cisControls[subInd] = { ...cisControls[subInd], description: value };
+            comControlData[ind] = { ...comControlData[ind], cis_control_id: cisControls };
+            setSelectedControl(comControlData[ind]);
+          }
+        }
+      } else {
+        const id = selectedControl?._id || "";
+        const ind = comControlData.findIndex((x) => x._id === id);
+        if (ind >= 0) {
+          comControlData[ind] = { ...comControlData[ind], description: value, control_description: value };
+          setSelectedControl(comControlData[ind]);
+        }
+      }
+
+      setComplianceControlData(comControlData);
     }
   }
 
@@ -219,9 +288,11 @@ const CompilanceController = () => {
               <SubControlCard
                 authUserItem={authUserItem}
                 selectedControl={selectedControl}
+                aiServiceEnabled={aiServiceEnabled}
                 selectedPriority={selectedPriority}
                 handleBackControl={handleBackControl}
                 complianceControlData={complianceControlData}
+                handleOpenAIWriteModal={handleOpenAIWriteModal}
                 handleOpenSolutionModal={handleOpenSolutionModal}
               />
             ) : (<>
@@ -243,6 +314,13 @@ const CompilanceController = () => {
         </Col>
       </Row>
 
+      <AIPromptWriteModal
+        isOpen={openAIWriteModal}
+        selectedControl={selectedControl}
+        closeModal={closeAiWriteModal}
+        handleUpdateDescription={handleUpdateDescription}
+      />
+
       <SelectSolutionTool
         open={openSolutionModal}
         controlItemData={selectedControl}
@@ -253,4 +331,4 @@ const CompilanceController = () => {
   )
 }
 
-export default CompilanceController;
+export default ResilienceIndex;

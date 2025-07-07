@@ -26,7 +26,6 @@ const ProjectDetails = () => {
 
   // ** Const
   const displayID = location?.state?.displayID;
-  // const data = RAMData.RAMTableData;
   const from = location?.state?.from || "";
   const controlItemData = location?.state?.control_data || null;
 

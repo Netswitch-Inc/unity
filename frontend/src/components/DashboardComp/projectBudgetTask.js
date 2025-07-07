@@ -1,11 +1,16 @@
+// ** Reactstrap Imports
 import {
     CardBody,
     CardTitle,
     CardHeader,
 } from "reactstrap";
+
+// ** Third Party Components
 import { Bar } from "react-chartjs-2";
 
-const ProjectBudgetByTask = () => {
+const ProjectBudgetByTask = ({
+    isEmptyBlankDataDisplay
+}) => {
     const budgetTaskChartOptions = {
         maintainAspectRatio: false,
         plugins: {
@@ -53,18 +58,24 @@ const ProjectBudgetByTask = () => {
         },
     };
 
-    return (
-        // <Card className="card-chart db-mid-section">
-        <>
-            <CardHeader>
-                {/* <ExportPdf className="d-flex justify-content-end" /> */}
-                <h5 className="card-category">Projected Budget by Task</h5>
+    return (<>
+        <CardHeader>
+            {/* <ExportPdf className="d-flex justify-content-end" /> */}
+            {/* <h5 className="card-category">Projected Budget by Task</h5> */}
+            <CardTitle tag="h5">Projected Budget by Task</CardTitle>
+            {!isEmptyBlankDataDisplay ? (
                 <CardTitle tag="h3">
                     <i className="tim-icons icon-coins text-primary" /> $776K
                 </CardTitle>
-            </CardHeader>
+            ) : null}
+        </CardHeader>
 
-            <CardBody>
+        <CardBody>
+            {isEmptyBlankDataDisplay ? (
+                <p className="text-center align-middle">N/A</p>
+            ) : null}
+
+            {!isEmptyBlankDataDisplay ? (
                 <div className="chart-area">
                     <Bar
                         data={(canvas) => {
@@ -76,7 +87,7 @@ const ProjectBudgetByTask = () => {
 
                             return {
                                 //the chart label
-                                labels: ["CIS", "SIEM", "VAS", "IPDF", "Pentest"],
+                                labels: isEmptyBlankDataDisplay ? [] : ["CIS", "SIEM", "VAS", "IPDF", "Pentest"],
                                 datasets: [
                                     {
                                         label: "Budget",
@@ -88,7 +99,7 @@ const ProjectBudgetByTask = () => {
                                         borderDash: [],
                                         borderDashOffset: 0.0,
                                         //the chart data
-                                        data: [10000, 15000, 25000, 1600, 26000],
+                                        data: isEmptyBlankDataDisplay ? [] : [10000, 15000, 25000, 1600, 26000],
                                     },
                                 ],
                             };
@@ -96,10 +107,9 @@ const ProjectBudgetByTask = () => {
                         options={budgetTaskChartOptions}
                     />
                 </div>
-            </CardBody>
-            {/* </Card> */}
-        </>
-    );
-};
+            ) : null}
+        </CardBody>
+    </>)
+}
 
 export default ProjectBudgetByTask

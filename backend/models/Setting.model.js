@@ -9,7 +9,7 @@ var SettingSchema = new mongoose.Schema({
   type: String,
   note: String,
   value: String,
-  disabled: { type: Boolean, default: false },
+  disabled: { type: Boolean },
   deletedAt: Date
 }, { timestamps: true, versionKey: false })
 

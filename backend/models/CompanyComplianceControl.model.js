@@ -9,6 +9,8 @@ var CompanyComplianceControlSchema = new Schema({
     control_id: { type: Schema.Types.ObjectId, ref: "controls", default: null },
     project_id: { type: Schema.Types.ObjectId, ref: "projects", default: null },
     tool_icons: { type: String, default: "" },
+    control_description: { type: String, default: "" },
+    cis_control_descriptions: { type: Array },
     status: { type: Boolean, default: true },
     deletedAt: { type: Date, default: null }
 }, { timestamps: true, versionKey: false })

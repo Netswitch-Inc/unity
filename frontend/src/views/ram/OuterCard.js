@@ -1,14 +1,20 @@
+// ** React Imports
 import React from "react";
+
+// ** Reactstrap Imports
 import { Card, CardBody, CardHeader, CardTitle, Col, Row } from "reactstrap";
+
+// ** Third Party Components
 import Chart from "react-apexcharts";
 import RiskByScoreDoughnutChart from "./RiskByScoreDoughnutChart";
 
-const OuterCard = () => {
+const OuterCard = ({
+  isEmptyBlankDataDisplay
+}) => {
+
   const projectReactChartOption = {
     options: {
-      chart: {
-        id: "area",
-      },
+      chart: { id: "area" },
       xaxis: {
         labels: {
           style: {
@@ -16,7 +22,7 @@ const OuterCard = () => {
             fontSize: "12px",
           },
         },
-        categories: [
+        categories: isEmptyBlankDataDisplay ? [] : [
           "June",
           "July",
           "Aug",
@@ -25,7 +31,7 @@ const OuterCard = () => {
           "Nov",
           "Dec",
           "2022 Jan",
-        ],
+        ]
       },
       yaxis: {
         labels: {
@@ -56,14 +62,15 @@ const OuterCard = () => {
     series: [
       {
         name: "Tasks Remaining ",
-        data: [38, 35, 38, 32, 23, 19, 13, 14],
+        data: isEmptyBlankDataDisplay ? [] : [38, 35, 38, 32, 23, 19, 13, 14],
       },
       {
         name: "Tasks Completion",
-        data: [9, 8, 8, 7, 4, 4, 3, 3],
+        data: isEmptyBlankDataDisplay ? [] : [9, 8, 8, 7, 4, 4, 3, 3],
       },
     ],
-  };
+  }
+
   return (
     <Row>
       <Col lg="6">
@@ -73,10 +80,10 @@ const OuterCard = () => {
           </CardHeader>
           <CardBody>
             <Chart
-              options={projectReactChartOption.options}
-              series={projectReactChartOption.series}
               type="area"
               height="270"
+              options={projectReactChartOption.options}
+              series={projectReactChartOption.series}
             />
           </CardBody>
         </Card>
@@ -88,12 +95,12 @@ const OuterCard = () => {
             <CardTitle tag="h3">Tasks by Risk level</CardTitle>
           </CardHeader>
           <CardBody>
-            <RiskByScoreDoughnutChart />
+            <RiskByScoreDoughnutChart isEmptyBlankDataDisplay={isEmptyBlankDataDisplay} />
           </CardBody>
         </Card>
       </Col>
     </Row>
-  );
-};
+  )
+}
 
 export default OuterCard;
