@@ -1,11 +1,17 @@
+// ** React Imports
 import { useNavigate } from "react-router-dom";
 
+// ** Reactstrap Imports
 import {
     Button,
     ButtonGroup
 } from "reactstrap";
 
+// ** Third Party Components
 import { FrappeGantt, ViewMode } from "frappe-gantt-react";
+
+// ** Constant
+import { isEmptyBlankDataDisplay } from "utility/reduxConstant";
 
 const FrappeGanttView = () => {
     const navigate = useNavigate();
@@ -54,49 +60,53 @@ const FrappeGanttView = () => {
             Add Project
         </Button>
 
-        <ButtonGroup
-            className="btn-group-toggle pull-right"
-            data-toggle="buttons"
-        >
-            <Button id="0" size="sm" className="mr-2 btn btn-primary">
-                <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block ">
-                    Day
-                </span>
-            </Button>
+        {!isEmptyBlankDataDisplay ? (
+            <ButtonGroup
+                className="btn-group-toggle pull-right"
+                data-toggle="buttons"
+            >
+                <Button id="0" size="sm" className="mr-2 btn btn-primary">
+                    <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block ">
+                        Day
+                    </span>
+                </Button>
 
-            <Button id="1" size="sm" className="mr-2 btn btn-primary">
-                <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                    Month
-                </span>
-                <span className="d-block d-sm-none">
-                    <i className="tim-icons icon-gift-2" />
-                </span>
-            </Button>
+                <Button id="1" size="sm" className="mr-2 btn btn-primary">
+                    <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                        Month
+                    </span>
+                    <span className="d-block d-sm-none">
+                        <i className="tim-icons icon-gift-2" />
+                    </span>
+                </Button>
 
-            <Button id="1" size="sm" className="btn btn-primary">
-                <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                    Year
-                </span>
-                <span className="d-block d-sm-none">
-                    <i className="tim-icons icon-gift-2" />
-                </span>
-            </Button>
-        </ButtonGroup>
+                <Button id="1" size="sm" className="btn btn-primary">
+                    <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                        Year
+                    </span>
+                    <span className="d-block d-sm-none">
+                        <i className="tim-icons icon-gift-2" />
+                    </span>
+                </Button>
+            </ButtonGroup>
+        ) : null}
 
-        <div className="py-4">
-            <FrappeGantt
-                tasks={tasks}
-                onClick={(task) => console.log(task, "click")}
-                onDateChange={(task, start, end) =>
-                    console.log(task, start, end, "date")
-                }
-                onProgressChange={(task, progress) =>
-                    console.log(task, progress, "progress")
-                }
-                onTasksChange={(tasks) => console.log(tasks, "tasks")}
-                viewMode={ViewMode.Month}
-            />
-        </div>
+        {!isEmptyBlankDataDisplay ? (
+            <div className="py-4">
+                <FrappeGantt
+                    tasks={tasks}
+                    onClick={(task) => console.log(task, "click")}
+                    onDateChange={(task, start, end) =>
+                        console.log(task, start, end, "date")
+                    }
+                    onProgressChange={(task, progress) =>
+                        console.log(task, progress, "progress")
+                    }
+                    onTasksChange={(tasks) => console.log(tasks, "tasks")}
+                    viewMode={ViewMode.Month}
+                />
+            </div>
+        ) : null}
     </>)
 }
 

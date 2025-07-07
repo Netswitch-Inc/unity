@@ -170,6 +170,11 @@ const modulesData = [
   }
 ]
 
+const aiServiceTypes = {
+  gemini: "gemini",
+  openai: "openai",
+}
+
 // ** Checks if an object is empty (returns boolean)
 const isObjEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -453,6 +458,32 @@ const getReadFileContent = async (filePath = "") => {
   }
 }
 
+const getAIIntegrationCredentials = async () => {
+  try {
+    var aIService = await SettingService.getSettingBySlug("ai_integration_service") || null;
+    var aiServiceAPISlug = `${aIService?.type}_${aIService?.value}_api_key`;
+    if (aIService?.value && aiServiceAPISlug) {
+      var aiApiKey = await SettingService.getSettingBySlug(aiServiceAPISlug) || null;
+      if (aiApiKey?.value) {
+        let configType = aIService.value;
+        aiApiKey = aiApiKey?.value || "";
+
+        let config = {
+          type: configType,
+          api_key: aiApiKey,
+        }
+
+        return config;
+      }
+    }
+
+    throw Error("No AI Integration credentials found.")
+  } catch (error) {
+    console.log("getAIIntegrationCredentials catch >>> ", error);
+    throw Error(error)
+  }
+}
+
 module.exports = {
   wazuhKey,
   openVASKey,
@@ -462,6 +493,7 @@ module.exports = {
 
   moduleSlugs,
   modulesData,
+  aiServiceTypes,
 
   isObjEmpty,
   createUpdateEventLog,
@@ -476,5 +508,6 @@ module.exports = {
   createUpdateCronEventLog,
   sendPlatformTypeEmail,
   getReplaceValue,
-  getReadFileContent
+  getReadFileContent,
+  getAIIntegrationCredentials
 }

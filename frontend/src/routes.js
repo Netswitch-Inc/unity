@@ -32,9 +32,9 @@ import EditConnection from "views/connections/edit";
 
 import RiskAssessmentMethod from "views/ram";
 import ComplianceBuilder from "views/CompilanceBuilders";
-import CompilanceController from "views/CompilanceControl/index";
+import ResilienceIndex from "views/resilienceIndex";
 import CVELookupTool from "views/cveLookupTool";
-import ComplianceLookupTool from "views/complianceLookupTool";
+// import ComplianceLookupTool from "views/complianceLookupTool";
 
 import EventLogList from "views/eventLogs";
 import EventLogDetail from "views/eventLogs/detail";
@@ -101,7 +101,7 @@ import {
 
   toolsGroupPermissionId,
   cveLookupPermissionId,
-  complianceLookupPermissionId,
+  // complianceLookupPermissionId,
   vulnerabilityScannerPermissionId,
   siemPermissionId,
   logCollectorPermissionId,
@@ -268,7 +268,7 @@ const routes = [
         mini: "RI",
         layout: "/admin",
         customClass: "",
-        component: (<CompilanceController />),
+        component: (<ResilienceIndex />),
         permissionId: resilienceIndexPermissionId,
       },
       {
@@ -350,15 +350,15 @@ const routes = [
         component: (<CVELookupTool />),
         permissionId: cveLookupPermissionId
       },
-      {
-        path: "/compliance-lookup",
-        name: "Compliance Lookup",
-        mini: "CL",
-        layout: "/admin",
-        customClass: "",
-        component: (<ComplianceLookupTool />),
-        permissionId: complianceLookupPermissionId
-      },
+      // {
+      //   path: "/compliance-lookup",
+      //   name: "Compliance Lookup",
+      //   mini: "CL",
+      //   layout: "/admin",
+      //   customClass: "",
+      //   component: (<ComplianceLookupTool />),
+      //   permissionId: complianceLookupPermissionId
+      // },
       {
         path: "/vulnerability-scanner",
         name: "Vulnerability Scanner",

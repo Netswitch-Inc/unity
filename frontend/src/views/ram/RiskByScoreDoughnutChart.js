@@ -1,32 +1,43 @@
-import ReactApexChart from "react-apexcharts";
+// ** React Imports
 import React from "react";
 
-function RiskByScoreDoughnutChart() {
+// ** Third Party Components
+import ReactApexChart from "react-apexcharts";
+
+const RiskByScoreDoughnutChart = ({
+  isEmptyBlankDataDisplay
+}) => {
   let type = "pie";
   var options = {
-    labels: ["High", "Medium", "Low"],
+    labels: isEmptyBlankDataDisplay ? [] : ["High", "Medium", "Low"],
     legend: {
       labels: {
         colors: [
           "rgba(255,255,255, 0.8)",
           "rgba(255,255,255, 0.8)",
-          "rgba(255,255,255, 0.8)",
-        ],
-      },
+          "rgba(255,255,255, 0.8)"
+        ]
+      }
     },
-  };
-  let series = [25.37, 10.45, 64.18];
+    noData: {
+      text: "N/A",
+      align: "center",
+      style: {
+        color: "#FFFFFF"
+      }
+    }
+  }
+
+  let series = isEmptyBlankDataDisplay ? [] : [25.37, 10.45, 64.18];
   return (
-    <>
-      <ReactApexChart
-        width={"100%"}
-        height={280}
-        series={series}
-        type={type}
-        options={options}
-      />
-    </>
-  );
+    <ReactApexChart
+      type={type}
+      height={280}
+      width={"100%"}
+      series={series}
+      options={options}
+    />
+  )
 }
 
 export default RiskByScoreDoughnutChart;

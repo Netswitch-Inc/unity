@@ -41,6 +41,7 @@ var NetswitchThreatIntelStatsController = require("../controllers/netswitchThrea
 var ZendeskSupportController = require("../controllers/zendeskSupports.controller");
 var CompliancePriorityController = require("../controllers/compliancePriorities.controller");
 var ContactController = require("../controllers/contacts.controller");
+var AIPromptController = require("../controllers/aiPrompts.controller");
 
 // ** Auth
 router.post("/users/login", UserController.loginUser);
@@ -349,6 +350,9 @@ router.put("/compliance-priorities", Authorization, CompliancePriorityController
 router.get("/compliance-priorities/:id", Authorization, CompliancePriorityController.getCompliancePriority);
 router.delete("/compliance-priorities/:id", Authorization, CompliancePriorityController.softDeleteCompliancePriority);
 router.post("/company-compliance-priorities", Authorization, CompliancePriorityController.createCompanyCompliancesPriotity);
+
+// ** AI Prompts
+router.post("/ai-description-write", Authorization, AIPromptController.writeAiDescription);
 
 router.post("/tool-solution-contact", Authorization, ContactController.toolSolutionContact);
 

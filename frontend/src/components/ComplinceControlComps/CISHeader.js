@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { downloadFromStorage } from "../../views/CompilanceControl/cisstore";
+import { downloadFromStorage } from "../../views/resilienceIndex/cisstore";
 
 import { Row, Col } from "reactstrap";
 import { ProgressBar } from "react-bootstrap";
