@@ -36,7 +36,7 @@ import moment from "moment";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 // ** Constant
-import { dashboardTopWidgetDefault, priviledgesObjectPermission } from "utility/reduxConstant.js";
+import { isEmptyBlankDataDisplay, priviledgesObjectPermission } from "utility/reduxConstant.js";
 
 // ** Config
 import { wazuhKey, openVASKey, netswitchThreatIntelKey } from "configs/toolConfig.js";
@@ -469,7 +469,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Log Processed</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? ("178GB") : ("0")}
+                        {isEmptyBlankDataDisplay ? ("0") : ("178GB")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -499,7 +499,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Traffic Monitored</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? ("1.82TB") : ("0")}
+                        {isEmptyBlankDataDisplay ? ("0") : ("1.82TB")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -529,7 +529,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Protected Devices</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? ("265") : ("0")}
+                        {isEmptyBlankDataDisplay ? ("0") : ("265")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -559,7 +559,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Last Threat Intel</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? (lastIntelDate) : ("None")}
+                        {isEmptyBlankDataDisplay ? ("N/A") : (lastIntelDate)}
                       </CardTitle>
                     </div>
                   </Col>
@@ -589,7 +589,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Blocked Traffic</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? ("98k") : ("0")}
+                        {isEmptyBlankDataDisplay ? ("0") : ("98k")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -619,7 +619,7 @@ const Dashboard = () => {
                     <div>
                       <p className="card-category">Incidents</p>
                       <CardTitle tag="h3" style={{ fontSize: "1.75rem" }}>
-                        {dashboardTopWidgetDefault ? ("2") : ("0")}
+                        {isEmptyBlankDataDisplay ? ("0") : ("2")}
                       </CardTitle>
                     </div>
                   </Col>
@@ -673,6 +673,7 @@ const Dashboard = () => {
                                 data={item.data}
                                 height={item.height}
                                 className={item.className}
+                                isEmptyBlankDataDisplay={isEmptyBlankDataDisplay}
                                 handleToggle={() => handleToggleFunc(item.toggleFunc, item.name, !item.show)}
                               />
                             ) : null}

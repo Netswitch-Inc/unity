@@ -1,28 +1,54 @@
+// ** React Imports
 import React from "react";
-import { useTable, useExpanded } from "react-table";
+
+// ** Reactstrap Imports
 import { Table } from "reactstrap";
+import { useTable, useExpanded } from "react-table";
 
 // ** Third Party Components
 import classnames from "classnames";
 
+// ** Icons
+import editIcon from "assets/img/edit.svg";
+
 // Define this inside the file
-const renderRowSubComponent = ({ row, visibleColumns }) => {
+const renderRowSubComponent = ({ row, visibleColumns, projectStatus, projectItemData, aiServiceEnabled, handleOpenAIWriteModal }) => {
   return (
     <tr className="expanded-row">
       <td colSpan={visibleColumns.length}>
         <div className="my-expanded-content">
-          <p className="description-text">Type: <span className="font-weight-light">{row.original.security_function}</span></p>
+          <p className="description-text">Type: <span className="font-weight-light">{row.original?.security_function}</span></p>
         </div>
 
         <div className="my-expanded-content">
-          <p className="description-text">Description</p><p>{row.original.description}</p>
+          <p className="description-text">
+            Description
+            {!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status)) ? (
+              <img
+                width={18}
+                height={18}
+                alt="Edit"
+                title="Edit"
+                src={editIcon}
+                className="cursor-pointer mx-2"
+                onClick={() => handleOpenAIWriteModal(`sub-edit-dec@${row.original?._id}`)}
+              />
+            ) : null}
+          </p>
+          <p>{row.original?.description}</p>
         </div>
+
+        {aiServiceEnabled && (!projectItemData || (projectItemData && projectStatus?.includes(projectItemData?.status))) ? (
+          <div className="my-expanded-content buttons">
+            <button type="button" className="btnprimary mt-2" onClick={() => handleOpenAIWriteModal(`cis@${row.original?._id}`)}>Rewrite with Sara</button>
+          </div>
+        ) : null}
       </td>
     </tr>
   )
 }
 
-function ReactTable({ columns: userColumns, data }) {
+function ReactTable({ columns: userColumns, data, projectStatus, projectItemData, aiServiceEnabled, handleOpenAIWriteModal }) {
   const {
     headerGroups,
     rows,
@@ -91,7 +117,7 @@ function ReactTable({ columns: userColumns, data }) {
                     ))}
                   </tr>
                   {row.isExpanded ? (
-                    renderRowSubComponent({ row, rowProps, visibleColumns, data })
+                    renderRowSubComponent({ row, rowProps, visibleColumns, data, projectStatus, projectItemData, aiServiceEnabled, handleOpenAIWriteModal })
                   ) : null}
                 </React.Fragment>
               )

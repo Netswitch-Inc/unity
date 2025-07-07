@@ -136,11 +136,19 @@ exports.getAppSettings = async function (req, res, next) {
         var appURL = await SettingService.getSettingBySlug("app_setting_url") || null;
         var appFavicon = await SettingService.getSettingBySlug("app_setting_favicon") || null;
         var appLogo = await SettingService.getSettingBySlug("app_setting_logo") || null;
+        var aiInteService = await SettingService.getSettingBySlug("ai_integration_service") || null;
+        var aiInteApiKey = null;
+        if (aiInteService?.value) {
+            var aiServiceAPISlug = `${aiInteService?.type}_${aiInteService?.value}_api_key`;
+            aiInteApiKey = await SettingService.getSettingBySlug(aiServiceAPISlug) || null;
+        }
 
         appName = appName?.value || "";
         appURL = appURL?.value || "";
         appFavicon = appFavicon?.value || "";
         appLogo = appLogo?.value || "";
+        aiInteService = aiInteService?.value || "";
+        aiInteApiKey = aiInteApiKey?.value || "";
 
         if (appFavicon && !fs.existsSync(`${publicPath}/${appFavicon}`)) { appFavicon = ""; }
         if (appLogo && !fs.existsSync(`${publicPath}/${appLogo}`)) { appLogo = ""; }
@@ -150,6 +158,10 @@ exports.getAppSettings = async function (req, res, next) {
             url: appURL,
             favicon: appFavicon,
             logo: appLogo
+        }
+
+        if (aiInteService && aiInteApiKey) {
+            appSettingItems.ai_service_enabled = true;
         }
 
         // Return the Settings list with the appropriate HTTP password Code and Message.

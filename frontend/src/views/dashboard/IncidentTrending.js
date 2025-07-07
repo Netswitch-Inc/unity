@@ -14,10 +14,8 @@ import {
   DropdownToggle
 } from "reactstrap";
 
-import moment from "moment";
 import Chart from "react-apexcharts";
 
-import { VulnerTaskData } from "../sampleData/mockData";
 import { OptionsForSIEMGraph } from "utility/reduxConstant";
 
 const IncidentTrending = () => {
@@ -36,15 +34,6 @@ const IncidentTrending = () => {
   useLayoutEffect(() => {
     handleIncidentTrendWazuhStatsData();
   }, [handleIncidentTrendWazuhStatsData]);
-
-  let siemTrending = [];
-  VulnerTaskData.SIEMTending.forEach((data) => {
-    var arr = [];
-    let date = moment(data["Time"], "YYYY-MM-DD").format("x");
-    arr.push(parseInt(date));
-    arr.push(data["Alert"]);
-    siemTrending.push(arr);
-  });
 
   const [lowTrending, setLowTrending] = useState([]);
   const [mediumTrending, setMediumTrending] = useState([]);

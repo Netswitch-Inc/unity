@@ -1,3 +1,4 @@
+// ** Reactstrap Imports
 import {
     Table,
     Progress,
@@ -7,16 +8,20 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownToggle,
-    UncontrolledDropdown,
+    UncontrolledDropdown
 } from "reactstrap";
+
 import { ManagementTaskData } from "views/sampleData/mockData";
 
-const ManagementTable = () => {
-    return (
-        // <Card className="db-mid-section">
-        <>
-            <CardHeader>
-                {/* <ExportPdf className="d-flex justify-content-end" /> */}
+const ManagementTable = ({
+    isEmptyBlankDataDisplay
+}) => {
+    const managementTasks = isEmptyBlankDataDisplay ? [] : ManagementTaskData;
+
+    return (<>
+        <CardHeader>
+            {/* <ExportPdf className="d-flex justify-content-end" /> */}
+            {!isEmptyBlankDataDisplay ? (
                 <div className="tools float-right">
                     <UncontrolledDropdown>
                         <DropdownToggle
@@ -48,9 +53,15 @@ const ManagementTable = () => {
                         </DropdownMenu>
                     </UncontrolledDropdown>
                 </div>
-                <CardTitle tag="h5">Management Table</CardTitle>
-            </CardHeader>
-            <CardBody>
+            ) : null}
+            <CardTitle tag="h5">Management Table</CardTitle>
+        </CardHeader>
+        <CardBody>
+            {isEmptyBlankDataDisplay ? (
+                <p className="text-center align-middle">N/A</p>
+            ) : null}
+
+            {!isEmptyBlankDataDisplay ? (
                 <Table responsive>
                     <thead className="text-primary">
                         <tr>
@@ -63,35 +74,33 @@ const ManagementTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {ManagementTaskData.map((val, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td className="text-center">{val.Index}</td>
-                                    <td>{val.TaskName}</td>
-                                    <td>{val.Owner}</td>
-                                    <td>{val.ProjectedDate}</td>
-                                    <td>
-                                        <div className="progress-container progress-sm">
-                                            <Progress multi>
-                                                <Progress bar max="100" value={val.Milestone} />
-                                            </Progress>
-                                            <span
-                                                className="progress-value"
-                                                style={{ fontSize: "0.62475rem" }}
-                                            >
-                                                {val.Milestone} %
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="text-right">${val.Spent}</td>
-                                </tr>
-                            );
-                        })}
+                        {managementTasks.map((val, index) => (
+                            <tr key={index}>
+                                <td className="text-center">{val.Index}</td>
+                                <td>{val.TaskName}</td>
+                                <td>{val.Owner}</td>
+                                <td>{val.ProjectedDate}</td>
+                                <td>
+                                    <div className="progress-container progress-sm">
+                                        <Progress multi>
+                                            <Progress bar max="100" value={val.Milestone} />
+                                        </Progress>
+                                        <span
+                                            className="progress-value"
+                                            style={{ fontSize: "0.62475rem" }}
+                                        >
+                                            {val.Milestone} %
+                                        </span>
+                                    </div>
+                                </td>
+                                <td className="text-right">${val.Spent}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </Table>
-            </CardBody>
-            {/* </Card> */}
-        </>
-    );
-};
+            ) : null}
+        </CardBody>
+    </>)
+}
+
 export default ManagementTable

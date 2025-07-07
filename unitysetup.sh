@@ -44,6 +44,9 @@ MONGO_DB_USER=""
 MONGO_DB_PASSWORD=""
 MONGO_DB_AUTH=""
 
+# Set to "true" or "false" for Blank (true) data on server
+IS_EMPTY_BLANK_DATA_DISPLAY="false"
+
 
 # Function to print descriptions in color
 print_yellow() {
@@ -163,6 +166,7 @@ update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_SECURED" "$MONGO_DB_SECURED"
 update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_USER" "$MONGO_DB_USER"
 update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_PASSWORD" "$MONGO_DB_PASSWORD"
 update_environment_file "$ROOT_ENV_FILE" "MONGO_DB_AUTH" "$MONGO_DB_AUTH"
+update_environment_file "$ROOT_ENV_FILE" "REACT_APP_IS_EMPTY_BLANK_DATA_DISPLAY" "$IS_EMPTY_BLANK_DATA_DISPLAY"
 
 print_yellow "Updating backend .env file..."
 update_environment_file "$BACKEND_ENV_FILE" "FRONT_WEB_URL" "$FRONTEND_WEB_URL"
@@ -186,6 +190,7 @@ update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_BACKEND_REST_API_URL" "$
 update_environment_file "$FRONTEND_ENV_FILE" "PORT" "$FRONTEND_PORT"
 update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_COMPANY_NAME" "$COMPANY_NAME"
 update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_COMPANY_URL" "$COMPANY_URL"
+update_environment_file "$FRONTEND_ENV_FILE" "REACT_APP_IS_EMPTY_BLANK_DATA_DISPLAY" "$IS_EMPTY_BLANK_DATA_DISPLAY"
 
 print_green  "Updated .env files successfully."
 

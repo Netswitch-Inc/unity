@@ -56,7 +56,6 @@ const AllprojectsTab = ({ currentTab }) => {
   const handleRowClicked = (row) => {
     navigate(`/admin/project-details/${row?._id}`, {
       state: {
-        // data: RAMData.RAMTableData,
         displayID: row?._id,
       },
     });
