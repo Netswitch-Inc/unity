@@ -67,7 +67,7 @@ until mongosh --host "$MONGO_DB_HOST" --port "$MONGO_DB_PORT" --eval "db.runComm
 done
 echo "✅ MongoDB is up and running."
 
-MONGO_DB_COLLECTIONS="modules,settings"
+MONGO_DB_COLLECTIONS="modules"
 
 # Validate required env vars
 if [ -z "$MONGO_DB_NAME" ] || [ -z "$MONGO_DB_HOST" ] || [ -z "$MONGO_DB_PORT" ]; then
