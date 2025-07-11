@@ -118,6 +118,12 @@ const ComplianceBuilder = () => {
     }
   }, [dispatch, controlStore.actionFlag, controlStore.error])
 
+  useEffect(() => {
+    setTimeout(() => {
+      setShowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar])
+
   const finishButtonClick = (event) => {
     let controls = [...complianceControls]
     if (event && event[step3Name]) {
