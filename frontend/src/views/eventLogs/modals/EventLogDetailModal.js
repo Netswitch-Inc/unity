@@ -30,6 +30,9 @@ const EventLogDetailModal = ({ open, closeModal, eventLogDetailItem }) => {
       "retry_count",
       "is_super",
       "is_default",
+      "weightIndex",
+      "priviledges",
+      "users_ai_description",
       "__v",
     ];
 

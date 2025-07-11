@@ -3,14 +3,17 @@ import React, { useState, useEffect, useCallback } from "react";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
+import { updateProject } from "../store";
 import { cleanAIPromptMessage, writeDescriptionWithAI } from "views/aiPrompts/store";
-import { updateCompanyComplianceControl } from "views/companyComplianceControls/store";
 
 // ** Reactstrap Imports
 import { Col, Row, FormFeedback, Label } from "reactstrap";
 import { Modal, Form as BootstrapForm } from "react-bootstrap";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
+
+// ** Utils
+import { getFormatDate } from "utility/Utils";
 
 // ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
@@ -22,17 +25,19 @@ import { TiMessages } from "react-icons/ti";
 const AIPromptWriteModal = ({
     isOpen,
     closeModal,
-    selectedControl,
-    handleUpdateDescription
+    authUserItem,
+    handleGetProject,
+    currentUserIsSuper,
+    selectedProjectItem,
+    isUserGeneratedAIDescription
 }) => {
     // ** Store vars
     const dispatch = useDispatch();
     const store = useSelector((state) => state.aiPrompt);
-    const companyComplianceControlStore = useSelector((state) => state.companyComplianceControls);
+    const projectStore = useSelector((state) => state.projects);
 
     // ** Const
-    const writeTypes = ["cis", "sub-edit-dec"];
-    const initValues = { name: selectedControl?.name || "", description: selectedControl?.description || "", keywords: "" }
+    const initValues = { name: selectedProjectItem?.name || "", description: selectedProjectItem?.description || "", keywords: "" }
 
     // ** States
     const [showSnackBar, setShowSnackbar] = useState(false);
@@ -40,7 +45,7 @@ const AIPromptWriteModal = ({
     const [formItem, setFormItem] = useState(initValues);
     const [viewType, setViewType] = useState("");
     const [optDecInd, setOptDecInd] = useState("");
-    const [decValue, setDecValue] = useState("");
+    const [usersDescription, setUsersDescription] = useState([]);
 
     const ValidationSchema = yup.object({
         // keywords: yup.string().required("Keywords is required.")
@@ -52,27 +57,28 @@ const AIPromptWriteModal = ({
 
     const handleReset = useCallback(() => {
         closeModal();
-        setDecValue("");
         setViewType("");
         setOptDecInd("");
+        setUsersDescription([]);
     }, [closeModal])
 
     const handleModalOpen = () => {
-        setDecValue("");
         setViewType("");
         setOptDecInd("");
         const frmItem = initValues;
-        const writeType = isOpen?.split("@");
-        const cisControls = selectedControl?.cis_control_id || [];
-        if (cisControls?.length && writeType?.length > 1 && writeTypes.includes(writeType[0])) {
-            const control = cisControls.find((x) => x._id === writeType[1]);
-            if (control?._id) {
-                frmItem.name = control?.name || "";
-                frmItem.description = control?.description || "";
+        let usrDescriptions = [];
+        const userId = authUserItem?._id || null;
+        if (isOpen.includes("edit-dec") && isUserGeneratedAIDescription()) {
+            if (selectedProjectItem?.users_ai_description?.length) {
+                const ind = selectedProjectItem.users_ai_description.findIndex((x) => x.user_id._id === userId);
+                if (ind >= 0 && selectedProjectItem.users_ai_description?.[ind]?.description) { frmItem.description = selectedProjectItem.users_ai_description[ind]?.description; }
             }
+
+            usrDescriptions = selectedProjectItem.users_ai_description.filter((x) => x.user_id._id !== userId);
         }
 
         setFormItem(frmItem);
+        setUsersDescription(usrDescriptions);
     }
 
     const handleRegenerate = () => {
@@ -80,21 +86,14 @@ const AIPromptWriteModal = ({
         setOptDecInd("");
     }
 
-    const handleUpdateDescriptionLocally = useCallback(() => {
-        if (optDecInd >= 0 && handleUpdateDescription) {
-            const description = decValue;
-            handleUpdateDescription(isOpen, description);
-            handleReset();
-        }
-    }, [handleReset, handleUpdateDescription, isOpen, decValue, optDecInd])
-
     useEffect(() => {
-        if (companyComplianceControlStore?.actionFlag === "CMPN_CONTRL_UPDT") {
-            handleUpdateDescriptionLocally();
-        }
-
         if (store?.actionFlag === "WRT_AI_DEC_SCS") {
             setViewType("generated");
+        }
+
+        if (projectStore.actionFlag === "PRJCT_UPDT_SCS" && isOpen) {
+            if (handleGetProject) { handleGetProject(); }
+            handleReset();
         }
 
         if (store?.actionFlag || store?.success || store?.error) {
@@ -110,7 +109,7 @@ const AIPromptWriteModal = ({
             setShowSnackbar(true);
             setSnackMessage(store.error);
         }
-    }, [dispatch, handleReset, handleUpdateDescriptionLocally, store.error, store.success, store.actionFlag, companyComplianceControlStore.actionFlag])
+    }, [dispatch, handleReset, handleGetProject, store.error, store.success, store.actionFlag, projectStore.actionFlag, isOpen])
 
     useEffect(() => {
         setTimeout(() => {
@@ -122,66 +121,69 @@ const AIPromptWriteModal = ({
         if (values) {
             const payload = { ...values }
 
-            if (selectedControl?.framework_id?.label) {
-                payload.framework_name = selectedControl?.framework_id?.label;
+            if (selectedProjectItem?.framework_id?.label) {
+                payload.framework_name = selectedProjectItem?.framework_id?.label;
             }
 
-            // console.log("handleSubmit >>> ", payload);
             dispatch(writeDescriptionWithAI(payload));
         }
     }
 
     const handleAISaveDescription = () => {
+        const userId = authUserItem?._id || null;
         if (optDecInd >= 0) {
-            const payload = { _id: selectedControl?.company_compliance_control_id || "" }
+            const payload = {
+                _id: selectedProjectItem?._id || "",
+                users_ai_description: [...selectedProjectItem?.users_ai_description]
+            }
 
             const description = store?.aiDescriptionItems[optDecInd]?.description || "";
-            if (isOpen?.includes("cis@") && isOpen?.split("@")?.length > 1) {
-                const cisControlId = isOpen?.split("@")[1];
-                const subCisDescrip = [...selectedControl?.cis_control_descriptions];
-                const ind = subCisDescrip?.findIndex((x) => x.cis_control_id === cisControlId);
-                if (ind >= 0) {
-                    subCisDescrip[ind] = { ...subCisDescrip[ind], description };
-                } else {
-                    subCisDescrip.push({ cis_control_id: cisControlId, description })
-                }
-
-                payload.cis_control_descriptions = subCisDescrip;
+            const ind = payload.users_ai_description.findIndex((x) => x.user_id._id === userId);
+            if (ind >= 0) {
+                payload.users_ai_description[ind] = { ...payload.users_ai_description[ind], description, createdAt: new Date().getTime() }
             } else {
-                payload.control_description = description;
+                payload.users_ai_description.push({
+                    user_id: authUserItem?._id || null,
+                    description,
+                    createdAt: new Date().getTime()
+                })
             }
 
             // console.log("handleAISaveDescription ==== ", optDecInd, payload);
-            if (payload?._id && (payload?.control_description || payload?.cis_control_descriptions?.length)) {
-                setDecValue(description);
-                dispatch(updateCompanyComplianceControl(payload));
+            if (payload?._id && payload?.users_ai_description?.length) {
+                dispatch(updateProject(payload));
             }
         }
     }
 
     const handleSubmitDescription = (values) => {
+        const userId = authUserItem?._id || null;
         if (values) {
-            const payload = { _id: selectedControl?.company_compliance_control_id || "" }
-            const description = values?.description || "";
-            if (isOpen?.includes("sub-edit-dec@") && isOpen?.split("@")?.length > 1) {
-                const cisControlId = isOpen?.split("@")[1];
-                const subCisDescrip = [...selectedControl?.cis_control_descriptions];
-                const ind = subCisDescrip?.findIndex((x) => x.cis_control_id === cisControlId);
-                if (ind >= 0) {
-                    subCisDescrip[ind] = { ...subCisDescrip[ind], description };
-                } else {
-                    subCisDescrip.push({ cis_control_id: cisControlId, description })
-                }
+            const payload = {
+                _id: selectedProjectItem?._id || "",
+                users_ai_description: [...selectedProjectItem?.users_ai_description]
+            }
 
-                payload.cis_control_descriptions = subCisDescrip;
+            const description = values?.description || "";
+            const ind = payload.users_ai_description.findIndex((x) => x.user_id._id === userId);
+            if (ind >= 0) {
+                payload.users_ai_description[ind] = {
+                    ...payload.users_ai_description[ind],
+                    description,
+                    createdAt: new Date().getTime(),
+                    user_id: payload.users_ai_description[ind]?.user_id?._id || payload.users_ai_description[ind]?.user_id
+                }
             } else {
-                payload.control_description = description;
+                payload.users_ai_description.push({
+                    user_id: authUserItem?._id || null,
+                    description,
+                    createdAt: new Date().getTime()
+                })
             }
 
             // console.log("handleSubmitDescription >>> ", values, payload);
-            if (payload?._id && (payload?.control_description || payload?.cis_control_descriptions?.length)) {
-                setDecValue(description);
-                dispatch(updateCompanyComplianceControl(payload));
+            if (payload?._id && payload?.users_ai_description?.length) {
+                dispatch(updateProject(payload));
             }
         }
     }
@@ -205,18 +207,17 @@ const AIPromptWriteModal = ({
             <Modal.Header>
                 <span className="modal-title col-sm-12" id="example-modal-sizes-title-lg">
                     <h3 className="mb-0 mt-0">
-                        {isOpen.includes("edit-dec@") ? ("Edit Description") : ("Write with Sara")}
+                        Review with Sara
                     </h3>
                 </span>
 
                 <button type="button" className='Close-button' onClick={handleReset}>×</button>
             </Modal.Header>
 
-            {!companyComplianceControlStore?.loading ? (<SimpleSpinner />) : null}
             {!store?.loading ? (<SimpleSpinner />) : null}
 
             <Modal.Body>
-                {isOpen.includes("edit-dec@") ? (
+                {isOpen.includes("edit-dec") ? (
                     <Formik
                         initialValues={formItem}
                         enableReinitialize={formItem}
@@ -225,6 +226,24 @@ const AIPromptWriteModal = ({
                     >
                         {({ errors, touched }) => (
                             <Form className="my-2">
+                                {currentUserIsSuper && usersDescription?.length ? (
+                                    <Row>
+                                        <h3 className="px-2 pb-1 mb-1">User Descriptions</h3>
+                                        {usersDescription.map((item, ind) => (
+                                            <Col key={`usr-dec-${ind}`} xl={12} lg={12} as={BootstrapForm.Group} controlId={`formGrid-${ind}`} className="full-width">
+                                                <BootstrapForm.Label className="col-label d-flex justify-content-between">
+                                                    <span>{item?.user_id?.name}</span>
+
+                                                    {item?.user_id?.createdAt ? (
+                                                        <span className="text-right">{getFormatDate(item?.user_id?.createdAt, "DD-MMM-YYYY HH:mm:ss")}</span>
+                                                    ) : null}
+                                                </BootstrapForm.Label>
+                                                <p className="text-white">{item?.description}</p>
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                ) : null}
+
                                 <Row>
                                     <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
                                         <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>

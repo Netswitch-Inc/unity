@@ -264,6 +264,36 @@ export const createMultipleCompanyComplianceControl = createAsyncThunk("appCompa
     }
 })
 
+async function updateMultipleCompanyComplianceControlRequest(payload) {
+    return instance.post(`${API_ENDPOINTS.companyComplianceControls.updates}`, payload)
+        .then((items) => items.data).catch((error) => error)
+}
+
+export const updateMultipleCompanyComplianceControl = createAsyncThunk("appCompanyComplianceControls/updateMultipleCompanyComplianceControl", async (params) => {
+    try {
+        const response = await updateMultipleCompanyComplianceControlRequest(params);
+        if (response && response.flag) {
+            return {
+                actionFlag: "CCC_MNY_UPDT",
+                success: response.message,
+                error: "",
+            };
+        } else {
+            return {
+                actionFlag: "CCC_MNY_UPDT_ERR",
+                success: "",
+                error: response.message,
+            };
+        }
+    } catch (error) {
+        return {
+            actionFlag: "CCC_MNY_UPDT_ERR",
+            success: "",
+            error: error,
+        };
+    }
+})
+
 // Create a slice
 const appAuthSlice = createSlice({
     name: 'appCompanyComplianceControls',
@@ -412,6 +442,24 @@ const appAuthSlice = createSlice({
                 state.error = action.payload?.error;
             })
             .addCase(createMultipleCompanyComplianceControl.rejected, (state) => {
+                state.loading = true;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(updateMultipleCompanyComplianceControl.pending, (state) => {
+                state.companyComplianceControlData = null;
+                state.companyFrameworkList = [];
+                state.loading = false;
+                state.success = "";
+                state.error = "";
+            })
+            .addCase(updateMultipleCompanyComplianceControl.fulfilled, (state, action) => {
+                state.loading = true;
+                state.actionFlag = action.payload?.actionFlag || "";
+                state.success = action.payload?.success;
+                state.error = action.payload?.error;
+            })
+            .addCase(updateMultipleCompanyComplianceControl.rejected, (state) => {
                 state.loading = true;
                 state.success = "";
                 state.error = "";

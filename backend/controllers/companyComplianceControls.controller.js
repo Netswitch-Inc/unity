@@ -5,8 +5,6 @@ var FrameworkService = require('../services/framework.service');
 // Saving the context of this module inside the _the variable
 _this = this;
 
-var superAdminRole = process.env?.SUPER_ADMIN_ROLE || "";
-
 exports.getCompanyComplianceControls = async function (req, res, next) {
   try {
     var sort = req.query?.sort == "asc" ? 1 : -1;
@@ -68,7 +66,6 @@ exports.getCompanyComplianceControlList = async function (req, res, next) {
   try {
     var companyId = req.query?.company_id || req?.companyId || "";
     var userId = req.query?.user_id || req?.userId || "";
-    var roleId = req?.roleId || "";
     var compliancePriorityId = req.query?.compliance_priority_id || "";
     if (!companyId && !userId) {
       return res.status(200).json({ status: 200, flag: false, message: "Company or User Id must be present." });
@@ -77,6 +74,10 @@ exports.getCompanyComplianceControlList = async function (req, res, next) {
     var query = { deletedAt: null };
     if (companyId) { query.company_id = companyId; }
     if (userId) { query.user_id = userId; }
+
+    if (req.query?.builder_session == "active") {
+      query.builder_status = { $ne: "reset" };
+    }
 
     var compliancePriority = null;
     if (compliancePriorityId) {
@@ -173,6 +174,27 @@ exports.updateCompanyComplianceControl = async function (req, res, next) {
     });
   } catch (e) {
     return res.status(200).json({ status: 200, flag: false, message: e.message });
+  }
+}
+
+exports.updateManyCompanyComplianceControl = async function (req, res, next) {
+  try {
+    var query = {};
+    var payload = {};
+    if (req?.body?.company_id) { query.company_id = req.body.company_id; }
+    if (req?.body?.user_id) { query.user_id = req.body.user_id; }
+    if (req?.body?.user_id) { query.user_id = req.body.user_id; }
+    if (req?.body?.builder_status) { payload.builder_status = req.body.builder_status; }
+
+    await CompanyComplianceControlService.updateManyCompanyComplianceControl(query, payload);
+
+    return res.status(200).json({
+      status: 200,
+      flag: true,
+      message: "Company Compliance Control updated successfully.",
+    });
+  } catch (error) {
+    return res.status(200).json({ status: 200, flag: false, message: error.message });
   }
 }
 

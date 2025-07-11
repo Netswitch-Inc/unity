@@ -28,9 +28,9 @@ import { TiArrowLeft } from "react-icons/ti";
 // ** Constant
 import {
   currencySign,
-  superAdminRole,
-  companyAdminRole,
   defaultPerPageRow,
+  superPriviledgeType,
+  adminPriviledgeType,
   projectsPermissionId,
   governanceGroupPermissionId
 } from "utility/reduxConstant";
@@ -39,20 +39,31 @@ import Gauge from "./Gauge";
 import Comments from "./Comments";
 import Attachments from "./Attachments";
 
+// ** Models
+import AIPromptWriteModal from "views/projects/models/AIPromptWriteModal";
+
+// ** PNG Icons
+import crgGoldenYellowLogo from "assets/img/crg-golden-yellow-logo.png";
+
 const ProjectDetailsCard = (props) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   let id = props.displayID;
   let riskData = props.data;
-  
+
   const allowed = riskData?.status === 'created';
 
+  const dispatch = useDispatch();
   const historyStore = useSelector((state) => state.history);
-  const loginStore = useSelector((state) => state.login)
+  const loginStore = useSelector((state) => state.login);
   const store = useSelector((state) => state.comments);
+  const settingStore = useSelector((state) => state.globalSetting);
 
   // ** Const
   const permission = getModulePermissionData(loginStore?.authRolePermission, projectsPermissionId, governanceGroupPermissionId)
+  const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
+  const appSettingItem = settingStore?.appSettingItem || null;
+  const aiServiceEnabled = appSettingItem?.ai_service_enabled || false;
+  const currentUserIsSuper = (authUserItem?.role_id?.priviledge === superPriviledgeType) || false;
 
   const frameworks = riskData.framework_id?.map((framework) => framework?.label)
   const InvolvedParties = riskData.involved_parties?.map((party) => party?.user_name)
@@ -62,12 +73,20 @@ const ProjectDetailsCard = (props) => {
   const [page] = useState(1);
   const [complianceTags] = useState(frameworks);
   const [partiesTags] = useState(InvolvedParties);
-  const [submitTagsinput] = useState([riskData.submitted_by.user_name])
+  const [submitTagsinput] = useState([riskData.submitted_by.user_name]);
+  const [openAIDecWriteModal, setAIDecWriteModal] = useState("");
 
   const slider1Ref = useRef(null);
   const slider2Ref = useRef(null);
-  const leftSectionRef = useRef(null)
+  const leftSectionRef = useRef(null);
 
+  const handleOpenAIDecWriteModal = (value) => {
+    setAIDecWriteModal(value);
+  }
+
+  const closeAIDecWriteModal = () => {
+    setAIDecWriteModal("");
+  }
 
   const callApies = async (payload) => {
     dispatch(updateProject(payload))
@@ -131,6 +150,13 @@ const ProjectDetailsCard = (props) => {
     "High",
     "Catastrophic"
   ]
+
+  // const handleUpdateDescription = useCallback(() => {
+  //   if (aiPromptStore?.aiDescriptionItems?.length) {
+  //     const description = aiPromptStore?.aiDescriptionItems?.[0]?.description || "";
+  //     dispatch(updateProject({ _id: id, ai_description: description }));
+  //   }
+  // }, [dispatch, aiPromptStore.aiDescriptionItems])
 
   useEffect(() => {
     const createSlider = (sliderRef, startValue, onChange) => {
@@ -244,6 +270,17 @@ const ProjectDetailsCard = (props) => {
     await updateProjectStatus(payload, action);
   }
 
+  const isUserGeneratedAIDescription = () => {
+    let isGenerated = false;
+    const userId = authUserItem?._id || null;
+    if (riskData?.users_ai_description?.length) {
+      const ind = riskData.users_ai_description.findIndex((x) => x.user_id._id === userId);
+      if (ind >= 0) { isGenerated = true; }
+    }
+
+    return isGenerated;
+  }
+
   return (
     <div className="main-risk-edit">
       <Row className="align-items-center mb-2">
@@ -270,244 +307,260 @@ const ProjectDetailsCard = (props) => {
             </button>
           </>) : null}
 
-          {(loginStore?.authUserItem?.role_id?._id === superAdminRole ||
-            loginStore?.authUserItem?.role_id?._id === companyAdminRole) || permission?.update ? (<>
-              {riskData?.status === 'created' ? (<>
-                <button
-                  className="btnprimary mb-0 mt-0 ml-2"
-                  onClick={() => updateStatus({ _id: id, status: "approved" }, "created", "Approve")}
-                >
-                  Approve
-                </button>
-              </>) : null}
-
-              {riskData?.status === 'approved' ? (<>
-                <button
-                  className="btnprimary mb-0 mt-0 ml-2"
-                  onClick={() => updateStatus({ _id: id, status: "completed" }, "approved", "Complete")}
-                >
-                  Complete
-                </button>
-              </>) : null}
-
-              {riskData?.status === 'created' || riskData?.status === 'approved' ? (<>
-                <button
-                  className="btnprimary mb-0 mt-0 ml-2"
-                  onClick={() => updateStatus({ _id: id, status: "cancelled" }, "created", "Cancel")}
-                >
-                  Decline
-                </button>
-              </>) : null}
+          {(currentUserIsSuper || authUserItem?.role_id?.priviledge === adminPriviledgeType) || permission?.update ? (<>
+            {riskData?.status === 'created' ? (<>
+              <button
+                className="btnprimary mb-0 mt-0 ml-2"
+                onClick={() => updateStatus({ _id: id, status: "approved" }, "created", "Approve")}
+              >
+                Approve
+              </button>
             </>) : null}
+
+            {riskData?.status === 'approved' ? (<>
+              <button
+                className="btnprimary mb-0 mt-0 ml-2"
+                onClick={() => updateStatus({ _id: id, status: "completed" }, "approved", "Complete")}
+              >
+                Complete
+              </button>
+            </>) : null}
+
+            {riskData?.status === 'created' || riskData?.status === 'approved' ? (<>
+              <button
+                className="btnprimary mb-0 mt-0 ml-2"
+                onClick={() => updateStatus({ _id: id, status: "cancelled" }, "created", "Cancel")}
+              >
+                Decline
+              </button>
+            </>) : null}
+          </>) : null}
         </Col>
       </Row>
 
       <Row>
         <Col lg={8}>
-        <div ref={leftSectionRef}>
-          <Row className="mb-3">
-            <Col md={6}>
-              <Card role="description" className="h-100 pb-0">
-                <FormGroup>
-                  <label className="description">Description</label>
-                  <p className="description-text"> {riskData?.description}</p>
-                </FormGroup>
-              </Card>
-            </Col>
+          <div ref={leftSectionRef}>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Card role="description" className="h-100 pb-0">
+                  <FormGroup>
+                    <label className="description">Description</label>
+                    <p className="description-text"> {riskData?.description || ""}</p>
+                  </FormGroup>
 
-            <Col md={6} className="pl-md-0">
-              {/* Column for gauge */}
-              <Card className=" main-graph-dot h-100 mt-md-0 mt-2 p-0">
-                <Gauge val={((likelihood * impactAssessment) / 25) * 100} />
-              </Card>
-            </Col>
-          </Row>
+                  <div className="buttons">
+                    {aiServiceEnabled && !isUserGeneratedAIDescription() ? (
+                      <button type="button" className="btnprimary mt-0" onClick={() => handleOpenAIDecWriteModal("ai-dec")}>Review with Sara</button>
+                    ) : null}
 
-          <Row>
-            <Col>
-              <div>
-                <Card className="mb-3 asses-card">
-                  <Row>
-                    <Col lg={12}>
-                      <div className="description mb-2">Risk Assessment</div>
-                      {/* Column for Details */}
-                      <Row role="displayName">
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup className="text-lg-left">
-                            <label className="text-info">Compliance</label>
-                            <div className="react-tagsinput">
-                              <p className="react-tagsinput-tag warning">{complianceTags}</p>
-                            </div>
-                          </FormGroup>
-                        </Col>
+                    <img
+                      alt="CRG"
+                      width={20}
+                      height={20}
+                      title="Review with Sara"
+                      className="cursor-pointer"
+                      src={crgGoldenYellowLogo}
+                      onClick={() => handleOpenAIDecWriteModal("edit-dec")}
+                    />
+                  </div>
 
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">
-                              Involved Parties
-                            </label>
-                            <div className="react-tagsinput">
-                              <p className="react-tagsinput-tag info">{partiesTags}</p>
-                            </div>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">
-                              Cost of The Risk
-                            </label>
-                            <p>{currencySign}{riskData.cost_of_risk}</p>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">
-                              Cost of Fix Risk Ratio
-                            </label>
-                            <p>{currencySign}{riskData.fix_cost_risk_ratio}</p>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup className="text-lg-left">
-                            <label className="text-info">Submitted By</label>
-                            <div className="react-tagsinput">
-                              <p className="react-tagsinput-tag info">{submitTagsinput}</p>
-                            </div>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">
-                              Affected Scope
-                            </label>
-                            <p>{riskData.affected_scope}</p>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">Priority</label>
-                            <p>{riskData.priority}</p>
-                          </FormGroup>
-                        </Col>
-
-                        <Col className="col-6 col-md-4 col-lg-3">
-                          <FormGroup>
-                            <label className="text-info">
-                              Projected Cost to Fix
-                            </label>
-                            <p>{currencySign}{riskData.fix_projected_cost}</p>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
                 </Card>
+              </Col>
 
-                <Card className="mb-3 like-impact-main">
-                  <Row>
-                    <Col xs={12}>
-                      <h6 className="description">Likelihood</h6>
-                      <div className="box lg">
-                        <div className="slider" ref={slider1Ref} />
-                      </div>
+              <Col md={6} className="pl-md-0">
+                {/* Column for gauge */}
+                <Card className=" main-graph-dot h-100 mt-md-0 mt-2 p-0">
+                  <Gauge val={((likelihood * impactAssessment) / 25) * 100} />
+                </Card>
+              </Col>
+            </Row>
 
-                      <div className="hidden-mobile">
-                        <div className="dropdown">
-                          <select
-                            aria-label="select"
-                            value={likelihood}
-                            onChange={(e) => setLikelihood(e?.target?.value || 0)}
-                            className="form-select dropbtn w-100 dropdown-toggle btn"
-                          >
-                            <option value={1}>Not Foreseeable</option>
-                            <option value={2}>
-                              Foreseeable,but unexpected
-                            </option>
-                            <option value={3}>
-                              Expected,but not common!
-                            </option>
-                            <option value={4}>Common</option>
-                            <option value={5}>Current</option>
-                          </select>
+            <Row>
+              <Col>
+                <div>
+                  <Card className="mb-3 asses-card">
+                    <Row>
+                      <Col lg={12}>
+                        <div className="description mb-2">Risk Assessment</div>
+                        {/* Column for Details */}
+                        <Row role="displayName">
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup className="text-lg-left">
+                              <label className="text-info">Compliance</label>
+                              <div className="react-tagsinput">
+                                <p className="react-tagsinput-tag warning">{complianceTags}</p>
+                              </div>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">
+                                Involved Parties
+                              </label>
+                              <div className="react-tagsinput">
+                                <p className="react-tagsinput-tag info">{partiesTags}</p>
+                              </div>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">
+                                Cost of The Risk
+                              </label>
+                              <p>{currencySign}{riskData.cost_of_risk}</p>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">
+                                Cost of Fix Risk Ratio
+                              </label>
+                              <p>{currencySign}{riskData.fix_cost_risk_ratio}</p>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup className="text-lg-left">
+                              <label className="text-info">Submitted By</label>
+                              <div className="react-tagsinput">
+                                <p className="react-tagsinput-tag info">{submitTagsinput}</p>
+                              </div>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">
+                                Affected Scope
+                              </label>
+                              <p>{riskData.affected_scope}</p>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">Priority</label>
+                              <p>{riskData.priority}</p>
+                            </FormGroup>
+                          </Col>
+
+                          <Col className="col-6 col-md-4 col-lg-3">
+                            <FormGroup>
+                              <label className="text-info">
+                                Projected Cost to Fix
+                              </label>
+                              <p>{currencySign}{riskData.fix_projected_cost}</p>
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Card>
+
+                  <Card className="mb-3 like-impact-main">
+                    <Row>
+                      <Col xs={12}>
+                        <h6 className="description">Likelihood</h6>
+                        <div className="box lg">
+                          <div className="slider" ref={slider1Ref} />
                         </div>
-                      </div>
-                      <h2 className="text-center impact-number">
-                        <u className="impact-text">{likelihood}</u>
-                      </h2>
-                    </Col>
-                  </Row>
-                </Card>
 
-                <Card className="mb-3 like-impact-main">
-                  <Row>
-                    <Col xs={"12"}>
-                      <h6 className="description">Impact</h6>
-                      <div className="box lg">
-                        <div className="slider" ref={slider2Ref} />
-                      </div>
-
-                      <div className="hidden-mobile">
-                        <div className="dropdown">
-                          <select
-                            aria-label="select"
-                            value={impactAssessment}
-                            className="form-select dropbtn w-100 dropdown-toggle btn"
-                            onChange={(e) => setImpactAssessment(e?.target?.value || 0)}
-                          >
-                            <option value={1}>Negligible</option>
-                            <option value={2}>Acceptable</option>
-                            <option value={3}>Unacceptable</option>
-                            <option value={4}>High</option>
-                            <option value={5}>Catastrophic</option>
-                          </select>
-                          <button className="dropbtn w-100 dropdown-toggle btn">
-                            Impact
-                          </button>
-                          <div className="dropdown-content">
-                            <span>Negligible</span>
-                            <span>Acceptable</span>
-                            <span>Unacceptable</span>
-                            <span>High</span>
-                            <span>Catastrophic</span>
+                        <div className="hidden-mobile">
+                          <div className="dropdown">
+                            <select
+                              aria-label="select"
+                              value={likelihood}
+                              onChange={(e) => setLikelihood(e?.target?.value || 0)}
+                              className="form-select dropbtn w-100 dropdown-toggle btn"
+                            >
+                              <option value={1}>Not Foreseeable</option>
+                              <option value={2}>
+                                Foreseeable,but unexpected
+                              </option>
+                              <option value={3}>
+                                Expected,but not common!
+                              </option>
+                              <option value={4}>Common</option>
+                              <option value={5}>Current</option>
+                            </select>
                           </div>
                         </div>
-                      </div>
-                      <h2 className="text-center impact-number">
-                        <u className="impact-text">{impactAssessment}</u>
-                      </h2>
-                    </Col>
-                  </Row>
+                        <h2 className="text-center impact-number">
+                          <u className="impact-text">{likelihood}</u>
+                        </h2>
+                      </Col>
+                    </Row>
+                  </Card>
+
+                  <Card className="mb-3 like-impact-main">
+                    <Row>
+                      <Col xs={"12"}>
+                        <h6 className="description">Impact</h6>
+                        <div className="box lg">
+                          <div className="slider" ref={slider2Ref} />
+                        </div>
+
+                        <div className="hidden-mobile">
+                          <div className="dropdown">
+                            <select
+                              aria-label="select"
+                              value={impactAssessment}
+                              className="form-select dropbtn w-100 dropdown-toggle btn"
+                              onChange={(e) => setImpactAssessment(e?.target?.value || 0)}
+                            >
+                              <option value={1}>Negligible</option>
+                              <option value={2}>Acceptable</option>
+                              <option value={3}>Unacceptable</option>
+                              <option value={4}>High</option>
+                              <option value={5}>Catastrophic</option>
+                            </select>
+                            <button className="dropbtn w-100 dropdown-toggle btn">
+                              Impact
+                            </button>
+                            <div className="dropdown-content">
+                              <span>Negligible</span>
+                              <span>Acceptable</span>
+                              <span>Unacceptable</span>
+                              <span>High</span>
+                              <span>Catastrophic</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h2 className="text-center impact-number">
+                          <u className="impact-text">{impactAssessment}</u>
+                        </h2>
+                      </Col>
+                    </Row>
+                  </Card>
+                </div>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                {/* Comments */}
+                <Card className="main-comment-card common-comment-attach mb-0 h-100">
+                  <div className="description mb-2">Comments ({store.commentItems?.length ? store.commentItems?.length : 0})</div>
+                  <CardBody>
+                    <Comments />
+                  </CardBody>
                 </Card>
-              </div>
-            </Col>
-          </Row>
+              </Col>
 
-          <Row>
-            <Col md={6}>
-              {/* Comments */}
-              <Card className="main-comment-card common-comment-attach mb-0 h-100">
-                <div className="description mb-2">Comments ({store.commentItems?.length ? store.commentItems?.length : 0})</div>
-                <CardBody>
-                  <Comments />
-                </CardBody>
-              </Card>
-            </Col>
-
-            <Col md={6} className="pl-md-0">
-              <Card className="common-comment-attach mb-0">
-                <div className="description mb-2">Attachments</div>
-                <CardBody>
-                  <Attachments />
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-        </div>
+              <Col md={6} className="pl-md-0">
+                <Card className="common-comment-attach mb-0">
+                  <div className="description mb-2">Attachments</div>
+                  <CardBody>
+                    <Attachments />
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </div>
         </Col>
 
         <Col lg={4} className="pl-lg-0">
@@ -523,6 +576,16 @@ const ProjectDetailsCard = (props) => {
           </Card>
         </Col>
       </Row>
+
+      <AIPromptWriteModal
+        isOpen={openAIDecWriteModal}
+        closeModal={closeAIDecWriteModal}
+        authUserItem={authUserItem}
+        selectedProjectItem={riskData}
+        currentUserIsSuper={currentUserIsSuper}
+        handleGetProject={props?.handleGetProject}
+        isUserGeneratedAIDescription={isUserGeneratedAIDescription}
+      />
     </div>
   )
 }

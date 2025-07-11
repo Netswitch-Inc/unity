@@ -123,7 +123,7 @@ function SubControlCard(props) {
 
               {aiServiceEnabled && (!projectItemData || (projectItemData && projectStatus.includes(projectItemData?.status))) ? (
                 <div className="buttons">
-                  <button type="button" className="btnprimary mt-0">Rewrite with Sara</button>
+                  <button type="button" className="btnprimary mt-0" onClick={() => handleOpenAIWriteModal(`cis@${row.original?._id}`)}>Rewrite with Sara</button>
                 </div>
               ) : null}
             </FormGroup>

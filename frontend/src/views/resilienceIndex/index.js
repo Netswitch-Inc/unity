@@ -22,10 +22,6 @@ import { getFormatDate } from "utility/Utils";
 // ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
 
-// ** Third Party Components
-// import ReactSnackBar from "react-js-snackbar";
-// import { TiMessages } from "react-icons/ti";
-
 import { GenerateRows } from "components/ComplinceControlComps/DataRows";
 import SubControlCard from "components/ComplinceControlComps/SubcontrolCard";
 // import HistoryAndReportCard from "components/ComplinceControlComps/HistoryGraphData";
