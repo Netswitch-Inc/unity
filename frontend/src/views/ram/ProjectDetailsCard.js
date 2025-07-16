@@ -349,20 +349,22 @@ const ProjectDetailsCard = (props) => {
                     <p className="description-text"> {riskData?.description || ""}</p>
                   </FormGroup>
 
-                  <div className="buttons">
+                  <div className="buttons d-flex justify-content-between">
                     {aiServiceEnabled && !isUserGeneratedAIDescription() ? (
                       <button type="button" className="btnprimary mt-0" onClick={() => handleOpenAIDecWriteModal("ai-dec")}>Review with Sara</button>
                     ) : null}
 
-                    <img
-                      alt="CRG"
-                      width={20}
-                      height={20}
-                      title="Review with Sara"
-                      className="cursor-pointer"
-                      src={crgGoldenYellowLogo}
-                      onClick={() => handleOpenAIDecWriteModal("edit-dec")}
-                    />
+                    {(riskData.users_ai_description?.length && currentUserIsSuper) || isUserGeneratedAIDescription() ? (
+                      <img
+                        alt="CRG"
+                        width={20}
+                        height={20}
+                        title="Review with Sara"
+                        className="cursor-pointer"
+                        src={crgGoldenYellowLogo}
+                        onClick={() => handleOpenAIDecWriteModal("edit-dec")}
+                      />
+                    ) : null}
                   </div>
 
                 </Card>

@@ -66,8 +66,12 @@ const AIPromptWriteModal = ({
         setViewType("");
         setOptDecInd("");
         const frmItem = initValues;
-        let usrDescriptions = [];
+        let usrDescriptions = selectedProjectItem?.users_ai_description || [];
         const userId = authUserItem?._id || null;
+        if (currentUserIsSuper) {
+            usrDescriptions = selectedProjectItem?.users_ai_description || [];
+        }
+
         if (isOpen.includes("edit-dec") && isUserGeneratedAIDescription()) {
             if (selectedProjectItem?.users_ai_description?.length) {
                 const ind = selectedProjectItem.users_ai_description.findIndex((x) => x.user_id._id === userId);
@@ -132,9 +136,11 @@ const AIPromptWriteModal = ({
     const handleAISaveDescription = () => {
         const userId = authUserItem?._id || null;
         if (optDecInd >= 0) {
+            const usersAiDescription = selectedProjectItem?.users_ai_description || [];
+
             const payload = {
                 _id: selectedProjectItem?._id || "",
-                users_ai_description: [...selectedProjectItem?.users_ai_description]
+                users_ai_description: [...usersAiDescription]
             }
 
             const description = store?.aiDescriptionItems[optDecInd]?.description || "";
@@ -159,9 +165,11 @@ const AIPromptWriteModal = ({
     const handleSubmitDescription = (values) => {
         const userId = authUserItem?._id || null;
         if (values) {
+            const usersAiDescription = selectedProjectItem?.users_ai_description || [];
+
             const payload = {
                 _id: selectedProjectItem?._id || "",
-                users_ai_description: [...selectedProjectItem?.users_ai_description]
+                users_ai_description: [...usersAiDescription]
             }
 
             const description = values?.description || "";
@@ -244,31 +252,33 @@ const AIPromptWriteModal = ({
                                     </Row>
                                 ) : null}
 
-                                <Row>
-                                    <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
-                                        <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
-                                        <Field
-                                            as="textarea"
-                                            type="textarea"
-                                            name="description"
-                                            className="col-input w-100"
-                                            placeholder="Please enter description"
-                                        />
-                                        {errors.description && touched.description && (
-                                            <FormFeedback className="d-block">{errors?.description}</FormFeedback>
-                                        )}
-                                    </Col>
-                                </Row>
+                                {isUserGeneratedAIDescription() ? (<>
+                                    <Row>
+                                        <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
+                                            <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
+                                            <Field
+                                                as="textarea"
+                                                type="textarea"
+                                                name="description"
+                                                className="col-input w-100"
+                                                placeholder="Please enter description"
+                                            />
+                                            {errors.description && touched.description && (
+                                                <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                                            )}
+                                        </Col>
+                                    </Row>
 
-                                <div className="buttons text-center">
-                                    <button
-                                        type="submit"
-                                        className="btnprimary"
-                                        disabled={!store?.loading}
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
+                                    <div className="buttons text-center">
+                                        <button
+                                            type="submit"
+                                            className="btnprimary"
+                                            disabled={!store?.loading}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </>) : null}
                             </Form>
                         )}
                     </Formik>
