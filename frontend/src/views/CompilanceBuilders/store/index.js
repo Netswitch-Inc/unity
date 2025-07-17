@@ -78,7 +78,7 @@ export const getControllerListByFrameworkId = createAsyncThunk("appFrameworks/ge
 })
 
 // Create a slice
-const appAuthSlice = createSlice({
+const appFrameworkSlice = createSlice({
   name: "appFrameworks",
   initialState: {
     frameworkItems: [],
@@ -125,8 +125,7 @@ const appAuthSlice = createSlice({
       })
       .addCase(getControllerListByFrameworkId.fulfilled, (state, action) => {
         state.controllerItem = action.payload?.controllerItem;
-        state.complianceControlItems =
-          action.payload?.complianceControlItems || [];
+        state.complianceControlItems = action.payload?.complianceControlItems || [];
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag || "";
         state.success = action.payload?.success;
@@ -140,6 +139,6 @@ const appAuthSlice = createSlice({
   }
 });
 
-export const { cleanFrameworkMessage } = appAuthSlice.actions;
+export const { cleanFrameworkMessage } = appFrameworkSlice.actions;
 
-export default appAuthSlice.reducer;
+export default appFrameworkSlice.reducer;

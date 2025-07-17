@@ -12,6 +12,7 @@ var CompanyComplianceControlSchema = new Schema({
     control_description: { type: String, default: "" },
     cis_control_descriptions: { type: Array },
     status: { type: Boolean, default: true },
+    builder_status: { type: String, default: "" }, // reset
     deletedAt: { type: Date, default: null }
 }, { timestamps: true, versionKey: false })
 
