@@ -274,7 +274,7 @@ const AIPromptWriteModal = ({
                                 {(currentUserIsSuper || currentUserIsAdmin) && usersDescription?.length && !enableEditDesc ? (
                                     <Row>
                                         {usersDescription.map((item, ind) => (<Fragment key={`usr-dec-${ind}`}>
-                                            <Col xl={12} lg={12} as={BootstrapForm.Group} controlId={`formGrid-${ind}`} className="full-width">
+                                            <Col xl={12} lg={12} as={BootstrapForm.Group} controlId={`formGrid-${ind}`} className="full-width mb-0">
                                                 <div className="d-inline-block frame-modal d-flex">
                                                     <label className="checkbox-box text-center">
                                                         <input
@@ -304,6 +304,12 @@ const AIPromptWriteModal = ({
                                                 >
                                                     {item?.description || ""}
                                                 </Label>
+
+                                                {isUserGeneratedAIDescription()?.user_id && usersDescription?.length - 1 === ind ? (
+                                                    <hr className="d-block border-bottom mt-1" />
+                                                ) : (usersDescription?.length - 1 !== ind) ? (
+                                                    <hr className="d-block border-bottom mt-1" />
+                                                ) : null}
                                             </Col>
                                         </Fragment>))}
                                     </Row>
@@ -326,6 +332,7 @@ const AIPromptWriteModal = ({
                                                     <FormFeedback className="d-block">{errors?.description}</FormFeedback>
                                                 )}
                                             </>) : (<>
+                                                {/* <div className="d-block border-top mt-1"></div> */}
                                                 <div className="d-inline-block frame-modal d-flex">
                                                     <label className="checkbox-box text-center">
                                                         <input
