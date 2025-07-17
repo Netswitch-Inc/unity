@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
 import { getProject } from "views/projects/store";
+import { getHistoryList } from "./projectHistoryStore";
 import { cleanAIPromptMessage } from "views/aiPrompts/store";
 
 import { Col, Row } from "reactstrap";
@@ -20,6 +21,9 @@ import ProjectDetailsCard from "./ProjectDetailsCard";
 // ** Third Party Components
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
+
+// ** Constant
+import { defaultPerPageRow } from "utility/reduxConstant";
 
 // ** Styles
 import "../../assets/scss/views-styles.scss";
@@ -44,9 +48,13 @@ const ProjectDetails = () => {
   const handleGetProject = useCallback(() => {
     if (displayID) {
       const query = { id: displayID };
-      dispatch(getProject(query))
+      dispatch(getProject(query));
+      dispatch(getHistoryList({
+        project_id: displayID, page: 1,
+        limit: defaultPerPageRow,
+      }))
     } else {
-      navigate(`/admin/risk-assessment`)
+      navigate(`/admin/risk-assessment`);
     }
   }, [dispatch, navigate, displayID])
 
@@ -56,10 +64,9 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     if (store?.actionFlag === 'PRJCT_UPDT_SCS' && displayID) {
-      const query = { id: displayID };
-      dispatch(getProject(query))
+      handleGetProject();
     }
-  }, [store?.actionFlag])
+  }, [handleGetProject, store?.actionFlag])
 
   useEffect(() => {
     if (aiPromptStore?.actionFlag || aiPromptStore?.error) {

@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // ** React Imports
-import React, { useEffect, useState, useMemo, useRef, useLayoutEffect } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
-import { getHistoryList } from "./projectHistoryStore";
-import { updateProject, cleanProjectMessage } from "../projects/store/index";
+import { updateProject } from "../projects/store/index";
 
 import {
   Col,
@@ -28,7 +27,6 @@ import { TiArrowLeft } from "react-icons/ti";
 // ** Constant
 import {
   currencySign,
-  defaultPerPageRow,
   superPriviledgeType,
   adminPriviledgeType,
   projectsPermissionId,
@@ -64,13 +62,13 @@ const ProjectDetailsCard = (props) => {
   const appSettingItem = settingStore?.appSettingItem || null;
   const aiServiceEnabled = appSettingItem?.ai_service_enabled || false;
   const currentUserIsSuper = (authUserItem?.role_id?.priviledge === superPriviledgeType) || false;
+  const currentUserIsAdmin = (authUserItem?.role_id?.priviledge === adminPriviledgeType) || false;
 
   const frameworks = riskData.framework_id?.map((framework) => framework?.label)
   const InvolvedParties = riskData.involved_parties?.map((party) => party?.user_name)
 
   const [likelihood, setLikelihood] = useState(riskData?.likelyhood || 0);
   const [impactAssessment, setImpactAssessment] = useState(riskData?.impact_assessment || 0)
-  const [page] = useState(1);
   const [complianceTags] = useState(frameworks);
   const [partiesTags] = useState(InvolvedParties);
   const [submitTagsinput] = useState([riskData.submitted_by.user_name]);
@@ -88,21 +86,9 @@ const ProjectDetailsCard = (props) => {
     setAIDecWriteModal("");
   }
 
-  const callApies = async (payload) => {
-    dispatch(updateProject(payload))
-    dispatch(getHistoryList({
-      project_id: id, page,
-      limit: defaultPerPageRow,
-    }))
-    dispatch(cleanProjectMessage())
+  const handleUpdateProject = (payload) => {
+    dispatch(updateProject(payload));
   }
-
-  useLayoutEffect(() => {
-    dispatch(getHistoryList({
-      project_id: id, page,
-      limit: defaultPerPageRow,
-    }))
-  }, [dispatch])
 
   const timelineItems = useMemo(() => {
     if (!historyStore?.historyItems?.length) return null;
@@ -121,9 +107,9 @@ const ProjectDetailsCard = (props) => {
               </div>
 
               <div className="timeline-body">
-                <p>{history.description + " " + history?.user_id?.user_name}</p>
+                <p>{history.description}</p>
               </div>
-              {/* Uncomment if needed */}
+
               <h6>
                 <i className="ti-time" />
                 {history.date} by {history?.user_id?.user_name}
@@ -157,6 +143,9 @@ const ProjectDetailsCard = (props) => {
   //     dispatch(updateProject({ _id: id, ai_description: description }));
   //   }
   // }, [dispatch, aiPromptStore.aiDescriptionItems])
+
+  useEffect(() => {
+  }, [])
 
   useEffect(() => {
     const createSlider = (sliderRef, startValue, onChange) => {
@@ -203,13 +192,14 @@ const ProjectDetailsCard = (props) => {
           const payload = {
             _id: id,
             likelyhood: value,
-            projectHistoryDescription: `Likelihood changed by`,
+            // projectHistoryDescription: `Likelihood changed by`,
+            projectHistoryDescription: `Likelihood changed`,
             type: 'Affected Risk',
             company_id: loginStore?.authUserItem?.company_id?._id,
             user_id: loginStore?.authUserItem?._id,
             affected_risk: ((value * impactAssessment) / 25) * 100
           }
-          callApies(payload)
+          handleUpdateProject(payload)
           setLikelihood(() => value)
         }
       });
@@ -220,13 +210,14 @@ const ProjectDetailsCard = (props) => {
         const payload = {
           _id: id,
           impact_assessment: value,
-          projectHistoryDescription: `Impact changed by`,
+          // projectHistoryDescription: `Impact changed by`,
+          projectHistoryDescription: `Impact changed`,
           type: 'Affected Risk',
           company_id: loginStore?.authUserItem?.company_id?._id,
           user_id: loginStore?.authUserItem?._id,
           affected_risk: ((likelihood * value) / 25) * 100
         }
-        callApies(payload)
+        handleUpdateProject(payload)
         setImpactAssessment(() => value)
       });
     }
@@ -271,14 +262,14 @@ const ProjectDetailsCard = (props) => {
   }
 
   const isUserGeneratedAIDescription = () => {
-    let isGenerated = false;
+    let item = null;
     const userId = authUserItem?._id || null;
     if (riskData?.users_ai_description?.length) {
       const ind = riskData.users_ai_description.findIndex((x) => x.user_id._id === userId);
-      if (ind >= 0) { isGenerated = true; }
+      if (ind >= 0) { item = riskData.users_ai_description[ind]; }
     }
 
-    return isGenerated;
+    return item;
   }
 
   return (
@@ -307,7 +298,7 @@ const ProjectDetailsCard = (props) => {
             </button>
           </>) : null}
 
-          {(currentUserIsSuper || authUserItem?.role_id?.priviledge === adminPriviledgeType) || permission?.update ? (<>
+          {(currentUserIsSuper || currentUserIsAdmin) || permission?.update ? (<>
             {riskData?.status === 'created' ? (<>
               <button
                 className="btnprimary mb-0 mt-0 ml-2"
@@ -350,16 +341,16 @@ const ProjectDetailsCard = (props) => {
                   </FormGroup>
 
                   <div className="buttons d-flex justify-content-between">
-                    {aiServiceEnabled && !isUserGeneratedAIDescription() ? (
+                    {aiServiceEnabled && !isUserGeneratedAIDescription()?.user_id ? (
                       <button type="button" className="btnprimary mt-0" onClick={() => handleOpenAIDecWriteModal("ai-dec")}>Review with Sara</button>
                     ) : null}
 
-                    {(riskData.users_ai_description?.length && currentUserIsSuper) || isUserGeneratedAIDescription() ? (
+                    {(riskData.users_ai_description?.length && (currentUserIsSuper || currentUserIsAdmin)) || isUserGeneratedAIDescription()?.user_id ? (
                       <img
                         alt="CRG"
                         width={20}
                         height={20}
-                        title="Review with Sara"
+                        title="Details"
                         className="cursor-pointer"
                         src={crgGoldenYellowLogo}
                         onClick={() => handleOpenAIDecWriteModal("edit-dec")}
@@ -580,12 +571,15 @@ const ProjectDetailsCard = (props) => {
       </Row>
 
       <AIPromptWriteModal
+        projectId={id}
         isOpen={openAIDecWriteModal}
         closeModal={closeAIDecWriteModal}
         authUserItem={authUserItem}
         selectedProjectItem={riskData}
         currentUserIsSuper={currentUserIsSuper}
+        currentUserIsAdmin={currentUserIsAdmin}
         handleGetProject={props?.handleGetProject}
+        handleUpdateProject={handleUpdateProject}
         isUserGeneratedAIDescription={isUserGeneratedAIDescription}
       />
     </div>

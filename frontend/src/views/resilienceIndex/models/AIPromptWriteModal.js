@@ -327,12 +327,12 @@ const AIPromptWriteModal = ({
                                         </Col>
 
                                         <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridKeywords" className="full-width">
-                                            <BootstrapForm.Label className="col-label">Keywords</BootstrapForm.Label>
+                                            <BootstrapForm.Label className="col-label">Your Intents</BootstrapForm.Label>
                                             <Field
                                                 type="text"
                                                 name="keywords"
                                                 className="col-input w-100"
-                                                placeholder="Please enter keywords with comma separated"
+                                                placeholder='Please enter "Your Intents" with comma separated'
                                             />
                                             {errors.keywords && touched.keywords && (
                                                 <FormFeedback className="d-block">{errors?.keywords}</FormFeedback>

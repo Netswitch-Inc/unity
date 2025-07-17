@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Fragment } from "react";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
@@ -22,13 +22,19 @@ import SimpleSpinner from "components/spinner/simple-spinner";
 import ReactSnackBar from "react-js-snackbar";
 import { TiMessages } from "react-icons/ti";
 
+// ** Icons
+import editIcon from "assets/img/edit.svg";
+
 const AIPromptWriteModal = ({
     isOpen,
+    projectId,
     closeModal,
     authUserItem,
     handleGetProject,
     currentUserIsSuper,
+    currentUserIsAdmin,
     selectedProjectItem,
+    handleUpdateProject,
     isUserGeneratedAIDescription
 }) => {
     // ** Store vars
@@ -46,6 +52,7 @@ const AIPromptWriteModal = ({
     const [viewType, setViewType] = useState("");
     const [optDecInd, setOptDecInd] = useState("");
     const [usersDescription, setUsersDescription] = useState([]);
+    const [enableEditDesc, setEnableEditDesc] = useState(false);
 
     const ValidationSchema = yup.object({
         // keywords: yup.string().required("Keywords is required.")
@@ -59,6 +66,7 @@ const AIPromptWriteModal = ({
         closeModal();
         setViewType("");
         setOptDecInd("");
+        setEnableEditDesc(false);
         setUsersDescription([]);
     }, [closeModal])
 
@@ -66,13 +74,17 @@ const AIPromptWriteModal = ({
         setViewType("");
         setOptDecInd("");
         const frmItem = initValues;
+        let enblDesEdt = false;
         let usrDescriptions = selectedProjectItem?.users_ai_description || [];
         const userId = authUserItem?._id || null;
-        if (currentUserIsSuper) {
+        if (currentUserIsSuper || currentUserIsAdmin) {
             usrDescriptions = selectedProjectItem?.users_ai_description || [];
+            enblDesEdt = false;
+        } else {
+            enblDesEdt = true;
         }
 
-        if (isOpen.includes("edit-dec") && isUserGeneratedAIDescription()) {
+        if (isOpen.includes("edit-dec") && isUserGeneratedAIDescription()?.user_id) {
             if (selectedProjectItem?.users_ai_description?.length) {
                 const ind = selectedProjectItem.users_ai_description.findIndex((x) => x.user_id._id === userId);
                 if (ind >= 0 && selectedProjectItem.users_ai_description?.[ind]?.description) { frmItem.description = selectedProjectItem.users_ai_description[ind]?.description; }
@@ -81,6 +93,7 @@ const AIPromptWriteModal = ({
             usrDescriptions = selectedProjectItem.users_ai_description.filter((x) => x.user_id._id !== userId);
         }
 
+        setEnableEditDesc(enblDesEdt);
         setFormItem(frmItem);
         setUsersDescription(usrDescriptions);
     }
@@ -88,6 +101,7 @@ const AIPromptWriteModal = ({
     const handleRegenerate = () => {
         setViewType("");
         setOptDecInd("");
+        setEnableEditDesc(false);
     }
 
     useEffect(() => {
@@ -196,6 +210,29 @@ const AIPromptWriteModal = ({
         }
     }
 
+    const handleSaveHistory = () => {
+        if (optDecInd !== "" || optDecInd >= 0) {
+            let description = "";
+            if (optDecInd === "self") {
+                description = formItem?.description || "";
+            } else {
+                description = usersDescription?.[optDecInd]?.description || "";
+            }
+
+            if (description) {
+                const payload = {
+                    _id: projectId,
+                    projectHistoryDescription: description,
+                    type: 'Sub-Control Description',
+                    company_id: authUserItem?.company_id?._id || authUserItem?.company_id,
+                    user_id: authUserItem?._id
+                }
+
+                handleUpdateProject(payload);
+            }
+        }
+    }
+
     return (
         <Modal
             centered
@@ -215,7 +252,7 @@ const AIPromptWriteModal = ({
             <Modal.Header>
                 <span className="modal-title col-sm-12" id="example-modal-sizes-title-lg">
                     <h3 className="mb-0 mt-0">
-                        Review with Sara
+                        Sub-Control Description
                     </h3>
                 </span>
 
@@ -234,51 +271,138 @@ const AIPromptWriteModal = ({
                     >
                         {({ errors, touched }) => (
                             <Form className="my-2">
-                                {currentUserIsSuper && usersDescription?.length ? (
+                                {(currentUserIsSuper || currentUserIsAdmin) && usersDescription?.length && !enableEditDesc ? (
                                     <Row>
-                                        <h3 className="px-2 pb-1 mb-1">User Descriptions</h3>
-                                        {usersDescription.map((item, ind) => (
-                                            <Col key={`usr-dec-${ind}`} xl={12} lg={12} as={BootstrapForm.Group} controlId={`formGrid-${ind}`} className="full-width">
-                                                <BootstrapForm.Label className="col-label d-flex justify-content-between">
-                                                    <span>{item?.user_id?.name}</span>
+                                        {usersDescription.map((item, ind) => (<Fragment key={`usr-dec-${ind}`}>
+                                            <Col xl={12} lg={12} as={BootstrapForm.Group} controlId={`formGrid-${ind}`} className="full-width">
+                                                <div className="d-inline-block frame-modal d-flex">
+                                                    <label className="checkbox-box text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`description-${ind}`}
+                                                            name={`description-${ind}`}
+                                                            className="form-check-input pointer"
+                                                            checked={ind === optDecInd}
+                                                            onChange={(event) => setOptDecInd(event?.target?.checked ? ind : "")}
+                                                        />
+                                                        <span className="checkmark mt-1" htmlFor={`description-${ind}`}></span>
+                                                    </label>
+                                                    <Label
+                                                        for={`description-${ind}`}
+                                                        className="form-check-label user-select-none pointer d-flex justify-content-between mb-0 w-100"
+                                                    >
+                                                        <span>{item?.user_id?.name}</span>
 
-                                                    {item?.user_id?.createdAt ? (
-                                                        <span className="text-right">{getFormatDate(item?.user_id?.createdAt, "DD-MMM-YYYY HH:mm:ss")}</span>
-                                                    ) : null}
-                                                </BootstrapForm.Label>
-                                                <p className="text-white">{item?.description}</p>
+                                                        {item?.createdAt ? (
+                                                            <span className="text-right">{getFormatDate(item?.createdAt, "DD-MMM-YYYY HH:mm:ss")}</span>
+                                                        ) : null}
+                                                    </Label>
+                                                </div>
+                                                <Label
+                                                    for={`description-${ind}`}
+                                                    className="col-label form-check-label user-select-none pointer mb-0"
+                                                >
+                                                    {item?.description || ""}
+                                                </Label>
                                             </Col>
-                                        ))}
+                                        </Fragment>))}
                                     </Row>
                                 ) : null}
 
-                                {isUserGeneratedAIDescription() ? (<>
+                                {isUserGeneratedAIDescription()?.user_id ? (<>
                                     <Row>
                                         <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridDescription" className="full-width">
-                                            <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
-                                            <Field
-                                                as="textarea"
-                                                type="textarea"
-                                                name="description"
-                                                className="col-input w-100"
-                                                placeholder="Please enter description"
-                                            />
-                                            {errors.description && touched.description && (
-                                                <FormFeedback className="d-block">{errors?.description}</FormFeedback>
-                                            )}
+                                            {enableEditDesc ? (<>
+                                                <BootstrapForm.Label className="col-label">Description</BootstrapForm.Label>
+                                                <Field
+                                                    as="textarea"
+                                                    type="textarea"
+                                                    name="description"
+                                                    disabled={optDecInd !== ""}
+                                                    className="col-input w-100 ml-2"
+                                                    placeholder="Please enter description"
+                                                />
+                                                {errors.description && touched.description && (
+                                                    <FormFeedback className="d-block">{errors?.description}</FormFeedback>
+                                                )}
+                                            </>) : (<>
+                                                <div className="d-inline-block frame-modal d-flex">
+                                                    <label className="checkbox-box text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`usr-description`}
+                                                            name={`usr-description`}
+                                                            className="form-check-input pointer"
+                                                            checked={optDecInd === "self"}
+                                                            onChange={(event) => setOptDecInd(event?.target?.checked ? "self" : "")}
+                                                        />
+                                                        <span className="checkmark mt-1" htmlFor={`usr-description`}></span>
+                                                    </label>
+
+                                                    <Label
+                                                        for={`usr-description`}
+                                                        className="form-check-label user-select-none pointer d-flex justify-content-between mb-0 w-100"
+                                                    >
+                                                        <span>
+                                                            {isUserGeneratedAIDescription()?.user_id?.name} (Self)
+                                                            <img
+                                                                width={18}
+                                                                height={18}
+                                                                alt="Edit"
+                                                                title="Edit"
+                                                                src={editIcon}
+                                                                className="cursor-pointer mx-2"
+                                                                onClick={(event) => { event?.stopPropagation(); setEnableEditDesc(true) }}
+                                                            />
+                                                        </span>
+
+                                                        {isUserGeneratedAIDescription()?.createdAt ? (
+                                                            <span className="text-right">{getFormatDate(isUserGeneratedAIDescription()?.createdAt, "DD-MMM-YYYY HH:mm:ss")}</span>
+                                                        ) : null}
+                                                    </Label>
+                                                </div>
+                                                <Label
+                                                    for={`usr-description`}
+                                                    className="col-label form-check-label user-select-none pointer mb-0"
+                                                >
+                                                    {formItem?.description || ""}
+                                                </Label>
+                                            </>)}
                                         </Col>
                                     </Row>
 
                                     <div className="buttons text-center">
+                                        {enableEditDesc ? (
+                                            <button
+                                                type="submit"
+                                                className="btnprimary"
+                                                disabled={!store?.loading}
+                                            >
+                                                Submit
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="btnprimary"
+                                                disabled={!store?.loading || optDecInd === ""}
+                                                onClick={() => handleSaveHistory()}
+                                            >
+                                                Save History
+                                            </button>
+                                        )}
+                                    </div>
+                                </>) : usersDescription?.length ? (
+                                    <div className="buttons text-center">
                                         <button
-                                            type="submit"
+                                            type="button"
                                             className="btnprimary"
-                                            disabled={!store?.loading}
+                                            disabled={!store?.loading || optDecInd === ""}
+                                            onClick={() => handleSaveHistory()}
                                         >
-                                            Submit
+                                            Save History
                                         </button>
                                     </div>
-                                </>) : null}
+                                ) : null}
                             </Form>
                         )}
                     </Formik>
@@ -356,12 +480,12 @@ const AIPromptWriteModal = ({
                                         </Col>
 
                                         <Col xl={12} lg={12} as={BootstrapForm.Group} controlId="formGridKeywords" className="full-width">
-                                            <BootstrapForm.Label className="col-label">Keywords</BootstrapForm.Label>
+                                            <BootstrapForm.Label className="col-label">Your Intents</BootstrapForm.Label>
                                             <Field
                                                 type="text"
                                                 name="keywords"
                                                 className="col-input w-100"
-                                                placeholder="Please enter keywords with comma separated"
+                                                placeholder='Please enter "Your Intents" with comma separated'
                                             />
                                             {errors.keywords && touched.keywords && (
                                                 <FormFeedback className="d-block">{errors?.keywords}</FormFeedback>
