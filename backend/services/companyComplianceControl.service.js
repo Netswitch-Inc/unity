@@ -98,6 +98,7 @@ exports.createCompanyComplianceControl = async function (companyComplianceContro
         control_description: companyComplianceControl.control_description ? companyComplianceControl.control_description : "",
         cis_control_descriptions: companyComplianceControl.cis_control_descriptions?.length ? companyComplianceControl.cis_control_descriptions : null,
         status: true,
+        builder_status: "",
         deletedAt: null
     })
 
@@ -154,11 +155,25 @@ exports.updateCompanyComplianceControl = async function (companyComplianceContro
         oldCompanyComplianceControl.cis_control_descriptions = companyComplianceControl.cis_control_descriptions?.length ? companyComplianceControl.cis_control_descriptions : null;
     }
 
+    if (companyComplianceControl?.builder_status || companyComplianceControl.builder_status == "") {
+        oldCompanyComplianceControl.builder_status = companyComplianceControl.builder_status;
+    }
+
     try {
         var savedCompanyComplianceControl = await oldCompanyComplianceControl.save();
         return savedCompanyComplianceControl;
     } catch (error) {
         throw Error(error.message);
+    }
+}
+
+exports.updateManyCompanyComplianceControl = async function (query, payload) {
+    try {
+        var companyComplianceControls = await CompanyComplianceControl.updateMany(query, payload);
+        return companyComplianceControls;
+    } catch (error) {
+        console.log("updateManyCompanyComplianceControl catch >>> ", error);
+        throw Error("Getting error while multiple updating the company compliance control");
     }
 }
 

@@ -11,6 +11,12 @@ const defaultCompanyName = getLocalAppSetting()?.name || process.env?.REACT_APP_
 const defaultCompanyUrl = getLocalAppSetting()?.url || process.env?.REACT_APP_COMPANY_URL || "";
 const defaultLogo = getLocalAppSetting()?.logo || logo;
 
+const superPriviledgeType = "super";
+const adminPriviledgeType = "admin";
+const executivePriviledgeType = "executive";
+const governorPriviledgeType = "governor";
+const technologistPriviledgeType = "technologist";
+
 const superAdminRole = "6694b16dc2bc754ae7c64e0a";
 const companyAdminRole = "6694b643c788405b9fcafbe1";
 
@@ -112,7 +118,7 @@ const initialConnectionItem = { _id: "", tool_slug: "", name: "", type: "", desc
 
 const initQuestion = { section_id: "", question: "", description: "", option_type: { label: "Note", value: "note" }, options: [{ value: "", points: "" }], value: "", is_mandatory: false, point: 0, order: null, status: 1, deletedAt: null }
 
-const initialProject = { company_id: "", user_id: "", framework_id: [], involved_parties: [], submitted_by: "", name: "", description: "", cost_of_risk: 0, fix_cost_risk_ratio: 0, affected_scope: "", priority: "", fix_projected_cost: 0, likelyhood: 1, impact_assessment: 1, affected_risk: 0, status: "" }
+const initialProject = { company_id: "", user_id: "", framework_id: [], involved_parties: [], submitted_by: "", company_compliance_control_id: "", cis_control_id: "", users_ai_description: [], name: "", description: "", cost_of_risk: 0, fix_cost_risk_ratio: 0, affected_scope: "", priority: "", fix_projected_cost: 0, likelyhood: 1, impact_assessment: 1, affected_risk: 0, status: "" }
 
 const initAssessmentItem = { _id: "", name: "", description: "", order: "", additional_description: "", status: 1, show_score_calculation: false }
 
@@ -256,8 +262,15 @@ export {
   defaultCompanyName,
   defaultCompanyUrl,
   defaultLogo,
+
+  superPriviledgeType,
+  adminPriviledgeType,
+
   superAdminRole,
   companyAdminRole,
+  executivePriviledgeType,
+  governorPriviledgeType,
+  technologistPriviledgeType,
 
   masterGroupPermissionId,
   rolesPermissionId,
