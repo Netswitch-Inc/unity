@@ -59,6 +59,7 @@ exports.createControl = async function (control) {
         impact: control.impact ? control.impact : "",
         priority: control.priority ? control.priority : "",
         description: control.description ? control.description : "",
+        ai_description: control.ai_description ? control.ai_description : "",
         icon: control.icon ? control.icon : "",
         relation: control.relation ? control.relation : "",
         status: control.status ? control.status : 0,
@@ -116,6 +117,10 @@ exports.updateControl = async function (control) {
 
     if (control.description) {
         oldControl.description = control.description;
+    }
+
+    if (control.ai_description) {
+        oldControl.ai_description = control.ai_description;
     }
 
     if (control.icon) {

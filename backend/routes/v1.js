@@ -136,6 +136,7 @@ router.get("/company-compliance-controls", Authorization, CompanyComplianceContr
 router.get("/company-compliance-controls/:id", Authorization, CompanyComplianceControlController.getCompanyComplianceControl);
 router.post("/company-compliance-controls", Authorization, CompanyComplianceControlController.createCompanyComplianceControl);
 router.put("/company-compliance-controls", Authorization, CompanyComplianceControlController.updateCompanyComplianceControl);
+router.post("/company-compliance-controls-many", Authorization, CompanyComplianceControlController.updateManyCompanyComplianceControl);
 router.delete("/company-compliance-controls/:id", Authorization, CompanyComplianceControlController.removeCompanyComplianceControl);
 router.get("/company-compliance-controls-list", Authorization, CompanyComplianceControlController.getCompanyComplianceControlList);
 router.post("/company-multiple-compliance-controls", Authorization, CompanyComplianceControlController.createCompanyComplianceControls);

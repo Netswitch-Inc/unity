@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useSelector, useDispatch } from "react-redux";
+import { cleanAIPromptMessage } from "views/aiPrompts/store";
+import { cleanControlMessage } from "views/resilienceIndex/store";
 import { cleanCompliancePriorityMessage } from "views/compliancePriority/store";
 
 import { Col } from "react-bootstrap";
@@ -16,6 +18,8 @@ import SimpleSpinner from "components/spinner/simple-spinner";
 
 // ** Third Party Components
 import ReactWizard from "react-bootstrap-wizard";
+import ReactSnackBar from "react-js-snackbar";
+import { TiMessages } from "react-icons/ti";
 
 // ** Constant
 // import { superAdminRole } from "utility/reduxConstant";
@@ -31,12 +35,16 @@ const ComplianceBuilder = () => {
   const dispatch = useDispatch();
 
   const loginStore = useSelector((state) => state.login);
+  const aiPromptStore = useSelector((state) => state.aiPrompt);
+  const controlStore = useSelector((state) => state.complincecontrol);
   const compliancePriorityStore = useSelector((state) => state.compliancePriority);
-  const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
 
+  // ** Const
+  const authUserItem = loginStore?.authUserItem?._id ? loginStore?.authUserItem : null;
   const step1Name = "Compliance Selection";
   const step2Name = "Compliance Benchmark";
   const step3Name = "Recommended Tools";
+
   const complianceSteps = useMemo(() => [
     {
       stepName: step1Name,
@@ -58,6 +66,8 @@ const ComplianceBuilder = () => {
   // ** States
   const [modalOpen, setModalOpen] = useState(false);
   const [complianceControls, setComplianceControls] = useState([]);
+  const [showSnackBar, setShowSnackbar] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
 
   const handleOpen = () => {
     setModalOpen(true)
@@ -86,6 +96,34 @@ const ComplianceBuilder = () => {
     }
   }, [compliancePriorityStore?.actionFlag, compliancePriorityStore?.success, compliancePriorityStore?.error, dispatch, navigate]);
 
+  useEffect(() => {
+    if (aiPromptStore?.actionFlag || aiPromptStore?.error) {
+      dispatch(cleanAIPromptMessage(null));
+    }
+
+    if (aiPromptStore?.error) {
+      setShowSnackbar(true);
+      setSnackMessage(aiPromptStore.error);
+    }
+  }, [dispatch, aiPromptStore.actionFlag, aiPromptStore.error])
+
+  useEffect(() => {
+    if (controlStore?.actionFlag || controlStore?.error) {
+      dispatch(cleanControlMessage(null));
+    }
+
+    if (controlStore?.error) {
+      setShowSnackbar(true);
+      setSnackMessage(controlStore.error);
+    }
+  }, [dispatch, controlStore.actionFlag, controlStore.error])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowSnackbar(false);
+    }, 6000);
+  }, [showSnackBar])
+
   const finishButtonClick = (event) => {
     let controls = [...complianceControls]
     if (event && event[step3Name]) {
@@ -104,7 +142,15 @@ const ComplianceBuilder = () => {
 
   return (
     <div className="content complaince-builder-content ps">
+      {!controlStore?.loading ? (<SimpleSpinner />) : null}
+      {!aiPromptStore?.loading ? (<SimpleSpinner />) : null}
       {!compliancePriorityStore?.loading ? (<SimpleSpinner />) : null}
+
+      <ReactSnackBar Icon={(
+        <span><TiMessages size={25} /></span>
+      )} Show={showSnackBar}>
+        {snackMessage}
+      </ReactSnackBar>
 
       <Col className="col-md-12 col-xxl-10 mr-auto ml-auto compliance-head">
         <ReactWizard

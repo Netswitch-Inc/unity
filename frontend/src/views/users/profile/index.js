@@ -69,7 +69,7 @@ const Auth = () => {
                           </div>
                         </div>
                       )}
-                      <h4 className="title mt-2">{`${user?.first_name}${user?.last_name}`}</h4>
+                      <h4 className="title mt-2">{`${user?.first_name} ${user?.last_name}`}</h4>
                       <div className="username-profile">
                       <h4>{user?.role_id?.name}</h4>
                       </div>
