@@ -118,8 +118,8 @@ const solutionToolIcons = [
         ]
     },
     {
-        key: "business-impace-analysis",
-        value: "Business Impace Analysis",
+        key: "business-impact-analysis",
+        value: "Business Impact Analysis",
         icon: "BIA",
         source: biaIcon,
         resilienceIndex: 52,
