@@ -79,6 +79,7 @@ const EventLogDetail = () => {
       "is_default",
       "weightIndex",
       "priviledges",
+      "users_ai_description",
       "__v",
     ];
 

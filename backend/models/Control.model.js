@@ -10,6 +10,7 @@ var ControlSchema = new mongoose.Schema({
     impact: String,
     priority: String,
     description: String,
+    ai_description: String,
     icon: String,
     relation: String,
     status: Number,

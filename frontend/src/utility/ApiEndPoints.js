@@ -55,6 +55,8 @@ export const API_ENDPOINTS = {
     listing: `/controls-frameworks`,
     listingAll: `/controls`,
     get: `/controls`,
+    create: `/controls`,
+    update: `/controls`,
   },
   Controller: {
     listing: `/compliance-controls-frameworks`,
@@ -81,6 +83,7 @@ export const API_ENDPOINTS = {
     delete: `/company-compliance-controls`,
     lists: `/company-compliance-controls-list`,
     creates: `/company-multiple-compliance-controls`,
+    updates: `/company-compliance-controls-many`
   },
   settings: {
     lists: `/settings`,

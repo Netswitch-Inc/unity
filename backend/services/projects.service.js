@@ -36,6 +36,7 @@ exports.getProjects = async function (query = {}, page = 1, limit = 0, sortField
       .populate({ path: "involved_parties" })
       .populate({ path: "submitted_by" })
       .populate({ path: "company_compliance_control_id" })
+      .populate({ path: "users_ai_description.user_id" })
       .sort(sorts)
       .skip(skips)
       .limit(limit);
@@ -65,7 +66,8 @@ exports.getProject = async function (id) {
       .populate({ path: "framework_id" })
       .populate({ path: "involved_parties" })
       .populate({ path: "submitted_by" })
-      .populate({ path: "company_compliance_control_id" });
+      .populate({ path: "company_compliance_control_id" })
+      .populate({ path: "users_ai_description.user_id" });
     if (_details._id) {
       return _details;
     } else {
@@ -86,7 +88,8 @@ const getProjectDetail = async (query) => {
       .populate({ path: "framework_id" })
       .populate({ path: "involved_parties" })
       .populate({ path: "submitted_by" })
-      .populate({ path: "company_compliance_control_id" });
+      .populate({ path: "company_compliance_control_id" })
+      .populate({ path: "users_ai_description.user_id" });
 
     return project || null;
   } catch (error) {
@@ -104,8 +107,10 @@ exports.createProject = async function (Project) {
     submitted_by: Project.submitted_by ? Project.submitted_by : null,
     company_compliance_control_id: Project.company_compliance_control_id ? Project.company_compliance_control_id : null,
     cis_control_id: Project.cis_control_id ? Project.cis_control_id : null,
+    users_ai_description: Project.users_ai_description?.length ? Project.users_ai_description : null,
     name: Project.name ? Project.name : "",
     description: Project.description ? Project.description : "",
+    ai_description: Project.ai_description ? Project.ai_description : "",
     cost_of_risk: Project.cost_of_risk ? Project.cost_of_risk : 0,
     fix_cost_risk_ratio: Project.fix_cost_risk_ratio ? Project.fix_cost_risk_ratio : 0,
     affected_scope: Project.affected_scope ? Project.affected_scope : "",
@@ -195,12 +200,20 @@ exports.updateProject = async function (projectData) {
     oldProject.cis_control_id = projectData.cis_control_id;
   }
 
+  if (projectData.users_ai_description?.length) {
+    oldProject.users_ai_description = projectData.users_ai_description;
+  }
+
   if (projectData.name) {
     oldProject.name = projectData.name;
   }
 
   if (projectData.description) {
     oldProject.description = projectData.description;
+  }
+
+  if (projectData.ai_description) {
+    oldProject.ai_description = projectData.ai_description;
   }
 
   if (projectData.cost_of_risk) {
