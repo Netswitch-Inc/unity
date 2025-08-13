@@ -323,8 +323,6 @@ const appAssessmentReportSlice = createSlice({
       state.actionFlag = "";
       state.success = "";
       state.error = "";
-      state.addAssessmentReportItem = null;
-      state.assessmentReportItem = null;
     }
   },
   extraReducers: (builder) => {
@@ -366,12 +364,22 @@ const appAssessmentReportSlice = createSlice({
         state.success = "";
         state.error = "";
       })
+      .addCase(getAssessmentReport.pending, (state) => {
+        state.loading = false;
+        state.success = "";
+        state.error = "";
+      })
       .addCase(getAssessmentReport.fulfilled, (state, action) => {
-        state.assessmentReportItem = action.payload.assessmentReportItem;
+        state.assessmentReportItem = action.payload?.assessmentReportItem;
         state.loading = true;
         state.actionFlag = action.payload?.actionFlag;
         state.success = action.payload.success;
         state.error = action.payload.error;
+      })
+      .addCase(getAssessmentReport.rejected, (state) => {
+        state.loading = true;
+        state.success = "";
+        state.error = "";
       })
       .addCase(createAssessmentReport.pending, (state) => {
         state.loading = false;

@@ -48,7 +48,7 @@ const LoginForm = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state.login);
     const settingStore = useSelector((state) => state.globalSetting);
-    
+
     // ** Const
     const appSettingItem = settingStore?.appSettingItem || null;
     const appLogo = appSettingItem?.logo || defaultLogo;
@@ -70,8 +70,8 @@ const LoginForm = () => {
 
     // Initial form values
     const initialValues = {
-        user_name: '',
-        password: ''
+        user_name: "",
+        password: "",
     }
 
     const handleDefaults = useCallback(() => {

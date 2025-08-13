@@ -4,8 +4,8 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
-import { getSectionList, cleanSectionMessage } from "views/section/store";
-import { updateQuestion, getQuestion, cleanQuestionMessage } from "./store";
+import { getSectionList, cleanSectionMessage } from "../section/store";
+import { getQuestion, updateQuestion, cleanQuestionMessage } from "./store";
 
 // ** Reactstrap Imports
 import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
@@ -75,7 +75,6 @@ const EditQuestion = () => {
 
   useLayoutEffect(() => {
     dispatch(getSectionList());
-
     dispatch(getQuestion({ id: id }));
   }, [dispatch, id])
 
@@ -89,11 +88,11 @@ const EditQuestion = () => {
   }
 
   useEffect(() => {
-    if (sectionStore.actionFlag) {
+    if (sectionStore?.actionFlag) {
       dispatch(cleanSectionMessage(null))
     }
 
-    if (sectionStore?.sectionItems && sectionStore.actionFlag === "SCTN_LST") {
+    if (sectionStore?.sectionItems && sectionStore?.actionFlag === "SCTN_LST") {
       let sectionList = [];
       if (sectionStore?.sectionItems?.length > 0) {
         sectionList = sectionStore?.sectionItems?.map((item) => {
@@ -180,7 +179,7 @@ const EditQuestion = () => {
   return (
     <div className="content">
       {!store?.loading ? (<SimpleSpinner />) : null}
-      
+
       <ReactSnackBar Icon={(
         <span><TiMessages size={25} /></span>
       )} Show={showSnackBar}>

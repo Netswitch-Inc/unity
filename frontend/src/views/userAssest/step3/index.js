@@ -13,18 +13,10 @@ import { createAnswer, updateAnswer, cleanAnswerMessage } from "../assessment-re
 import { Card } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
 
-// ** Utils
-import { onImageSrcError } from 'utility/Utils';
-
 // ** Custom Components
+import AssessmentSidebar from "../sidebar";
 import SimpleSpinner from "components/spinner/simple-spinner";
 import DynamicInput from "components/AssessmentReportQuestionType/DynamicInput";
-
-// ** Constant
-import { defaultLogo } from 'utility/reduxConstant';
-
-// ** Logo
-import logo from "assets/img/react-logo.png";
 
 const AsessmentReport = () => {
   // ** Hooks
@@ -37,12 +29,8 @@ const AsessmentReport = () => {
   const dispatch = useDispatch();
   const assessmentReport = useSelector((state) => state.assessmentReport);
   const assessmentReportAnswerList = useSelector((state) => state.questionAnswer)
-  const settingStore = useSelector((state) => state.globalSetting);
 
   // ** Const
-  const appSettingItem = settingStore?.appSettingItem || null;
-  const appLogo = appSettingItem?.logo || defaultLogo;
-
   const assessmentReportId = queryParams.get("id");
 
   const [show, setShow] = useState(true);
@@ -325,62 +313,9 @@ const AsessmentReport = () => {
 
   return (
     <div className="step-wise-content">
+
       <Row className="sticky--- m-0">
-        <Card className="main-progress col-md-3 mb-0">
-          <div className="main-logo-img">
-            <div className="logo">
-              <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
-            </div>
-          </div>
-
-          <div className="mb-0">
-            <div className="steps-mains">
-              <div className="steps filled-step">
-                <div className="borders step-line second-step">
-                  <div className="step-icon">
-                    <p>1</p>
-                  </div>
-                </div>
-                <div className="step-name">
-                  <h4>Company Info</h4>
-                </div>
-              </div>
-
-              <div className="steps filled-step">
-                <div className="borders step-line">
-                  <div className="step-icon ">
-                    <p>2</p>
-                  </div>
-                </div>
-                <div className="step-name">
-                  <h4>Verification</h4>
-                </div>
-              </div>
-
-              <div className="steps active-class">
-                <div className="borders step-line">
-                  <div className="step-icon ">
-                    <p>3</p>
-                  </div>
-                </div>
-                <div className="step-name">
-                  <h4>Self Assessment</h4>
-                </div>
-              </div>
-
-              <div className="steps">
-                <div className="borders">
-                  <div className="step-icon">
-                    <p>4</p>
-                  </div>
-                </div>
-                <div className="step-name">
-                  <h4>Thank You</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <AssessmentSidebar activeStep={3} step1Filled={true} step2Filled={true} />
 
         <Col className="right-side self-assesement col-md-9">
           <div className="card-header">
@@ -392,7 +327,7 @@ const AsessmentReport = () => {
             </h3>
           </div>
           <Card className="assesment-card">
-            <div className="pl-0 pr-0">
+            <div className="pl-0 pr-0 assesment-content">
               {!assessmentReportAnswerList?.loading ? <SimpleSpinner /> : null}
               {show && (
                 <>
@@ -546,17 +481,19 @@ const AsessmentReport = () => {
                 <div className="buttons d-flex justify-content-between btn-position">
                   <button
                     type="button"
-                    className="btnprimary ml-3"
+                    className="btnprimary"
                     onClick={() => handlePreviousClick()}
+                    disabled={!assessmentReportAnswerList?.loading}
                   >
                     Previous
                   </button>
                   <button
-                    className="btnprimary mr-3"
+                    className="btnprimary"
                     onClick={() => {
                       handleNextClick();
                       setShow(() => false);
                     }}
+                    disabled={!assessmentReportAnswerList?.loading}
                   >
                     Next
                   </button>

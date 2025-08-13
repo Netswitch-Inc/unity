@@ -9,7 +9,7 @@ import {
   deleteQuestion,
   getQuestionListFilter,
   updateBulkOrderQuestion
-} from "views/questions/store";
+} from "../../questions/store";
 import Swal from "sweetalert2";
 import { deleteSection } from "views/section/store";
 import DroppableComp from "components/droppable/assessment";

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { createAssessment, cleanAssessmentMessage } from "../store";
-import { cleanQuestionMessage } from "views/questions/store";
+import { cleanQuestionMessage } from "../../questions/store";
 
 // ** Reactstrap Imports
 import { Row, Col, Form as BootstrapForm } from "react-bootstrap";
