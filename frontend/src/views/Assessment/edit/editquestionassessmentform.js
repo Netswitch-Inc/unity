@@ -4,13 +4,13 @@ import { useParams, useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
-import { deleteSection, cleanSectionMessage } from "views/section/store";
+import { deleteSection, cleanSectionMessage } from "../../section/store";
 import {
   deleteQuestion,
   cleanQuestionMessage,
   getQuestionListFilter,
   updateBulkOrderQuestion
-} from "views/questions/store";
+} from "../../questions/store";
 
 // ** Reactstrap Imports
 import { Row, Col } from "react-bootstrap";

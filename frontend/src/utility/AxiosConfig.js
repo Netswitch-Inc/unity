@@ -34,7 +34,11 @@ instance.interceptors.response.use((res) => {
 
     return res
 }, (error) => {
-    const { status } = error.response;
+    let status = error?.status
+    if (error?.response?.status) {
+        status = error.response.status
+    }
+
     if (status === 401) {
         logoutCurrentUser();
         window.location.reload();

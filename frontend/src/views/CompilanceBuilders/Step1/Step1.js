@@ -26,7 +26,8 @@ import SelectFramewroksModal from "../modals/SelectFramewroksModal";
 
 // ** PNG Icons
 import infoIcon from "assets/img/info.png";
-import crgGoldenYellowLogo from "assets/img/crg-golden-yellow-logo.png";
+// import crgGoldenYellowLogo from "assets/img/crg-golden-yellow-logo.png";
+import saraAiIcon from "assets/img/sara-ai-icon.jpeg";
 
 // ** Styles
 import "./style.scss";
@@ -171,7 +172,7 @@ const Step1 = React.forwardRef((props, ref) => {
             <img
               alt="CRG"
               className="i-icon-img"
-              src={crgGoldenYellowLogo}
+              src={saraAiIcon}
               id={`ai-desc-tip-${keyVal}`}
               onClick={(event) => { event.stopPropagation(); handleGetAIDescription(item) }}
             />

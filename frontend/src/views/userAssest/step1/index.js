@@ -19,17 +19,15 @@ import * as Yup from "yup";
 
 import Select from "react-select";
 
-// ** Utils
-import { onImageSrcError } from 'utility/Utils';
+// ** Custom Components
+import SimpleSpinner from "components/spinner/simple-spinner";
+import AssessmentSidebar from "../sidebar";
 
 // ** Third Party Components
 import PhoneInput from 'react-phone-input-2';
 
 // ** Constant
-import { defaultLogo, businessType, AssessmentReport } from "utility/reduxConstant";
-
-// ** Logo
-import logo from "assets/img/react-logo.png";
+import { businessType, AssessmentReport } from "utility/reduxConstant";
 
 // ** Styles
 import 'react-phone-input-2/lib/style.css';
@@ -40,15 +38,12 @@ const CompanyInfoStep = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    
+
     // ** Store vars
     const dispatch = useDispatch();
     const assessmentReport = useSelector((state) => state.assessmentReport);
-    const settingStore = useSelector((state) => state.globalSetting);
-    
+
     // ** Const
-    const appSettingItem = settingStore?.appSettingItem || null;
-    const appLogo = appSettingItem?.logo || defaultLogo;
     const assessmentId = queryParams.get("id");
 
     const [asessmentReportValue, setAsessmentReportValue] = useState(AssessmentReport);
@@ -71,17 +66,23 @@ const CompanyInfoStep = () => {
     }
 
     useEffect(() => {
+        if (assessmentReport?.actionFlag) {
+            dispatch(cleanAssessmentReportMessage());
+        }
+
         if (assessmentReport?.actionFlag === "ASSMT_RPRT_CRTD_SCS" && assessmentReport?.addAssessmentReportItem?._id) {
             navigate(`/code-verification/${id}?id=${assessmentReport?.addAssessmentReportItem?._id}`)
-            dispatch(cleanAssessmentReportMessage());
         }
 
         if (assessmentReport?.actionFlag === "ASSMT_RPRT_UPDT_SCS" && assessmentReport?.assessmentReportItem?._id) {
-            navigate(`/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
-            dispatch(cleanAssessmentReportMessage());
+            if (assessmentReport?.assessmentReportItem?.email_verified) {
+                navigate(`/assessment-report/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
+            } else {
+                navigate(`/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
+            }
         }
 
-        if (assessmentReport?.actionFlag === "ASSESSMENT_REPORT_GET") {
+        if (assessmentReport?.actionFlag === "ASSMT_RPRT_ITM_SCS") {
             setAsessmentReportValue({
                 ...assessmentReport?.assessmentReportItem,
                 business_type: getbusinessTypeOption(
@@ -93,7 +94,6 @@ const CompanyInfoStep = () => {
 
     useEffect(() => {
         if (assessmentId) {
-            // setAsessmentReportValue()
             const query = { id: assessmentId };
             dispatch(getAssessmentReport(query));
         }
@@ -123,62 +123,10 @@ const CompanyInfoStep = () => {
 
     return (
         <div className="step-wise-content">
+            {!assessmentReport?.loading ? (<SimpleSpinner />) : null}
+
             <Row className="sticky--- m-0">
-                <Card className="main-progress col-md-3 mb-0">
-                    <div className="main-logo-img">
-                        <div className="logo">
-                            <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
-                        </div>
-                    </div>
-
-                    <div className="mb-0">
-                        <div className="steps-mains">
-                            <div className="steps active-class">
-                                <div className="borders step-line second-step">
-                                    <div className="step-icon">
-                                        <p>1</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Company Info</h4>
-                                </div>
-                            </div>
-
-                            <div className="steps">
-                                <div className="borders step-line">
-                                    <div className="step-icon ">
-                                        <p>2</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Verification</h4>
-                                </div>
-                            </div>
-
-                            <div className="steps">
-                                <div className="borders step-line">
-                                    <div className="step-icon ">
-                                        <p>3</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Self Assessment</h4>
-                                </div>
-                            </div>
-                            
-                            <div className="steps">
-                                <div className="borders">
-                                    <div className="step-icon">
-                                        <p>4</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Thank You</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <AssessmentSidebar activeStep={1} />
 
                 <Col className="right-side col-md-9">
                     <div className="card-header">
@@ -275,7 +223,7 @@ const CompanyInfoStep = () => {
                                                             placeholder="Select Business Type..."
                                                             value={values?.business_type}
                                                             options={businessType}
-                                                            onChange={(type) => setFieldValue("business_type", type) }
+                                                            onChange={(type) => setFieldValue("business_type", type)}
                                                         />
                                                     )}
                                                     {errors.business_type && touched.business_type && (

@@ -41,7 +41,8 @@ import Attachments from "./Attachments";
 import AIPromptWriteModal from "views/projects/models/AIPromptWriteModal";
 
 // ** PNG Icons
-import crgGoldenYellowLogo from "assets/img/crg-golden-yellow-logo.png";
+// import crgGoldenYellowLogo from "assets/img/crg-golden-yellow-logo.png";
+import saraAiIcon from "assets/img/sara-ai-icon.jpeg";
 
 const ProjectDetailsCard = (props) => {
   const navigate = useNavigate();
@@ -352,7 +353,7 @@ const ProjectDetailsCard = (props) => {
                         height={20}
                         title="Details"
                         className="cursor-pointer"
-                        src={crgGoldenYellowLogo}
+                        src={saraAiIcon}
                         onClick={() => handleOpenAIDecWriteModal("edit-dec")}
                       />
                     ) : null}

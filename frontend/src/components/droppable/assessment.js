@@ -81,7 +81,6 @@ const DroppableComp = ({
                                 onClick={() => navigate(`/admin/questions/add?assessmentId=${assessmentStore?.assessmentItem?._id}&sectionId=${item?.section_id}`)}
                               >
                                 Add Question
-                                {/* <TiPlus size={20}/> */}
                               </button>
                             </div>
                           </div>

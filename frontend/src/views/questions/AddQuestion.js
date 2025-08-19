@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
 import { createQuestion, cleanQuestionMessage } from "./store";
-import { getSectionList, cleanSectionMessage } from "views/section/store";
+import { getSectionList, cleanSectionMessage } from "../section/store";
 
 // ** Reactstrap Imports
 import { Card, CardBody, FormGroup, Label, FormFeedback } from "reactstrap";

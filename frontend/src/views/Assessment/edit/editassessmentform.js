@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux";
-import { cleanQuestionMessage } from "views/questions/store";
+import { cleanQuestionMessage } from "../../questions/store";
 import { getAssessment, updateAssessment, cleanAssessmentMessage } from "../store";
 
 // ** Reactstrap Imports

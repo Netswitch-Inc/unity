@@ -39,11 +39,8 @@ async function generatePdf(
       defaultViewport: null, // Set to null for full screen,
       // executablePath: "",
       // cacheDirectory: cacheDir,
-      cacheDirectory: pdfpath.join(
-        pdfpath.resolve("./"),
-        ".cache",
-        "puppeteer"
-      ),
+      cacheDirectory: puppeteer.executablePath(),
+      // cacheDirectory: pdfpath.join(pdfpath.resolve("./"), ".cache", "puppeteer"),
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",

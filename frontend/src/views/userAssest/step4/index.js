@@ -14,16 +14,13 @@ import { Card } from "reactstrap";
 import { Row, Col } from "react-bootstrap";
 
 // ** Utils
-import { setInnerHtml, htmlToString, onImageSrcError } from "utility/Utils";
+import { setInnerHtml, htmlToString } from "utility/Utils";
 
 // ** Custom Components
+import AssessmentSidebar from "../sidebar";
 import SimpleSpinner from "components/spinner/simple-spinner";
 
-// ** Constant
-import { defaultLogo } from 'utility/reduxConstant';
-
 // ** Icons
-import logo from "assets/img/react-logo.png";
 import thankYouImg from "assets/img/thankyouicon.svg";
 
 const ThankYou = () => {
@@ -35,12 +32,8 @@ const ThankYou = () => {
     // ** Store vars
     const dispatch = useDispatch();
     const assessmentReport = useSelector((state) => state.assessmentReport);
-    const settingStore = useSelector((state) => state.globalSetting);
     
     // ** Const
-    const appSettingItem = settingStore?.appSettingItem || null;
-    const appLogo = appSettingItem?.logo || defaultLogo;
-
     const assessmentReportId = queryParams.get("id");
     // const calculationPoint = location?.state?.aseesmentCalculation
 
@@ -134,61 +127,7 @@ const ThankYou = () => {
     return (
         <div className="step-wise-content vh-100">
             <Row className="sticky--- m-0 thank-you-sticky">
-                <Card className="main-progress col-md-3 mb-0">
-                    <div className="main-logo-img">
-                        <div className="logo">
-                            <img alt="..." src={appLogo} onError={(currentTarget) => onImageSrcError(currentTarget, logo)} />
-                        </div>
-                    </div>
-
-                    <div className="mb-0">
-                        <div className="steps-mains">
-                            <div className="steps filled-step">
-                                <div className="borders step-line second-step">
-                                    <div className="step-icon">
-                                        <p>1</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Company Info</h4>
-                                </div>
-                            </div>
-
-                            <div className="steps filled-step">
-                                <div className="borders step-line">
-                                    <div className="step-icon ">
-                                        <p>2</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Verification</h4>
-                                </div>
-                            </div>
-
-                            <div className="steps filled-step">
-                                <div className="borders step-line">
-                                    <div className="step-icon ">
-                                        <p>3</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Self Assessment</h4>
-                                </div>
-                            </div>
-
-                            <div className="steps active-class">
-                                <div className="borders">
-                                    <div className="step-icon">
-                                        <p>4</p>
-                                    </div>
-                                </div>
-                                <div className="step-name">
-                                    <h4>Thank You</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <AssessmentSidebar activeStep={4} step1Filled={true} step2Filled={true} step3Filled={true} />
 
                 <Col className="right-side thank-you">
                     <div className="card-header">

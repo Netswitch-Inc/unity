@@ -59,7 +59,7 @@ const App = () => {
             <Route path="/code-verification/:id" element={(<VarificationCode />)} />
 
 
-            <Route path="/asessment-report/:id" element={(<AsessmentReport />)} />
+            <Route path="/assessment-report/:id" element={(<AsessmentReport />)} />
 
             <Route path="/thank-you/:id" element={(<ThankYou />)} />
             {isAuthenticated && (
