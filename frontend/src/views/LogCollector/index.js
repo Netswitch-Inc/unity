@@ -18,7 +18,7 @@ const LogCollector = () => {
       pdfFileName: "Zeek_Log_Collector_Deployment_Guide.pdf",
     },
     {
-      name: "Unity Integration",
+      name: "UnityRI Integration",
       path: Zeek,
       pdfFileName: "Zeek_Log_Collector_Deployment_Guide.pdf",
     },

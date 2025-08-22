@@ -18,7 +18,7 @@ const SIEM = () => {
             pdfFileName: "Wazuh-Deployment-Guide.pdf",
         },
         {
-            name: "Unity Integration",
+            name: "UnityRI Integration",
             path: Wazuh,
             pdfFileName: "Wazuh-Deployment-Guide.pdf",
         },

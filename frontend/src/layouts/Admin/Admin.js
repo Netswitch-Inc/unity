@@ -33,7 +33,7 @@ const Admin = (props) => {
   const { error, menuRoutes } = useRoutesByRole();
 
   // ** Const
-  const companyName = defaultCompanyName || "";
+  const companyName = defaultCompanyName || "UnityRi";
   const companyUrl = defaultCompanyUrl || "";
 
   // ** Store vars
@@ -204,7 +204,7 @@ const Admin = (props) => {
                 logo={{
                   imgSrc: appSettingItem?.logo || defaultLogo,
                   outterLink: appSettingItem?.url || companyUrl,
-                  text: appSettingItem?.name || companyName || "Unity"
+                  text: appSettingItem?.name || companyName
                 }}
                 activeColor="blue"
                 closeSidebar={closeSidebar}

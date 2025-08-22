@@ -30,7 +30,7 @@ const ContactUsModal = ({
     const store = useSelector((state) => state.contact);
 
     // ** Const
-    const initContactSchema = { name: authUserItem?.name || "", email: authUserItem?.email || "", subject: `Unity Solution Inquiry`, message: "" }
+    const initContactSchema = { name: authUserItem?.name || "", email: authUserItem?.email || "", subject: `UnityRI Solution Inquiry`, message: "" }
 
     // ** States
     const [showSnackBar, setShowSnackbar] = useState(false);

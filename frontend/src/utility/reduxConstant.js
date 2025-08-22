@@ -7,7 +7,7 @@ import logo from "assets/img/react-logo.png";
 const hostRestApiUrl = process.env?.REACT_APP_BACKEND_REST_API_URL || "";
 const hostRestApiPrefix = process.env?.REACT_APP_BACKEND_REST_API_PREFIX || "";
 const isEmptyBlankDataDisplay = process.env?.REACT_APP_IS_EMPTY_BLANK_DATA_DISPLAY === "true" || false;
-const defaultCompanyName = getLocalAppSetting()?.name || process.env?.REACT_APP_COMPANY_NAME || "Unity";
+const defaultCompanyName = getLocalAppSetting()?.name || process.env?.REACT_APP_COMPANY_NAME || "UnityRi";
 const defaultCompanyUrl = getLocalAppSetting()?.url || process.env?.REACT_APP_COMPANY_URL || "";
 const defaultLogo = getLocalAppSetting()?.logo || logo;
 
