@@ -5,10 +5,10 @@ import bcIcon from "assets/img/toolIcons/bc.png";
 import biaIcon from "assets/img/toolIcons/bia.png";
 import caIcon from "assets/img/toolIcons/ca.png";
 import ciaIcon from "assets/img/toolIcons/cia.png";
-import ciIcon from "assets/img/toolIcons/ci.png";
-import criIcon from "assets/img/toolIcons/cri.png";
+// import ciIcon from "assets/img/toolIcons/ci.png";
+// import criIcon from "assets/img/toolIcons/cri.png";
 import cscIcon from "assets/img/toolIcons/csc.png";
-import ctIcon from "assets/img/toolIcons/ct.png";
+// import ctIcon from "assets/img/toolIcons/ct.png";
 import dlpIcon from "assets/img/toolIcons/dlp.png";
 import drmIcon from "assets/img/toolIcons/drm.png";
 import essIcon from "assets/img/toolIcons/ess.png";
@@ -18,7 +18,7 @@ import nbaIcon from "assets/img/toolIcons/nba.png";
 import nimIcon from "assets/img/toolIcons/nim.png";
 import peIcon from "assets/img/toolIcons/pe.png";
 import pentestIcon from "assets/img/toolIcons/pentest.png";
-import rbIcon from "assets/img/toolIcons/rb.png";
+// import rbIcon from "assets/img/toolIcons/rb.png";
 import saeIcon from "assets/img/toolIcons/sae.png";
 import siemIcon from "assets/img/toolIcons/siem.png";
 import socIcon from "assets/img/toolIcons/soc.png";
@@ -182,32 +182,32 @@ const solutionToolIcons = [
             { id: 3, name: "OpenVAS" }
         ]
     },
-    {
-        key: "compliance",
-        value: "Compliance",
-        icon: "CI",
-        source: ciIcon,
-        resilienceIndex: 46,
-        historicData: [59, 49, 31, 40, 60, 76, 42, 68, 28, 46],
-        description: "",
-        functions: [],
-        paid_tools: [],
-        os_tools: []
-    },
-    {
-        key: "cyber-risk-indicator",
-        value: "Cyber Risk Indicator",
-        icon: "CRI",
-        source: criIcon,
-        resilienceIndex: 39,
-        historicData: [69, 40, 36, 45, 68, 70, 48, 64, 24, 39],
-        description: "URI offers a dynamic dashboard that visualizes your cyber risk in an easy-to-understand format, making it accessible for both technical and non-technical stakeholders. It helps you prioritize security efforts, make informed decisions, and proactively mitigate risks before they become incidents.",
-        functions: [
-            { id: 1, name: "Data Visualization" }
-        ],
-        paid_tools: [],
-        os_tools: []
-    },
+    // {
+    //     key: "compliance",
+    //     value: "Compliance",
+    //     icon: "CI",
+    //     source: ciIcon,
+    //     resilienceIndex: 46,
+    //     historicData: [59, 49, 31, 40, 60, 76, 42, 68, 28, 46],
+    //     description: "",
+    //     functions: [],
+    //     paid_tools: [],
+    //     os_tools: []
+    // },
+    // {
+    //     key: "cyber-risk-indicator",
+    //     value: "Cyber Risk Indicator",
+    //     icon: "CRI",
+    //     source: criIcon,
+    //     resilienceIndex: 39,
+    //     historicData: [69, 40, 36, 45, 68, 70, 48, 64, 24, 39],
+    //     description: "URI offers a dynamic dashboard that visualizes your cyber risk in an easy-to-understand format, making it accessible for both technical and non-technical stakeholders. It helps you prioritize security efforts, make informed decisions, and proactively mitigate risks before they become incidents.",
+    //     functions: [
+    //         { id: 1, name: "Data Visualization" }
+    //     ],
+    //     paid_tools: [],
+    //     os_tools: []
+    // },
     {
         key: "critical-security-controls",
         value: "Critical Security Controls",
@@ -228,18 +228,18 @@ const solutionToolIcons = [
             { id: 3, name: "Security Onion" }
         ]
     },
-    {
-        key: "compliance-tethering",
-        value: "Compliance Tethering",
-        icon: "CT",
-        source: ctIcon,
-        resilienceIndex: 51,
-        historicData: [62, 49, 33, 40, 58, 76, 48, 65, 28, 51],
-        description: "CT is an innovative solution designed to help organizations evaluate governance standards to the technical telemetry from your organization's cybersecurity tools. This ensures that your compliance efforts are not only documented but also actively monitored and enforced through real-time data.",
-        functions: [],
-        paid_tools: [],
-        os_tools: []
-    },
+    // {
+    //     key: "compliance-tethering",
+    //     value: "Compliance Tethering",
+    //     icon: "CT",
+    //     source: ctIcon,
+    //     resilienceIndex: 51,
+    //     historicData: [62, 49, 33, 40, 58, 76, 48, 65, 28, 51],
+    //     description: "CT is an innovative solution designed to help organizations evaluate governance standards to the technical telemetry from your organization's cybersecurity tools. This ensures that your compliance efforts are not only documented but also actively monitored and enforced through real-time data.",
+    //     functions: [],
+    //     paid_tools: [],
+    //     os_tools: []
+    // },
     {
         key: "data-loss-prevention",
         value: "Data Loss Prevention",
@@ -458,18 +458,18 @@ const solutionToolIcons = [
             }
         ]
     },
-    {
-        key: "ransom-bloc",
-        value: "RansomBloc",
-        icon: "RB",
-        source: rbIcon,
-        resilienceIndex: 56,
-        historicData: [50, 22, 40, 46, 65, 70, 44, 63, 28, 56],
-        description: "RB integrates advanced tools and methodologies to provide robust ransomware protection",
-        functions: [],
-        paid_tools: [],
-        os_tools: []
-    },
+    // {
+    //     key: "ransom-bloc",
+    //     value: "RansomBloc",
+    //     icon: "RB",
+    //     source: rbIcon,
+    //     resilienceIndex: 56,
+    //     historicData: [50, 22, 40, 46, 65, 70, 44, 63, 28, 56],
+    //     description: "RB integrates advanced tools and methodologies to provide robust ransomware protection",
+    //     functions: [],
+    //     paid_tools: [],
+    //     os_tools: []
+    // },
     {
         key: "security-awareness-education",
         value: "Security Awareness Education",
