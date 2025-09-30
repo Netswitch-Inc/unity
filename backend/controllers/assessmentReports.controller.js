@@ -23,12 +23,7 @@ var fs = require("fs");
 let pdfpath = require("path");
 var pdfpathexistance = require("path").resolve("public");
 
-async function generatePdf(
-  html,
-  outputPath,
-  options = { format: "A4" },
-  userDetailsHtml
-) {
+async function generatePdf(html, outputPath, options = { format: "A4" }, userDetailsHtml) {
   try {
     const browser = await puppeteer.launch({
       timeout: 3000,
@@ -55,8 +50,7 @@ async function generatePdf(
 
     const page = await browser.newPage();
 
-    const combinedHtml = `
-    <html>
+    const combinedHtml = `<html>
     <head>
         <style>
             @media print {
@@ -71,8 +65,7 @@ async function generatePdf(
         <div class="page-break"></div>
         <div>${html}</div>
     </body>
-    </html>
-  `;
+    </html>`;
 
     // Set the user details HTML for the first page
     await page.setContent(combinedHtml, { waitUntil: "networkidle0" });
@@ -93,22 +86,12 @@ async function compressPdfFile(inputPath, outputPath) {
   await fs.promises.writeFile(outputPath, buffer);
 }
 
-const generateReport = async (
-  assessmentReport,
-  file_name,
-  assessmentUserReport
-) => {
+const generateReport = async (assessmentReport, file_name, assessmentUserReport) => {
   try {
     // Render the EJS template
-    const html = await ejs.renderFile(
-      `${reportpath}/views/assessment-form.ejs`,
-      { data: assessmentReport }
-    );
+    const html = await ejs.renderFile(`${reportpath}/views/assessment-form.ejs`, { data: assessmentReport });
 
-    const userDetailsHtml = await ejs.renderFile(
-      `${reportpath}/views/assessment-user-details.ejs`,
-      { data: assessmentUserReport }
-    );
+    const userDetailsHtml = await ejs.renderFile(`${reportpath}/views/assessment-user-details.ejs`, { data: assessmentUserReport });
 
     // Define output path for the PDF
     const outputPath = `public/files/assessment-report/${file_name}.pdf`;
@@ -138,12 +121,7 @@ const generateReport = async (
     };
 
     // Generate the PDF
-    const pdfGenerated = await generatePdf(
-      html,
-      outputPath,
-      options,
-      userDetailsHtml
-    );
+    const pdfGenerated = await generatePdf(html, outputPath, options, userDetailsHtml);
     if (pdfGenerated) {
       // Compress the PDF if generated successfully
       const inputPdfPath = outputPath; // Same as outputPath
@@ -173,6 +151,8 @@ exports.getAssessmentReports = async function (req, res, next) {
     if (search) {
       query["$or"] = [
         { name: { $regex: ".*" + search + ".*", $options: "i" } },
+        { first_name: { $regex: ".*" + search + ".*", $options: "i" } },
+        { last_name: { $regex: ".*" + search + ".*", $options: "i" } },
         { company_name: { $regex: ".*" + search + ".*", $options: "i" } },
         {
           operation_description: {
@@ -182,28 +162,17 @@ exports.getAssessmentReports = async function (req, res, next) {
         },
       ];
     }
+    
     if (req.query?.asessmentId) {
       query.assessment_id = req.query?.asessmentId;
     }
 
     var count = await AssessmentReportService.getAssessmentReportsCount(query);
-    var assessmentReports = await AssessmentReportService.getAssessmentReports(
-      query,
-      page,
-      limit,
-      sortColumn,
-      sort
-    );
+    var assessmentReports = await AssessmentReportService.getAssessmentReports(query, page, limit, sortColumn, sort);
     if (!assessmentReports || !assessmentReports.length) {
       if (Number(req.query?.page || 0) > 0) {
         page = 1;
-        assessmentReports = await AssessmentReportService.getAssessmentReports(
-          query,
-          page,
-          limit,
-          sortColumn,
-          sort
-        );
+        assessmentReports = await AssessmentReportService.getAssessmentReports(query, page, limit, sortColumn, sort);
       }
     }
 
@@ -265,22 +234,20 @@ exports.createAssessmentReport = async function (req, res, next) {
         message: "Assessment Id is required!",
       });
     }
+    
     const query = { assessment_id: assessment_id, status: 1 };
     // let mobileCode = generateCode();
     let emailCode = generateCode();
     let section_data = await sectionService.getSectionsByAssessmentId(query);
-    let assessmentData = await AssessmentService.getAssessmentOne(
-      assessment_id
-    );
-    // let group_data=
-    var createdAssessmentReport =
-      await AssessmentReportService.createAssessmentReport({
+    let assessmentData = await AssessmentService.getAssessmentOne(assessment_id);
+    var createdAssessmentReport = await AssessmentReportService.createAssessmentReport({
         ...req.body,
         email_code: emailCode,
         // mobile_code: mobileCode,
         group_data: section_data,
         assessment_data: assessmentData,
-      });
+    });
+    
     if (createdAssessmentReport) {
       let mailItem = {
         to: createdAssessmentReport?.email,
@@ -292,6 +259,7 @@ exports.createAssessmentReport = async function (req, res, next) {
 
       await sendPlatformTypeEmail(mailItem)
     }
+    
     return res.status(200).json({
       status: 200,
       flag: true,
@@ -311,8 +279,7 @@ exports.updateAssessmentReport = async function (req, res, next) {
   }
 
   try {
-    const getAssessmentReport =
-      await AssessmentReportService.getAssessmentReport(req.body._id);
+    const getAssessmentReport = await AssessmentReportService.getAssessmentReport(req.body._id);
     if (req.body?.email !== getAssessmentReport?.email) {
       req.body.email_code = generateCode();
       // req.body.mobile_code = generateCode();
@@ -340,8 +307,7 @@ exports.updateAssessmentReport = async function (req, res, next) {
     // }
 
     // Calling the Service function with the new object from the Request Body
-    var updatedAssessmentReport =
-      await AssessmentReportService.updateAssessmentReport(req.body);
+    var updatedAssessmentReport = await AssessmentReportService.updateAssessmentReport(req.body);
     return res.status(200).json({
       status: 200,
       flag: true,
@@ -434,20 +400,9 @@ exports.verifyAssessmentReport = async function (req, res, next) {
 exports.generateAssessmentReport = async function (req, res, next) {
   try {
     const { assessment_id, asessment_report_id } = req.body;
-    const assessmentReport = await AssessmentReportService.getAssessmentReport(
-      asessment_report_id
-    );
-    if (
-      !assessmentReport?.pdf_path ||
-      assessmentReport?.pdf_path === "" ||
-      !fs.existsSync(
-        pdfpathexistance + `/files/assessment-report/${asessment_report_id}.pdf`
-      )
-    ) {
-      let data = await QuestionService.getSectionsWithQuestionsAndAnswers(
-        assessment_id,
-        asessment_report_id
-      );
+    const assessmentReport = await AssessmentReportService.getAssessmentReport(asessment_report_id);
+    if (!assessmentReport?.pdf_path || assessmentReport?.pdf_path === "" || !fs.existsSync(pdfpathexistance + `/files/assessment-report/${asessment_report_id}.pdf`)) {
+      let data = await QuestionService.getSectionsWithQuestionsAndAnswers(assessment_id, asessment_report_id);
       const generatdPdf = await generateReport(
         data,
         asessment_report_id,
@@ -459,6 +414,7 @@ exports.generateAssessmentReport = async function (req, res, next) {
       };
       await AssessmentReportService.updateAssessmentReport(payload);
     }
+    
     return res.status(200).json({
       status: 200,
       flag: true,
@@ -475,20 +431,10 @@ exports.sentAttachmentReportViaEmail = async function (req, res, next) {
     const { assessment_id, assessment_report_id } = req.body;
 
     // Step 1: Retrieve the data for the assessment report
-    const assessmentReport = await AssessmentReportService.getAssessmentReport(
-      assessment_report_id
-    );
-    if (
-      !assessmentReport?.pdf_path ||
-      assessmentReport?.pdf_path === "" ||
-      !fs.existsSync(
-        `${pdfpathexistance}/files/assessment-report/${assessment_report_id}.pdf`
-      )
+    const assessmentReport = await AssessmentReportService.getAssessmentReport(assessment_report_id);
+    if (!assessmentReport?.pdf_path || assessmentReport?.pdf_path === "" || !fs.existsSync(`${pdfpathexistance}/files/assessment-report/${assessment_report_id}.pdf`)
     ) {
-      const data = await QuestionService.getSectionsWithQuestionsAndAnswers(
-        assessment_id,
-        assessment_report_id
-      );
+      const data = await QuestionService.getSectionsWithQuestionsAndAnswers(assessment_id, assessment_report_id);
       await generateReport(data, assessment_report_id, assessmentReport);
       const payload = {
         _id: assessment_report_id,
