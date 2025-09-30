@@ -161,7 +161,7 @@ const businessType = [
   { label: "Other", value: "other" }
 ]
 
-const AssessmentReport = { name: "", company_name: "", email: "", mobile: "", business_type: "", team_size: 0, operation_description: "", address1: "", address2: "", city: "", state: "", country: "", zipcode: "" }
+const AssessmentReport = { name: "", first_name: "", last_name: "", company_name: "", email: "", mobile: "", business_type: "", team_size: 0, operation_description: "", address1: "", address2: "", city: "", state: "", country: "", zipcode: "" }
 
 const OptionsForGraph = [
   { label: "Day", value: "day" },

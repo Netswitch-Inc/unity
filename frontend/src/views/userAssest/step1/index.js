@@ -17,7 +17,7 @@ import { Card, CardBody, FormGroup, FormFeedback } from "reactstrap";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
-import Select from "react-select";
+//import Select from "react-select";
 
 // ** Custom Components
 import SimpleSpinner from "components/spinner/simple-spinner";
@@ -50,10 +50,11 @@ const CompanyInfoStep = () => {
 
     // Define the validation schema
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required("Contact Name number is required."),
+        first_name: Yup.string().required("First Name is required."),
+        last_name: Yup.string().required("Last Name is required."),
         email: Yup.string().email("Invalid email format.")
             .required("Email is required."),
-        mobile: Yup.string().required("Mobile number is required.")
+        //mobile: Yup.string().required("Mobile number is required.")
     })
 
     const getbusinessTypeOption = (typeValue) => {
@@ -76,7 +77,8 @@ const CompanyInfoStep = () => {
 
         if (assessmentReport?.actionFlag === "ASSMT_RPRT_UPDT_SCS" && assessmentReport?.assessmentReportItem?._id) {
             if (assessmentReport?.assessmentReportItem?.email_verified) {
-                navigate(`/assessment-report/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
+                //navigate(`/assessment-report/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
+                navigate(`/thank-you/${id}?id=${assessmentId}`);
             } else {
                 navigate(`/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
             }
@@ -90,7 +92,7 @@ const CompanyInfoStep = () => {
                 ),
             });
         }
-    }, [assessmentReport, navigate, id, dispatch]);
+    }, [assessmentReport, navigate, assessmentId, id, dispatch]);
 
     useEffect(() => {
         if (assessmentId) {
@@ -107,6 +109,7 @@ const CompanyInfoStep = () => {
     const onSubmit = (values) => {
         const payload = {
             ...values,
+            name: `${values.first_name} ${values.last_name}`?.trim(),
             business_type: values.business_type.value,
             assessment_id: id,
         }
@@ -163,15 +166,30 @@ const CompanyInfoStep = () => {
 
                                             <Col xl={6} className="mb-3">
                                                 <FormGroup controlId="formGridCompanyName" className="mb-0">
-                                                    <label className="col-label form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>
+                                                    <label className="col-label form-label">First Name <span style={{ color: 'red' }}>*</span></label>
                                                     <Field
                                                         type="text"
-                                                        name="name"
+                                                        name="first_name"
                                                         className="col-input w-100"
-                                                        placeholder="Enter Contact Name"
+                                                        placeholder="Enter First Name"
                                                     />
-                                                    {errors.name && touched.name && (
-                                                        <FormFeedback className="d-block">{errors?.name}</FormFeedback>
+                                                    {errors.first_name && touched.first_name && (
+                                                        <FormFeedback className="d-block">{errors?.first_name}</FormFeedback>
+                                                    )}
+                                                </FormGroup>
+                                            </Col>
+                                            
+                                            <Col xl={6} className="mb-3">
+                                                <FormGroup controlId="formGridCompanyName" className="mb-0">
+                                                    <label className="col-label form-label">First Name <span style={{ color: 'red' }}>*</span></label>
+                                                    <Field
+                                                        type="text"
+                                                        name="last_name"
+                                                        className="col-input w-100"
+                                                        placeholder="Enter Last Name"
+                                                    />
+                                                    {errors.last_name && touched.last_name && (
+                                                        <FormFeedback className="d-block">{errors?.last_name}</FormFeedback>
                                                     )}
                                                 </FormGroup>
                                             </Col>
@@ -193,8 +211,7 @@ const CompanyInfoStep = () => {
 
                                             <Col xl={6} className="mb-3">
                                                 <FormGroup controlId="formGridContactNumber" className="mb-0 mobile-no country-drpdwn">
-                                                    <label className="col-label form-label">Mobile Number <span style={{ color: 'red' }}>*</span> </label>
-                                                    {/*  <Field type="text" name="mobile" className="col-input w-100" placeholder="Enter Contact Number" /> */}
+                                                    <label className="col-label form-label">Mobile Number</label>
                                                     <PhoneInput
                                                         autoComplete="off"
                                                         value={values.mobile}
@@ -212,131 +229,131 @@ const CompanyInfoStep = () => {
                                                 </FormGroup>
                                             </Col>
 
-                                            <Col xl={6} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Business Type</label>
-                                                    {businessType && (
-                                                        <Select
-                                                            name="business_type"
-                                                            className="react-select col-select w-100"
-                                                            classNamePrefix="react-select"
-                                                            placeholder="Select Business Type..."
-                                                            value={values?.business_type}
-                                                            options={businessType}
-                                                            onChange={(type) => setFieldValue("business_type", type)}
-                                                        />
-                                                    )}
-                                                    {errors.business_type && touched.business_type && (
-                                                        <FormFeedback className="d-block">{errors?.business_type}</FormFeedback>
-                                                    )}
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col xl={6} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Number of Employees</label>
-                                                    <Field
-                                                        type="number"
-                                                        name="team_size"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Number of Employees"
-                                                    />
-                                                    {errors.team_size && touched.team_size && (
-                                                        <FormFeedback className="d-block">{errors?.team_size}</FormFeedback>
-                                                    )}
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col xl={12} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Description of Operations</label>
-                                                    <Field
-                                                        as="textarea"
-                                                        type="textarea"
-                                                        name="operation_description"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Description of Operations"
-                                                    />
-                                                    {errors.operation_description && touched.operation_description && (
-                                                        <FormFeedback className="d-block">{errors?.operation_description}</FormFeedback>
-                                                    )}
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col xl={6} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Address 1</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="address1"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Address Line 1"
-                                                    />
-                                                    {errors.address1 && touched.address1 && (
-                                                        <FormFeedback className="d-block">{errors?.address1}</FormFeedback>
-                                                    )}
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col xl={6} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Address 2</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="address2"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Address Line 2"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col lg={6} xl={3} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">City</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="city"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter City"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col lg={6} xl={3} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">State</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="state"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter State"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col lg={6} xl={3} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Country</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="country"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Country"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-
-                                            <Col lg={6} xl={3} className="mb-3">
-                                                <FormGroup controlId="formGridContactNumber" className="mb-0">
-                                                    <label className="col-label form-label">Zipcode</label>
-                                                    <Field
-                                                        type="text"
-                                                        name="zipcode"
-                                                        className="col-input w-100"
-                                                        placeholder="Enter Zipcode"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
+                                            {/*<Col xl={6} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Business Type</label>*/}
+                                            {/*        {businessType && (*/}
+                                            {/*            <Select*/}
+                                            {/*                name="business_type"*/}
+                                            {/*                className="react-select col-select w-100"*/}
+                                            {/*                classNamePrefix="react-select"*/}
+                                            {/*                placeholder="Select Business Type..."*/}
+                                            {/*                value={values?.business_type}*/}
+                                            {/*                options={businessType}*/}
+                                            {/*                onChange={(type) => setFieldValue("business_type", type)}*/}
+                                            {/*            />*/}
+                                            {/*        )}*/}
+                                            {/*        {errors.business_type && touched.business_type && (*/}
+                                            {/*            <FormFeedback className="d-block">{errors?.business_type}</FormFeedback>*/}
+                                            {/*        )}*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col xl={6} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Number of Employees</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="number"*/}
+                                            {/*            name="team_size"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Number of Employees"*/}
+                                            {/*        />*/}
+                                            {/*        {errors.team_size && touched.team_size && (*/}
+                                            {/*            <FormFeedback className="d-block">{errors?.team_size}</FormFeedback>*/}
+                                            {/*        )}*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col xl={12} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Description of Operations</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            as="textarea"*/}
+                                            {/*            type="textarea"*/}
+                                            {/*            name="operation_description"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Description of Operations"*/}
+                                            {/*        />*/}
+                                            {/*        {errors.operation_description && touched.operation_description && (*/}
+                                            {/*            <FormFeedback className="d-block">{errors?.operation_description}</FormFeedback>*/}
+                                            {/*        )}*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col xl={6} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Address 1</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="address1"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Address Line 1"*/}
+                                            {/*        />*/}
+                                            {/*        {errors.address1 && touched.address1 && (*/}
+                                            {/*            <FormFeedback className="d-block">{errors?.address1}</FormFeedback>*/}
+                                            {/*        )}*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col xl={6} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Address 2</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="address2"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Address Line 2"*/}
+                                            {/*        />*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col lg={6} xl={3} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">City</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="city"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter City"*/}
+                                            {/*        />*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col lg={6} xl={3} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">State</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="state"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter State"*/}
+                                            {/*        />*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col lg={6} xl={3} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Country</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="country"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Country"*/}
+                                            {/*        />*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
+                                            
+                                            {/*<Col lg={6} xl={3} className="mb-3">*/}
+                                            {/*    <FormGroup controlId="formGridContactNumber" className="mb-0">*/}
+                                            {/*        <label className="col-label form-label">Zipcode</label>*/}
+                                            {/*        <Field*/}
+                                            {/*            type="text"*/}
+                                            {/*            name="zipcode"*/}
+                                            {/*            className="col-input w-100"*/}
+                                            {/*            placeholder="Enter Zipcode"*/}
+                                            {/*        />*/}
+                                            {/*    </FormGroup>*/}
+                                            {/*</Col>*/}
                                         </Row>
 
                                         <div className="buttons d-flex justify-content-end">

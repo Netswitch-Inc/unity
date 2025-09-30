@@ -47,7 +47,7 @@ exports.writeDescriptionWithGemini = async function (credentials = null, payload
         prompt = getReplaceValue('{TOOL_DESCRIPTION}', payload?.description || "", prompt);
         prompt = getReplaceValue('{KEYWORDS}', payload?.keywords || "", prompt);
 
-        let model = "gemini-1.5-flash";
+        let model = "gemini-2.5-flash";
         var headers = {
             "Content-Type": "application/json"
         }

@@ -4,6 +4,7 @@ package-lock.json
 /build
 .vscode
 .eslintcache
+.idea
 
 # NPM lock fils
 *-lock*.*

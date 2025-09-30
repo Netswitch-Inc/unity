@@ -75,26 +75,27 @@ const AssessmentSidebar = ({
                         </div>
                     </div>
 
-                    <div className={classnames("steps", {
-                        'active-class': activeStep === step3,
-                        'filled-step': step3Filled
-                    })}>
-                        <div className="borders step-line">
-                            <div className="step-icon ">
-                                <p>{step3}</p>
-                            </div>
-                        </div>
-                        <div className="step-name">
-                            <h4>Self Assessment</h4>
-                        </div>
-                    </div>
+                    {/*<div className={classnames("steps", {*/}
+                    {/*    'active-class': activeStep === step3,*/}
+                    {/*    'filled-step': step3Filled*/}
+                    {/*})}>*/}
+                    {/*    <div className="borders step-line">*/}
+                    {/*        <div className="step-icon ">*/}
+                    {/*            <p>{step3}</p>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="step-name">*/}
+                    {/*        <h4>Self Assessment</h4>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
 
                     <div className={classnames("steps", {
                         'active-class': activeStep === step4
                     })}>
                         <div className="borders">
                             <div className="step-icon">
-                                <p>{step4}</p>
+                                <p>{step3}</p>
+                                {/*<p>{step4}</p>*/}
                             </div>
                         </div>
                         <div className="step-name">

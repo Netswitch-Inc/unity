@@ -6,6 +6,8 @@ var AssessmentReportSchema = new mongoose.Schema({
   assessment_data: Object,
   group_data: Array,
   name: String,
+  first_name: String,
+  last_name: String,
   company_name: String,
   email: String,
   mobile: String,

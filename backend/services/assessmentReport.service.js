@@ -81,32 +81,20 @@ exports.getAssessmentReportOne = async function (id) {
 
 exports.createAssessmentReport = async function (assessmentReport) {
     var newAssessmentReport = new AssessmentReport({
-        assessment_id: assessmentReport.assessment_id
-            ? assessmentReport.assessment_id
-            : null,
-        assessment_data: assessmentReport.assessment_data
-            ? assessmentReport.assessment_data
-            : null,
-        group_data: assessmentReport.group_data
-            ? assessmentReport.group_data
-            : null,
+        assessment_id: assessmentReport.assessment_id ? assessmentReport.assessment_id : null,
+        assessment_data: assessmentReport.assessment_data ? assessmentReport.assessment_data : null,
+        group_data: assessmentReport.group_data ? assessmentReport.group_data : null,
         name: assessmentReport.name ? assessmentReport.name : "",
-        company_name: assessmentReport.company_name
-            ? assessmentReport.company_name
-            : "",
+        first_name: assessmentReport.first_name ? assessmentReport.first_name : "",
+        last_name: assessmentReport.last_name ? assessmentReport.last_name : "",
+        company_name: assessmentReport.company_name ? assessmentReport.company_name : "",
         email: assessmentReport.email ? assessmentReport.email : "",
         mobile: assessmentReport.mobile ? assessmentReport.mobile : "",
         email_code: assessmentReport.email_code ? assessmentReport.email_code : "",
-        mobile_code: assessmentReport.mobile_code
-            ? assessmentReport.mobile_code
-            : "",
-        business_type: assessmentReport.business_type
-            ? assessmentReport.business_type
-            : "",
+        mobile_code: assessmentReport.mobile_code ? assessmentReport.mobile_code : "",
+        business_type: assessmentReport.business_type ? assessmentReport.business_type : "",
         team_size: assessmentReport.team_size ? assessmentReport.team_size : 0,
-        operation_description: assessmentReport.operation_description
-            ? assessmentReport.operation_description
-            : "",
+        operation_description: assessmentReport.operation_description ? assessmentReport.operation_description : "",
         address1: assessmentReport.address1 ? assessmentReport.address1 : "",
         address2: assessmentReport.address2 ? assessmentReport.address2 : "",
         city: assessmentReport.city ? assessmentReport.city : "",
@@ -119,12 +107,8 @@ exports.createAssessmentReport = async function (assessmentReport) {
         invalid: assessmentReport.invalid ? assessmentReport.invalid : 0,
         pdf_path: assessmentReport.pdf_path ? assessmentReport.pdf_path : "",
         score: assessmentReport.score ? assessmentReport.score : 0,
-        email_verified: assessmentReport.email_verified
-            ? assessmentReport.email_verified
-            : false,
-        mobile_verified: assessmentReport.mobile_verified
-            ? assessmentReport.mobile_verified
-            : false,
+        email_verified: assessmentReport.email_verified ? assessmentReport.email_verified : false,
+        mobile_verified: assessmentReport.mobile_verified ? assessmentReport.mobile_verified : false,
         status: assessmentReport.status ? assessmentReport.status : 1,
         deletedAt: null,
     });
@@ -134,7 +118,7 @@ exports.createAssessmentReport = async function (assessmentReport) {
         var savedAssessmentReport = await newAssessmentReport.save();
         return savedAssessmentReport;
     } catch (e) {
-        // return a Error message describing the reason
+        // return an Error message describing the reason
         throw Error("Error occurred while creating Assessment Report");
     }
 };
@@ -150,9 +134,7 @@ exports.updateAssessmentReport = async function (assessmentReport) {
     }
 
     // If no old AssessmentReport Object exists return false
-    if (!oldAssessmentReport) {
-        return false;
-    }
+    if (!oldAssessmentReport) return false;
 
     // Edit the AssessmentReport Object
     if (assessmentReport.assessment_id) {
@@ -169,6 +151,14 @@ exports.updateAssessmentReport = async function (assessmentReport) {
 
     if (assessmentReport.name) {
         oldAssessmentReport.name = assessmentReport.name;
+    }
+    
+    if (assessmentReport.first_name) {
+        oldAssessmentReport.first_name = assessmentReport.first_name;
+    }
+    
+    if (assessmentReport.last_name) {
+        oldAssessmentReport.last_name = assessmentReport.last_name;
     }
 
     if (assessmentReport.company_name) {
@@ -200,8 +190,7 @@ exports.updateAssessmentReport = async function (assessmentReport) {
     }
 
     if (assessmentReport.operation_description) {
-        oldAssessmentReport.operation_description =
-            assessmentReport.operation_description;
+        oldAssessmentReport.operation_description = assessmentReport.operation_description;
     }
 
     if (assessmentReport.address1) {
@@ -248,20 +237,12 @@ exports.updateAssessmentReport = async function (assessmentReport) {
         oldAssessmentReport.score = assessmentReport?.score || 0;
     }
 
-    if (
-        assessmentReport?.email_verified ||
-        assessmentReport.email_verified == false
-    ) {
-        oldAssessmentReport.email_verified =
-            assessmentReport?.email_verified || false;
+    if (assessmentReport?.email_verified || assessmentReport.email_verified == false) {
+        oldAssessmentReport.email_verified = assessmentReport?.email_verified || false;
     }
 
-    if (
-        assessmentReport?.mobile_verified ||
-        assessmentReport.mobile_verified == false
-    ) {
-        oldAssessmentReport.mobile_verified =
-            assessmentReport?.mobile_verified || false;
+    if (assessmentReport?.mobile_verified || assessmentReport.mobile_verified == false) {
+        oldAssessmentReport.mobile_verified = assessmentReport?.mobile_verified || false;
     }
 
     if (assessmentReport?.status || assessmentReport.status == 0) {
@@ -271,6 +252,7 @@ exports.updateAssessmentReport = async function (assessmentReport) {
     if (assessmentReport?.deletedAt) {
         oldAssessmentReport.deletedAt = assessmentReport.deletedAt;
     }
+    
     if (assessmentReport?.pdf_path) {
         oldAssessmentReport.pdf_path = assessmentReport.pdf_path;
     }
