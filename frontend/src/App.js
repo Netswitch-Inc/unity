@@ -14,8 +14,8 @@ import ResetPassword from "views/forgotpassowrd/Resetpassword";
 import CompanyInfoStep from "views/userAssest/step1";
 import VarificationCode from "views/userAssest/step2";
 import AsessmentReport from "views/userAssest/step3";
-//import ThankYou from "views/userAssest/step4/index";
-import ThankYou from "views/userAssest/step4/thank-you";
+import ThankYou from "views/userAssest/step4/index";
+//import ThankYou from "views/userAssest/step4/thank-you";
 
 const App = () => {
     // ** Hooks

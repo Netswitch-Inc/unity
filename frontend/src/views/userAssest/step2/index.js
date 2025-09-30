@@ -67,8 +67,8 @@ const VarificationCode = () => {
         }
 
         if (assessmentReport?.actionFlag === "CD_VRFYD_SCS") {
-            //navigate(`/assessment-report/${id}?id=${assessmentId}`);
-            navigate(`/thank-you/${id}?id=${assessmentId}`);
+            navigate(`/assessment-report/${id}?id=${assessmentId}`);
+            //navigate(`/thank-you/${id}?id=${assessmentId}`);
         }
 
         if (assessmentReport?.success) {

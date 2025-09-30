@@ -77,8 +77,8 @@ const CompanyInfoStep = () => {
 
         if (assessmentReport?.actionFlag === "ASSMT_RPRT_UPDT_SCS" && assessmentReport?.assessmentReportItem?._id) {
             if (assessmentReport?.assessmentReportItem?.email_verified) {
-                //navigate(`/assessment-report/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
-                navigate(`/thank-you/${id}?id=${assessmentId}`);
+                navigate(`/assessment-report/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
+                //navigate(`/thank-you/${id}?id=${assessmentId}`);
             } else {
                 navigate(`/code-verification/${id}?id=${assessmentReport?.assessmentReportItem?._id}`);
             }
