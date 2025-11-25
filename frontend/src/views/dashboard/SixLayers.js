@@ -267,7 +267,7 @@ const Sixlayers = ({
                 <path
                   d="M307.143,132.806,207.083,212.85l-23.414-54.013Z"
                   transform="translate(-36.08 -121.6)"
-                  fill={selectColor("Defence")}
+                  fill={selectColor("Defense")}
                   stroke={isEmptyBlankDataDisplay ? "white" : "none"}
                   strokeWidth={isEmptyBlankDataDisplay ? 2 : 0}
                 />
