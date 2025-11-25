@@ -181,7 +181,7 @@ const CompanyInfoStep = () => {
                                             
                                             <Col xl={6} className="mb-3">
                                                 <FormGroup controlId="formGridCompanyName" className="mb-0">
-                                                    <label className="col-label form-label">First Name <span style={{ color: 'red' }}>*</span></label>
+                                                    <label className="col-label form-label">Last Name <span style={{ color: 'red' }}>*</span></label>
                                                     <Field
                                                         type="text"
                                                         name="last_name"
