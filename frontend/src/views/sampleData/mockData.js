@@ -1713,7 +1713,7 @@ export const SixlayerData = {
         },
         {
             "id": 1,
-            "Cat": "Defence",
+            "Cat": "Defense",
             "Percent": 15,
             "labelTransform": "translate(119 111)",
             "valueLabel": "translate(209.087 183.555)"

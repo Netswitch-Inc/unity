@@ -40,7 +40,7 @@ const PermissionView = (props) => {
                     <li>
                         <div className='d-flex align-items-center mb-0'>
                             <span onClick={ShownDefenceChild} className="check-box-permission"> <p>{`${isShownDefenceChild ? "-" : "+"}`}  </p></span>
-                            <label className="mb-0" title="Defence" htmlFor="Defence">Defence</label>
+                            <label className="mb-0" title="Defense" htmlFor="Defence">Defense</label>
                         </div>
 
                         {isShownDefenceChild && (
