@@ -92,8 +92,8 @@ import {
   eventLogPermissionId,
 
   discoveryGroupPermissionId,
-  sectionsPermissionId,
-  questionsPermissionId,
+  // sectionsPermissionId,
+  // questionsPermissionId,
   assessmentFormsPermissionId,
 
   governanceGroupPermissionId,
@@ -144,7 +144,7 @@ const routes = [
         mini: "SE",
         layout: "/admin",
         component: (<AddSection />),
-        permissionId: sectionsPermissionId,
+        permissionId: assessmentFormsPermissionId,
         redirect: true
       },
       {
@@ -153,7 +153,7 @@ const routes = [
         mini: "SE",
         layout: "/admin",
         component: (<EditSection />),
-        permissionId: sectionsPermissionId,
+        permissionId: assessmentFormsPermissionId,
         redirect: true
       },
       {
@@ -163,7 +163,7 @@ const routes = [
         layout: "/admin",
         customClass: "d-none",
         component: (<SectionsList />),
-        permissionId: sectionsPermissionId
+        permissionId: assessmentFormsPermissionId
       },
       {
         path: "/questions/add",
@@ -171,7 +171,7 @@ const routes = [
         mini: "QE",
         layout: "/admin",
         component: (<AddQuestion />),
-        permissionId: questionsPermissionId,
+        permissionId: assessmentFormsPermissionId,
         redirect: true
       },
       {
@@ -180,7 +180,7 @@ const routes = [
         mini: "QE",
         layout: "/admin",
         component: (<EditQuestion />),
-        permissionId: questionsPermissionId,
+        permissionId: assessmentFormsPermissionId,
         redirect: true
       },
       {
@@ -190,7 +190,7 @@ const routes = [
         layout: "/admin",
         customClass: "d-none",
         component: (<QuestionsList />),
-        permissionId: questionsPermissionId
+        permissionId: assessmentFormsPermissionId
       },
       {
         path: "/assessment-forms/detail/:id",
