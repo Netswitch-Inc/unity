@@ -145,7 +145,11 @@ const EditProject = () => {
       const involvedPartiesArr =
         store.projectItem?.involved_parties?.length > 0 &&
         store.projectItem?.involved_parties?.map((involved) => {
-          return { label: involved?.user_name, value: involved?._id };
+          return {
+            // label: involved?.user_name,
+            label: `${`${involved?.first_name} ${involved?.last_name}`?.trim()} ${involved?.role_id?.name ? `(${involved?.role_id?.name})` : ""}`,
+            value: involved?._id
+          };
         });
       if (authUser?.role_id?._id === superAdminRole) {
         setCompanyVal({
@@ -202,7 +206,8 @@ const EditProject = () => {
     }
     if (userStore?.userItems?.length > 0) {
       const list = userStore?.userItems?.map((item) => ({
-        label: item?.user_name,
+        // label: item?.user_name,
+        label: `${`${item?.first_name} ${item?.last_name}`?.trim()} ${item?.role_id?.name ? `(${item?.role_id?.name})` : ""}`,
         value: item?._id,
       }));
       setInvolvedParties(() => list);

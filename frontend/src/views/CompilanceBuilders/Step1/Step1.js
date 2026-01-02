@@ -23,6 +23,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 // ** Modals
 import SelectFramewroksModal from "../modals/SelectFramewroksModal";
+import CompliancePrioritiesList from "../modals/CompliancePrioritiesList";
 
 // ** PNG Icons
 import infoIcon from "assets/img/info.png";
@@ -50,6 +51,7 @@ const Step1 = React.forwardRef((props, ref) => {
 
   // ** States
   const [modalOpen, setModalOpen] = useState(false)
+  const [openSvdPriority, setOpenSvdPriority] = useState(false);
   const [currentStep] = useState(1)
   const [compliance, setCompliance] = useState([])
   const [tiles, setTiles] = useState([]);
@@ -64,6 +66,14 @@ const Step1 = React.forwardRef((props, ref) => {
 
   const closeModal = () => {
     setModalOpen(false)
+  }
+
+  const openSvdPriorityModal = () => {
+    setOpenSvdPriority(true);
+  }
+
+  const closeSvdPriority = () => {
+    setOpenSvdPriority(false);
   }
 
   useEffect(() => {
@@ -406,11 +416,28 @@ const Step1 = React.forwardRef((props, ref) => {
     })
   }
 
+  const hasCompliancePriorities = companyComplianceControls?.companyComplianceControlData?.compliancePriorities?.length > 0 ? true : false;
   return (<>
     <div className="text-center buttons mt-3">
-      <button type="button" className="btnprimary" onClick={() => openModal()}>
+      <button
+        type="button"
+        onClick={() => openModal()}
+        className={classnames("btnprimary", {
+          "mr-2": hasCompliancePriorities
+        })}
+      >
         Select Framework
       </button>
+
+      {hasCompliancePriorities ? (
+        <button
+          type="button"
+          className="btnprimary ms-2"
+          onClick={() => openSvdPriorityModal()}
+        >
+          Saved Priorities
+        </button>
+      ): null}
     </div>
 
     <Row className="justify-content-center mt-3">
@@ -478,6 +505,12 @@ const Step1 = React.forwardRef((props, ref) => {
       handleSetTiles={handleSetTiles}
       frameworkItems={store?.frameworkItems}
       updateComplianceTiles={updateComplianceTiles}
+    />
+
+    <CompliancePrioritiesList
+      open={openSvdPriority}
+      closeModal={closeSvdPriority}
+      compliancePriorities={companyComplianceControls?.companyComplianceControlData?.compliancePriorities || []}
     />
   </>)
 })

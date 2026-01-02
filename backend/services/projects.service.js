@@ -64,7 +64,12 @@ exports.getProject = async function (id) {
       .populate({ path: "company_id" })
       .populate({ path: "user_id" })
       .populate({ path: "framework_id" })
-      .populate({ path: "involved_parties" })
+      .populate({
+        path: "involved_parties",
+        populate: {
+          path: "role_id"
+        }
+      })
       .populate({ path: "submitted_by" })
       .populate({ path: "company_compliance_control_id" })
       .populate({ path: "users_ai_description.user_id" });

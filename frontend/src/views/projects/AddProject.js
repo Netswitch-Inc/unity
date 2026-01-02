@@ -144,7 +144,8 @@ const AddProject = () => {
 
     if (userStore?.userItems?.length > 0) {
       const list = userStore?.userItems?.map((item) => ({
-        label: item?.user_name,
+        // label: item?.user_name,
+        label: `${`${item?.first_name} ${item?.last_name}`?.trim()} ${item?.role_id?.name ? `(${item?.role_id?.name})` : ""}`,
         value: item?._id
       }))
 

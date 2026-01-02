@@ -66,7 +66,9 @@ const ProjectDetailsCard = (props) => {
   const currentUserIsAdmin = (authUserItem?.role_id?.priviledge === adminPriviledgeType) || false;
 
   const frameworks = riskData.framework_id?.map((framework) => framework?.label)
-  const InvolvedParties = riskData.involved_parties?.map((party) => party?.user_name)
+  const InvolvedParties = riskData.involved_parties?.map((party) => {
+    return `${`${party?.first_name} ${party?.last_name}`?.trim()} ${party?.role_id?.name ? `(${party?.role_id?.name})` : ""}`
+  })
 
   const [likelihood, setLikelihood] = useState(riskData?.likelyhood || 0);
   const [impactAssessment, setImpactAssessment] = useState(riskData?.impact_assessment || 0)
