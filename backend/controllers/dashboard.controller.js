@@ -292,7 +292,7 @@ exports.openVASScanReportStatsGraphData = async function (req, res, next) {
         startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
         break;
       case "year":
-        dateFormat = "%m-%Y";
+        dateFormat = "%Y-%m";
         startTime = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // Last 1 year
         break;
       default:
