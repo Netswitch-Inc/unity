@@ -36,7 +36,7 @@ const Sixlayers = ({
   return (<>
     <CardHeader>
       {/* <ExportPdf className="d-flex justify-content-end" /> */}
-      <CardTitle tag="h3">Defense in depth overview</CardTitle>
+      <CardTitle tag="h3">Defense in Depth Overview</CardTitle>
     </CardHeader>
     <CardBody>
       <svg
